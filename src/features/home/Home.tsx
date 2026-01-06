@@ -63,21 +63,7 @@ export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
           <span style={{ fontSize: '0.9rem', color: 'var(--color-text-sub)' }}>今日もがんばろう！</span>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-             {/* DEBUG BUTTON: Reset Day */}
-            <button 
-                onClick={() => {
-                    const confirm = window.confirm('【デバッグ用】1日の回数をリセットしますか？');
-                    if(confirm) {
-                         const today = new Date().toISOString().split('T')[0];
-                         const updatedUser = { ...user, dailyGachaCount: 0, lastPlayedDate: today };
-                         updateUser(updatedUser);
-                         alert('リセットしました！');
-                    }
-                }} 
-                style={{ padding: '0.5rem', background: '#ffcccc', borderRadius: '4px', fontSize: '0.8rem', border: '1px solid red', color: 'red', fontWeight: 'bold' }}
-            >
-             Reset(Debug)
-            </button>
+
             <button onClick={onOpenSettings} style={{ padding: '0.5rem', background: 'var(--color-surface)', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
                  ⚙️
             </button>

@@ -25,6 +25,7 @@ export interface GameSettings {
   coinRewards: {
     [key in Difficulty]: number; // Average reward
   };
+  parentPasscode?: string;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -35,4 +36,5 @@ export const DEFAULT_SETTINGS: GameSettings = {
     normal: 22,
     hard: 30,
   },
+  parentPasscode: '0000', // Default
 };

@@ -8,34 +8,43 @@ interface SettingsProps {
 }
 
 export const Settings = ({ onBack }: SettingsProps) => {
-  const { settings, updateSettings } = useGame();
+  const { user, settings, updateSettings, updateUser } = useGame();
   
   // Local state for form
   const [localSettings, setLocalSettings] = useState(settings);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [gateAnswer, setGateAnswer] = useState('');
-  const [gateQuestion, setGateQuestion] = useState({ a: 0, b: 0 });
+  const [passwordInput, setPasswordInput] = useState('');
+  
+  // New: Current monthly coin editor
+  const [currentMonthlyCoins, setCurrentMonthlyCoins] = useState(user?.monthlyCoins || 0);
 
-  // Generate math question on mount
+  // Sync state when user/settings change (if needed, mainly init)
   useEffect(() => {
-    setGateQuestion({
-        a: Math.floor(Math.random() * 8) + 2, // 2-9
-        b: Math.floor(Math.random() * 8) + 2  // 2-9
-    });
-  }, []);
+      setLocalSettings(settings);
+      if (user) setCurrentMonthlyCoins(user.monthlyCoins);
+  }, [settings, user]);
+
+
 
   const handleGateSubmit = () => {
-      const ans = parseInt(gateAnswer);
-      if (ans === gateQuestion.a * gateQuestion.b) {
+      // Check password (default '0000' or saved)
+      const correct = settings.parentPasscode || '0000';
+      if (passwordInput === correct) {
           setIsUnlocked(true);
       } else {
-          alert('不正解です');
-          setGateAnswer('');
+          alert('パスワードがちがいます');
+          setPasswordInput('');
       }
   };
 
   const handleSave = () => {
       updateSettings(localSettings);
+      
+      // Update coins if changed
+      if (user && user.monthlyCoins !== currentMonthlyCoins) {
+          updateUser({ ...user, monthlyCoins: currentMonthlyCoins });
+      }
+
       alert('設定を保存しました');
       onBack();
   };
@@ -54,17 +63,16 @@ export const Settings = ({ onBack }: SettingsProps) => {
                   <LucideLock size={48} color="var(--color-text-sub)" style={{ marginBottom: '1rem' }}/>
                   <h2 style={{ marginBottom: '1rem' }}>保護者確認</h2>
                   <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-sub)' }}>
-                      設定画面に進むには、以下の計算の答えを入力してください。
+                      パスワードを入力してください (初期: 0000)
                   </p>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-                      {gateQuestion.a} × {gateQuestion.b} = ?
-                  </div>
+                  
                   <input 
-                    type="number" 
-                    value={gateAnswer}
-                    onChange={(e) => setGateAnswer(e.target.value)}
+                    type="password" 
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
                     className="input-base"
-                    style={{ textAlign: 'center', fontSize: '1.2rem', padding: '0.5rem', width: '100px', marginBottom: '1rem', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                    placeholder="Password"
+                    style={{ textAlign: 'center', fontSize: '1.2rem', padding: '0.5rem', width: '200px', marginBottom: '1rem', border: '1px solid #cbd5e1', borderRadius: '4px' }}
                   />
                   <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button onClick={onBack} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid #cbd5e1', borderRadius: '4px' }}>
@@ -165,6 +173,49 @@ export const Settings = ({ onBack }: SettingsProps) => {
                             onClick={() => setLocalSettings({...localSettings, maxDailyGacha: Math.min(10, localSettings.maxDailyGacha + 1)})}
                             style={{ padding: '0.2rem 0.8rem', background: '#e2e8f0', border: 'none', borderRadius: '4px' }}
                         >+</button>
+                  </div>
+              </div>
+          </section>
+
+          {/* New: Protection Settings and Coin Editor */}
+           <section className="glass-panel" style={{ padding: '1.5rem', background: 'white' }}>
+              <h3 style={{ borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
+                  管理機能
+              </h3>
+
+               {/* Password Change */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>保護者パスワード変更</label>
+                  <input 
+                    type="text" 
+                    value={localSettings.parentPasscode || ''}
+                    onChange={(e) => setLocalSettings({ ...localSettings, parentPasscode: e.target.value })}
+                    placeholder="新しいパスワード"
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                  />
+              </div>
+
+               {/* Monthly Coin Editor */}
+               <div style={{ marginBottom: '1rem' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label style={{ fontWeight: 'bold' }}>今月のコイン獲得数 (手動補正)</label>
+                    <span style={{ fontSize: '0.8rem', color: '#666' }}>※現在値: {user?.monthlyCoins}</span>
+                   </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                         onClick={() => setCurrentMonthlyCoins(Math.max(0, currentMonthlyCoins - 10))}
+                         style={{ padding: '0.5rem', background: '#e2e8f0', border: 'none', borderRadius: '4px' }}
+                     >-10</button>
+                    <input 
+                        type="number" 
+                        value={currentMonthlyCoins}
+                        onChange={(e) => setCurrentMonthlyCoins(parseInt(e.target.value) || 0)}
+                        style={{ flex: 1, padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px', textAlign: 'center' }}
+                    />
+                     <button 
+                         onClick={() => setCurrentMonthlyCoins(currentMonthlyCoins + 10)}
+                         style={{ padding: '0.5rem', background: '#e2e8f0', border: 'none', borderRadius: '4px' }}
+                     >+10</button>
                   </div>
               </div>
           </section>

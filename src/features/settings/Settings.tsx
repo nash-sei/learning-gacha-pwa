@@ -268,6 +268,10 @@ export const Settings = ({ onBack }: SettingsProps) => {
           >
               <LucideSave size={24} /> 設定を保存する
           </button>
+          
+          <div style={{ textAlign: 'center', marginTop: '1rem', color: '#94a3b8', fontSize: '0.8rem' }}>
+              App Version: 0.1.0
+          </div>
       </div>
     </div>
   );

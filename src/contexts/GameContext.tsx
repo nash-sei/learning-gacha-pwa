@@ -14,6 +14,9 @@ interface GameContextType {
   updateUser: (user: User) => void;
   updateSettings: (settings: GameSettings) => void;
   resetDaily: () => void; // Check if day changed
+  customQuestions: any[];
+  addCustomQuestions: (questions: any[]) => void;
+  clearCustomQuestions: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -64,6 +67,36 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSettings(newSettings);
       storage.saveSettings(newSettings); // Ensure storage.ts has saveSettings
   };
+
+  const [customQuestions, setCustomQuestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load custom questions
+    const loadedQuestions = localStorage.getItem('learning_gacha_custom_questions');
+    if (loadedQuestions) {
+        try {
+            setCustomQuestions(JSON.parse(loadedQuestions));
+        } catch (e) {
+            console.error("Failed to parse custom questions", e);
+        }
+    }
+  }, []);
+
+  const addCustomQuestions = (newQuestions: any[]) => {
+      // Logic to merge and prevent duplicates could ideally be here, 
+      // but users might want to overwrite. For now, we append but filter by exact ID match if IDs provided.
+      // Or simply simple append.
+      // Let's go with: Append new ones.
+      
+      const updated = [...customQuestions, ...newQuestions];
+      setCustomQuestions(updated);
+      localStorage.setItem('learning_gacha_custom_questions', JSON.stringify(updated));
+  };
+
+  const clearCustomQuestions = () => {
+      setCustomQuestions([]);
+      localStorage.removeItem('learning_gacha_custom_questions');
+  }
   
   const resetDaily = () => {
       // Manual trigger if needed, mostly handled in useEffect
@@ -76,7 +109,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <GameContext.Provider value={{ user, settings, createUser, updateUser, updateSettings, resetDaily }}>
+    <GameContext.Provider value={{ user, settings, createUser, updateUser, updateSettings, resetDaily, customQuestions, addCustomQuestions, clearCustomQuestions } as any}>
       {children}
     </GameContext.Provider>
   );

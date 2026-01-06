@@ -3,7 +3,7 @@ import { useGame } from '../../contexts/GameContext';
 import { LucideTrophy, LucideCoins, LucidePlay } from 'lucide-react';
 
 export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
-  const { user, createUser } = useGame();
+  const { user, createUser, settings } = useGame();
   const [nameInput, setNameInput] = useState('');
 
   if (!user) {
@@ -75,7 +75,10 @@ export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
         <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           <LucideCoins size={32} color="var(--color-accent)" />
           <span style={{ fontSize: '0.9rem', color: 'var(--color-text-sub)' }}>今月のコイン</span>
-          <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{user.monthlyCoins} / 1000</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{user.monthlyCoins}</span>
+             <span style={{ fontSize: '1rem', color: '#94a3b8' }}>/ {settings?.maxMonthlyCoins || 1000}</span>
+          </div>
         </div>
         <div 
             onClick={onOpenZukan}

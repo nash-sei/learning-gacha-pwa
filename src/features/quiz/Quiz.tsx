@@ -11,7 +11,10 @@ interface QuizProps {
   initialDifficulty?: Difficulty;
 }
 
+import { useGame } from '../../contexts/GameContext'; // Import context
+
 export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }: QuizProps) => {
+  const { customQuestions } = useGame(); // Get custom questions
   const [phase, setPhase] = useState<'difficulty' | 'playing' | 'result'>('difficulty');
   // If extra mode, skip difficulty selection
   if (mode === 'extra' && phase === 'difficulty') {
@@ -29,7 +32,7 @@ export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }:
   const startQuiz = (diff: Difficulty) => {
     // Extra Stage = 1 Question (Boss)
     const count = mode === 'extra' ? 1 : (diff === 'easy' ? 3 : diff === 'normal' ? 4 : 5);
-    const qs = getQuestions(diff, count);
+    const qs = getQuestions(diff, count, customQuestions); // Pass custom questions (3rd arg)
     setDifficulty(diff);
     setQuestions(qs);
     setPhase('playing');

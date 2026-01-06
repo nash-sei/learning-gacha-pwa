@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { LucideArrowLeft, LucideLock, LucideSave, LucideTrash2 } from 'lucide-react';
 import type { Difficulty } from '../../types';
+import Papa from 'papaparse';
 
 interface SettingsProps {
   onBack: () => void;
 }
 
 export const Settings = ({ onBack }: SettingsProps) => {
-  const { user, settings, updateSettings, updateUser } = useGame();
+  const { user, settings, updateSettings, updateUser, addCustomQuestions, clearCustomQuestions, customQuestions } = useGame() as any;
   
   // Local state for form
   const [localSettings, setLocalSettings] = useState(settings);
@@ -54,6 +55,43 @@ export const Settings = ({ onBack }: SettingsProps) => {
           localStorage.clear();
           window.location.reload();
       }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: false,
+      complete: (results: any) => {
+        const newQuestions: any[] = [];
+        results.data.forEach((row: any[], index: number) => {
+            if (row.length >= 5) {
+                const q = {
+                    id: `custom_${Date.now()}_${index}`,
+                    type: row[0] || 'choice',
+                    difficulty: row[1] || 'normal',
+                    category: row[2] || 'other',
+                    text: row[3],
+                    answer: row[4],
+                    choices: row.slice(5).filter((c: any) => c && c.trim() !== '')
+                };
+                newQuestions.push(q);
+            }
+        });
+        
+        if (newQuestions.length > 0) {
+            addCustomQuestions(newQuestions);
+            alert(`${newQuestions.length}問 追加しました！`);
+        } else {
+            alert('有効な問題が見つかりませんでした。フォーマットを確認してください。');
+        }
+      },
+      error: (error: any) => {
+          console.error(error);
+          alert('ファイルの読み込みに失敗しました');
+      }
+    });
   };
 
   if (!isUnlocked) {
@@ -177,7 +215,7 @@ export const Settings = ({ onBack }: SettingsProps) => {
               </div>
           </section>
 
-          {/* New: Protection Settings and Coin Editor */}
+
            <section className="glass-panel" style={{ padding: '1.5rem', background: 'white' }}>
               <h3 style={{ borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
                   管理機能
@@ -194,11 +232,36 @@ export const Settings = ({ onBack }: SettingsProps) => {
                     style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
                   />
               </div>
+              
+               {/* Monthly Coin Goal */}
+               <div style={{ marginBottom: '1.5rem' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label style={{ fontWeight: 'bold' }}>今月の目標コイン枚数</label>
+                    <span style={{ fontWeight: 'bold' }}>{localSettings.maxMonthlyCoins || 1000}枚</span>
+                   </div>
+                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                       {[1000, 2000, 3000, 5000].map(val => (
+                           <button
+                             key={val}
+                             onClick={() => setLocalSettings({ ...localSettings, maxMonthlyCoins: val })}
+                             style={{
+                                 padding: '0.5rem 1rem',
+                                 background: localSettings.maxMonthlyCoins === val ? 'var(--color-primary)' : '#e2e8f0',
+                                 color: localSettings.maxMonthlyCoins === val ? 'white' : 'black',
+                                 border: 'none', 
+                                 borderRadius: '4px'
+                             }}
+                           >
+                               {val}
+                           </button>
+                       ))}
+                   </div>
+               </div>
 
                {/* Monthly Coin Editor */}
-               <div style={{ marginBottom: '1rem' }}>
+               <div style={{ marginBottom: '1.5rem' }}>
                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <label style={{ fontWeight: 'bold' }}>今月のコイン獲得数 (手動補正)</label>
+                    <label style={{ fontWeight: 'bold' }}>現在の獲得コイン数 (手動補正)</label>
                     <span style={{ fontSize: '0.8rem', color: '#666' }}>※現在値: {user?.monthlyCoins}</span>
                    </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -217,6 +280,36 @@ export const Settings = ({ onBack }: SettingsProps) => {
                          style={{ padding: '0.5rem', background: '#e2e8f0', border: 'none', borderRadius: '4px' }}
                      >+10</button>
                   </div>
+              </div>
+              
+              {/* Question Import */}
+              <div style={{ marginBottom: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>問題の追加 (CSV)</label>
+                  <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' }}>
+                      形式: type, difficulty, category, text, answer, choices...<br/>
+                      例: choice, normal, math, 1+1=?, 2, 1, 2, 3
+                  </p>
+                  <input 
+                    type="file" 
+                    accept=".csv,.txt"
+                    onChange={handleFileUpload}
+                    style={{ marginBottom: '1rem' }}
+                  />
+                  {customQuestions?.length > 0 && (
+                      <div style={{ padding: '1rem', background: '#f0f9ff', borderRadius: '4px' }}>
+                          <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                              追加された問題: <strong>{customQuestions.length}</strong> 問
+                          </p>
+                          <button 
+                            onClick={() => {
+                                if(confirm('追加した問題をすべて削除しますか？')) clearCustomQuestions();
+                            }}
+                            style={{ padding: '0.5rem', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '4px', fontSize: '0.9rem' }}
+                          >
+                              追加問題を削除
+                          </button>
+                      </div>
+                  )}
               </div>
           </section>
 

@@ -3,7 +3,7 @@ import { useGame } from '../../contexts/GameContext';
 import { LucideTrophy, LucideCoins, LucidePlay } from 'lucide-react';
 
 export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
-  const { user, createUser, updateUser } = useGame();
+  const { user, createUser } = useGame();
   const [nameInput, setNameInput] = useState('');
 
   if (!user) {

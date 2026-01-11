@@ -21,8 +21,9 @@ export const storage = {
           lastPlayedDate: parsed.lastPlayedDate || new Date().toISOString().split('T')[0],
           dailyGachaCount: typeof parsed.dailyGachaCount === 'number' ? parsed.dailyGachaCount : 0,
           unlockedSeals: Array.isArray(parsed.unlockedSeals) ? parsed.unlockedSeals : [],
-          treeCoins: typeof parsed.treeCoins === 'number' ? parsed.treeCoins : 0
+          treeCoins: typeof parsed.treeCoins === 'number' ? parsed.treeCoins : 0 // Force git update
       };
+
       
       return safeUser;
     } catch (e) {

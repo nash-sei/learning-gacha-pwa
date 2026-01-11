@@ -43,7 +43,12 @@ export const Settings = ({ onBack }: SettingsProps) => {
       
       // Update coins if changed
       if (user && user.monthlyCoins !== currentMonthlyCoins) {
-          updateUser({ ...user, monthlyCoins: currentMonthlyCoins });
+          const diff = currentMonthlyCoins - user.monthlyCoins;
+          // Only increase tree coins if we are adding coins (optional, or just sync?)
+          // Let's just add the difference to treeCoins if positive
+          const newTreeCoins = diff > 0 ? (user.treeCoins || 0) + diff : user.treeCoins;
+          
+          updateUser({ ...user, monthlyCoins: currentMonthlyCoins, treeCoins: newTreeCoins });
       }
 
       alert('設定を保存しました');

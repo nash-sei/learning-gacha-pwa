@@ -52,7 +52,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       monthlyCoins: 0,
       lastPlayedDate: new Date().toISOString().split('T')[0],
       dailyGachaCount: 0,
-      unlockedSeals: []
+      unlockedSeals: [],
+      treeCoins: 0
     };
     setUser(newUser);
     storage.saveUser(newUser);

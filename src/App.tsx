@@ -4,6 +4,7 @@ import { Home } from './features/home/Home';
 import { Quiz } from './features/quiz/Quiz';
 import { Gacha } from './features/gacha/Gacha';
 import { SealList } from './features/collection/SealList';
+import { CoinTree } from './features/tree/CoinTree'; // Import
 import type { Difficulty } from './types';
 import { getRandomSeal } from './lib/seals';
 import { motion } from 'framer-motion';
@@ -60,7 +61,7 @@ const SealResult = ({ onBack }: any) => {
     )
 };
 
-type Screen = 'home' | 'quiz' | 'gacha' | 'settings' | 'extra_quiz' | 'seal_result' | 'zukan';
+type Screen = 'home' | 'quiz' | 'gacha' | 'settings' | 'extra_quiz' | 'seal_result' | 'zukan' | 'tree_coin';
 
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -73,6 +74,7 @@ function AppContent() {
           onStartQuiz={() => setCurrentScreen('quiz')}
           onOpenSettings={() => setCurrentScreen('settings')}
           onOpenZukan={() => setCurrentScreen('zukan')}
+          onOpenCoinTree={() => setCurrentScreen('tree_coin')}
         />
       )}
       {currentScreen === 'quiz' && (
@@ -117,6 +119,8 @@ function AppContent() {
       {currentScreen === 'seal_result' && <SealResult onBack={() => setCurrentScreen('home')} />}
 
       {currentScreen === 'zukan' && <SealList onBack={() => setCurrentScreen('home')} />}
+
+      {currentScreen === 'tree_coin' && <CoinTree onBack={() => setCurrentScreen('home')} />}
 
       {currentScreen === 'settings' && <Settings onBack={() => setCurrentScreen('home')} />}
     </div>

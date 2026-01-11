@@ -39,6 +39,7 @@ export const Gacha = ({ difficulty, onBack, onDanger }: GachaProps) => {
             ...user,
             coins: Math.min(settings.maxMonthlyCoins, user.coins + coin),
             monthlyCoins: Math.min(settings.maxMonthlyCoins, user.monthlyCoins + coin),
+            treeCoins: (user.treeCoins || 0) + coin, // Add to tree
             dailyGachaCount: nextGachaCount,
         };
         updateUser(newUser);

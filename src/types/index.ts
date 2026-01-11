@@ -5,6 +5,7 @@ export interface User {
   name: string;
   coins: number;
   monthlyCoins: number; // Reset monthly
+  treeCoins: number; // Coins on the tree (unharvested)
   lastPlayedDate: string; // ISO Date string YYYY-MM-DD
   dailyGachaCount: number;
   unlockedSeals: string[]; // Seal IDs

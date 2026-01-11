@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { LucideTrophy, LucideCoins, LucidePlay } from 'lucide-react';
 
-export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
+export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan, onOpenCoinTree }: any) => {
   const { user, createUser, settings } = useGame();
   const [nameInput, setNameInput] = useState('');
 
@@ -72,7 +72,22 @@ export const Home = ({ onStartQuiz, onOpenSettings, onOpenZukan }: any) => {
 
       {/* Stats Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <div 
+             onClick={onOpenCoinTree}
+             className="glass-panel" 
+             style={{ 
+                 padding: '1rem', 
+                 display: 'flex', 
+                 flexDirection: 'column', 
+                 alignItems: 'center', 
+                 gap: '0.5rem',
+                 cursor: 'pointer',
+                 transition: 'transform 0.1s',
+             }}
+             onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+             onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
           <LucideCoins size={32} color="var(--color-accent)" />
           <span style={{ fontSize: '0.9rem', color: 'var(--color-text-sub)' }}>今月のコイン</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>

@@ -9,6 +9,7 @@ export interface User {
   lastPlayedDate: string; // ISO Date string YYYY-MM-DD
   dailyGachaCount: number;
   unlockedSeals: string[]; // Seal IDs
+  monthlyHarvestedCoins: number; // Coins harvested this month
 }
 
 export interface Seal {

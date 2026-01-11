@@ -33,8 +33,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (loadedUser) {
         // Daily Reset Check
         const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.substring(0, 7); // YYYY-MM
+        const lastPlayedMonth = (loadedUser.lastPlayedDate || '').substring(0, 7);
+        
         if (loadedUser.lastPlayedDate !== today) {
-            const updatedUser = { ...loadedUser, dailyGachaCount: 0, lastPlayedDate: today };
+            let updatedUser = { ...loadedUser, dailyGachaCount: 0, lastPlayedDate: today };
+            
+            // Monthly reset for both earned and harvested coins
+            if (currentMonth !== lastPlayedMonth) {
+                updatedUser = { 
+                    ...updatedUser, 
+                    monthlyCoins: 0, 
+                    monthlyHarvestedCoins: 0 
+                };
+            }
+            
             setUser(updatedUser);
             storage.saveUser(updatedUser);
         } else {
@@ -53,7 +66,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lastPlayedDate: new Date().toISOString().split('T')[0],
       dailyGachaCount: 0,
       unlockedSeals: [],
-      treeCoins: 0
+      treeCoins: 0,
+      monthlyHarvestedCoins: 0
     };
     setUser(newUser);
     storage.saveUser(newUser);

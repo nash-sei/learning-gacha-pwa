@@ -17,26 +17,27 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
 
   const fruitCount = Math.floor((user?.treeCoins || 0) / 10);
   
-  // Canopy centers for fruit distribution (Grand Tree)
-  const canopyCenters = [
-    { x: 0, y: -40, r: 90 },     // Top Center
-    { x: -90, y: 10, r: 80 },    // Left
-    { x: 90, y: 10, r: 80 },     // Right
-    { x: -50, y: -90, r: 70 },   // Top Left
-    { x: 50, y: -90, r: 70 },    // Top Right
+  // Canopy centers for elliptical leaf clusters
+  const canopyClusters = [
+    { x: 0, y: -450, rx: 120, ry: 100, rotate: 0 },    // Top large
+    { x: -130, y: -380, rx: 100, ry: 80, rotate: -30 }, // Left upper
+    { x: 130, y: -380, rx: 100, ry: 80, rotate: 30 },  // Right upper
+    { x: -180, y: -280, rx: 90, ry: 70, rotate: -45 }, // Left lower
+    { x: 180, y: -280, rx: 90, ry: 70, rotate: 45 },  // Right lower
+    { x: 0, y: -320, rx: 110, ry: 90, rotate: 0 },    // Center mid
   ];
 
   const fruits = useMemo(() => {
     return Array.from({ length: 50 }).map((_, i) => {
-      // Pick a random canopy cluster
-      const cluster = canopyCenters[i % canopyCenters.length];
-      // Random position within that cluster
+      const cluster = canopyClusters[i % canopyClusters.length];
+      // Random position within elliptical cluster
       const angle = Math.random() * Math.PI * 2;
-      const distance = Math.random() * (cluster.r * 0.7); // Keep mostly inside
+      const d = Math.random() * 0.8;
       return {
         id: i,
-        x: cluster.x + Math.cos(angle) * distance,
-        y: cluster.y + Math.sin(angle) * distance,
+        // Ellipse coordinate calculation
+        x: cluster.x + Math.cos(angle) * cluster.rx * d,
+        y: cluster.y + Math.sin(angle) * cluster.ry * d,
       };
     });
   }, []);
@@ -50,7 +51,12 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
     setTimeout(() => {
       if (user) {
         const newTreeCoins = Math.max(0, (user.treeCoins || 0) - 10);
-        updateUser({ ...user, treeCoins: newTreeCoins });
+        const newTotalHarvested = (user.monthlyHarvestedCoins || 0) + 10;
+        updateUser({ 
+          ...user, 
+          treeCoins: newTreeCoins,
+          monthlyHarvestedCoins: newTotalHarvested 
+        });
         setHarvestingIds(prev => prev.filter(id => id !== fruitId));
       }
     }, 800);
@@ -74,61 +80,48 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(180deg, #0ea5e9 0%, #38bdf8 40%, #bae6fd 80%, #e0f2fe 100%)',
+          background: 'linear-gradient(180deg, #0284c7 0%, #38bdf8 60%, #bae6fd 90%, #e0f2fe 100%)', // Slightly deeper blue at top
           zIndex: 0,
         }}
       />
 
-      {/* Sun */}
+      {/* Sun (Restored Small Sun) */}
       <div 
         style={{
           position: 'absolute',
-          top: '-5%',
-          right: '-5%',
-          width: '50vw',
-          height: '50vw',
-          background: 'radial-gradient(circle, rgba(253, 224, 71, 0.4) 0%, rgba(253, 224, 71, 0) 70%)',
+          top: '10%',
+          right: '10%',
+          width: '60px',
+          height: '60px',
+          background: '#facc15', // Yellow-400
           borderRadius: '50%',
-          zIndex: 1,
-          pointerEvents: 'none',
-        }}
-      />
-      <div 
-        style={{
-          position: 'absolute',
-          top: '8%',
-          right: '8%',
-          width: '80px',
-          height: '80px',
-          background: '#facc15',
-          borderRadius: '50%',
-          boxShadow: '0 0 60px 20px rgba(250, 204, 21, 0.4)',
+          boxShadow: '0 0 40px 10px rgba(250, 204, 21, 0.6)', // Glow
           zIndex: 1,
         }}
       />
 
-      {/* Clouds */}
+      {/* Clouds (Moving) */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 2 }}>
-        {[0, 1, 2, 3, 4].map((i) => (
+        {[0, 1, 2].map((i) => (
           <motion.div
             key={`cloud-${i}`}
-            style={{ position: 'absolute', top: `${5 + i * 15}%` }}
-            initial={{ x: -300, opacity: 0.8 }}
-            animate={{ x: 1600 }}
+            style={{ 
+              position: 'absolute', 
+              top: `${15 + i * 20}%`,
+              opacity: 0.7 
+            }}
+            initial={{ x: -200 }}
+            animate={{ x: window.innerWidth + 200 }}
             transition={{
-              duration: 40 + i * 12,
+              duration: 30 + i * 10,
               repeat: Infinity,
-              delay: i * 8,
+              delay: i * 5,
               ease: "linear",
             }}
           >
-            <svg width="200" height="80" viewBox="0 0 200 80">
-              <path 
-                d="M50,60 Q30,60 25,40 Q20,10 50,15 Q60,5 80,10 Q100,0 120,15 Q150,10 160,40 Q170,70 140,70 L50,70 Z" 
-                fill="white" 
-                fillOpacity="0.8" 
-              />
-            </svg>
+             <svg width="120" height="50" viewBox="0 0 120 50">
+               <path d="M20,40 Q10,40 5,30 Q0,10 30,15 Q40,5 60,10 Q80,0 100,10 Q115,20 110,40 L20,40 Z" fill="white" />
+             </svg>
           </motion.div>
         ))}
       </div>
@@ -140,33 +133,33 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
           bottom: 0,
           left: 0,
           right: 0,
-          height: '40%', // Increased slightly for better rooting
+          height: '35%',
           zIndex: 5,
         }}
       >
         <div 
           style={{
             position: 'absolute',
-            bottom: '0',
+            bottom: '-10%',
             left: '-10%',
             width: '120%',
-            height: '80%',
+            height: '100%',
             background: '#15803d',
             borderRadius: '50% 50% 0 0',
-            transform: 'scaleY(0.5)',
+            transform: 'scaleY(0.4)',
             transformOrigin: 'bottom',
           }}
         />
         <div 
           style={{
             position: 'absolute',
-            bottom: '-20%',
+            bottom: '-15%',
             left: '-20%',
             width: '140%',
             height: '100%',
             background: 'linear-gradient(180deg, #4ade80 0%, #22c55e 100%)',
             borderRadius: '50% 50% 0 0',
-            transform: 'scaleY(0.4)',
+            transform: 'scaleY(0.35)',
             transformOrigin: 'bottom',
             boxShadow: '0 -10px 20px rgba(0,0,0,0.1) inset'
           }}
@@ -202,24 +195,53 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
         >
           <LucideArrowLeft size={24} />
         </button>
+        
+        {/* Monthly Stat Badge */}
         <div 
           style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(255, 255, 255, 0.9)',
-            padding: '6px 16px',
-            borderRadius: '9999px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-            border: '2px solid #eab308',
-            color: '#854d0e',
-            fontWeight: '800',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '4px'
           }}
         >
-          <div style={{ background: '#facc15', borderRadius: '50%', padding: '4px', display: 'flex' }}>
-            <LucideCoins size={16} color="#854d0e" />
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(255, 255, 255, 0.9)',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              border: '2px solid #eab308',
+              color: '#854d0e',
+              fontWeight: '800',
+              fontSize: '0.9rem'
+            }}
+          >
+            <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>今月のしゅうかく:</span>
+            <span>{user?.monthlyHarvestedCoins || 0}</span>
           </div>
-          <span style={{ fontSize: '1.2rem' }}>{user?.treeCoins || 0}</span>
+          
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(255, 255, 255, 0.9)',
+              padding: '6px 16px',
+              borderRadius: '9999px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+              border: '2px solid #eab308',
+              color: '#854d0e',
+              fontWeight: '800',
+            }}
+          >
+            <div style={{ background: '#facc15', borderRadius: '50%', padding: '4px', display: 'flex' }}>
+              <LucideCoins size={16} color="#854d0e" />
+            </div>
+            <span style={{ fontSize: '1.2rem' }}>{user?.treeCoins || 0}</span>
+          </div>
         </div>
       </header>
 
@@ -227,18 +249,19 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
       <main 
         style={{
           position: 'absolute',
-          bottom: '12%', // Adjusted for new ground height
+          bottom: 0, // Adjusted for new ground height
           left: 0,
           right: 0,
+          top: 0, // Fill vertical
           zIndex: 10,
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'flex-end',
           pointerEvents: 'none',
         }}
       >
-        {/* Expanded ViewBox for Grand Tree */}
-        <div style={{ width: '100%', maxWidth: '500px', height: '600px', position: 'relative', pointerEvents: 'auto' }}>
-          <svg viewBox="0 0 500 600" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+        <div style={{ width: '100%', maxWidth: '500px', height: '100%', position: 'relative', pointerEvents: 'auto' }}>
+          <svg viewBox="0 0 500 800" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <defs>
               <radialGradient id="goldLeafGradient" cx="50%" cy="30%" r="70%">
                 <stop offset="0%" stopColor="#fef08a" />
@@ -252,100 +275,104 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
                 <stop offset="80%" stopColor="#5d2e14" />
                 <stop offset="100%" stopColor="#3f1d0b" />
               </linearGradient>
+              
+              {/* Detailed bark texture pattern */}
+              <pattern id="barkTexture" x="0" y="0" width="40" height="100" patternUnits="userSpaceOnUse">
+                <path d="M10,0 Q15,50 10,100 M30,0 Q25,50 30,100" stroke="#4a220e" strokeWidth="1" fill="none" opacity="0.3" />
+              </pattern>
             </defs>
 
-            {/* Tree Group centered at 250, 400 (base) */}
-            <g transform="translate(250, 600)"> {/* Base at bottom center of viewBox */}
-              
-              {/* Grand Trunk Path */}
+            {/* Tree Group centered at bottom */}
+            <g transform="translate(250, 800)">
+              {/* Gnarled Trunk with wide roots */}
               <path 
-                d="M-60,0 Q-70,-20 -90,-40 Q-40,-50 -40,-100 Q-50,-200 -30,-300 Q-60,-380 -90,-420 L-70,-440 Q-30,-400 0,-350 Q30,-400 70,-440 L90,-420 Q60,-380 30,-300 Q50,-200 40,-100 Q40,-50 90,-40 Q70,-20 60,0 Z" 
+                d="
+                  M-40,0 
+                  Q-60,-5 -90,20 
+                  L-130,-10 
+                  Q-90,-20 -70,-80 
+                  Q-50,-150 -60,-250 
+                  Q-80,-350 -120,-420 
+                  L-80,-450 
+                  Q-40,-400 0,-360 
+                  Q40,-400 80,-450 
+                  L120,-420 
+                  Q80,-350 60,-250 
+                  Q50,-150 70,-80 
+                  Q90,-20 130,-10 
+                  L90,20 
+                  Q60,-5 40,0 
+                  Z
+                " 
                 fill="url(#trunkGradient)"
               />
+              <path d="M-40,0 Q-60,-5 -90,20 L-130,-10 Q-90,-20 -70,-80 Q-50,-150 -60,-250 Q-80,-350 -120,-420" fill="url(#barkTexture)" />
+
+              {/* Bark Details */}
+              <path d="M-50,-50 Q-40,-150 -45,-250" stroke="#351405" strokeWidth="5" fill="none" opacity="0.4" />
+              <path d="M50,-50 Q40,-150 45,-250" stroke="#351405" strokeWidth="5" fill="none" opacity="0.4" />
               
-              {/* Root Details (Darker patches) */}
-              <path d="M-40,0 Q-35,-30 -20,-40" stroke="#351405" strokeWidth="4" fill="none" opacity="0.6" />
-              <path d="M40,0 Q35,-30 20,-40" stroke="#351405" strokeWidth="4" fill="none" opacity="0.6" />
-              <path d="M0,0 L0,-60" stroke="#351405" strokeWidth="4" fill="none" opacity="0.4" />
-
-              {/* Bark Texture Lines */}
-              <path d="M-10,-100 Q-15,-200 -5,-300" stroke="#4a220e" strokeWidth="3" fill="none" />
-              <path d="M10,-120 Q15,-220 5,-320" stroke="#4a220e" strokeWidth="3" fill="none" />
-            </g>
-
-            {/* Swaying Canopy Group */}
-            <g transform="translate(250, 180)"> {/* Adjusted Y to sit on top of trunk (approx -420 from bottom) */}
+              {/* Swaying Canopy Group */}
               <motion.g
-                animate={{ rotate: [-1, 1, -1] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                style={{ transformOrigin: "0px 0px" }} // Rotate around center of this group
+                animate={{ rotate: [-0.5, 0.5, -0.5] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                style={{ transformOrigin: "0px -300px" }}
               >
-                  {/* Canopy Clusters (Cloud style - FLUFFY VERSION) */}
-                <g transform="translate(0, 0)">
-                   {/* Deep Back Layers (Darkest/Small) */}
-                   <circle cx="80" cy="-50" r="60" fill="url(#goldLeafGradient)" opacity="0.9" />
-                   <circle cx="-80" cy="-50" r="60" fill="url(#goldLeafGradient)" opacity="0.9" />
-                   <circle cx="0" cy="-80" r="60" fill="url(#goldLeafGradient)" opacity="0.9" />
-                   <circle cx="40" cy="10" r="50" fill="url(#goldLeafGradient)" opacity="0.9" />
-                   <circle cx="-40" cy="10" r="50" fill="url(#goldLeafGradient)" opacity="0.9" />
-
-                   {/* Mid Layers (Main Volume) */}
-                   <circle cx="0" cy="-40" r="90" fill="url(#goldLeafGradient)" /> {/* Top Center */}
-                   <circle cx="-90" cy="10" r="80" fill="url(#goldLeafGradient)" /> {/* Left */}
-                   <circle cx="90" cy="10" r="80" fill="url(#goldLeafGradient)" />  {/* Right */}
-                   <circle cx="-50" cy="-90" r="75" fill="url(#goldLeafGradient)" /> {/* Top Left */}
-                   <circle cx="50" cy="-90" r="75" fill="url(#goldLeafGradient)" />  {/* Top Right */}
-                   
-                   {/* Fluffy Edges (Smaller, projecting out) */}
-                   <circle cx="-100" cy="-40" r="40" fill="url(#goldLeafGradient)" />
-                   <circle cx="100" cy="-40" r="40" fill="url(#goldLeafGradient)" />
-                   <circle cx="0" cy="-110" r="50" fill="url(#goldLeafGradient)" />
-                   <circle cx="-60" cy="40" r="45" fill="url(#goldLeafGradient)" />
-                   <circle cx="60" cy="40" r="45" fill="url(#goldLeafGradient)" />
-
-                   {/* Front Detail Layers (To hide gaps and add texture) */}
-                   <circle cx="0" cy="0" r="60" fill="url(#goldLeafGradient)" />
-                   <circle cx="-30" cy="-30" r="50" fill="url(#goldLeafGradient)" />
-                   <circle cx="30" cy="-30" r="50" fill="url(#goldLeafGradient)" />
-                   <circle cx="-40" cy="20" r="50" fill="url(#goldLeafGradient)" />
-                   <circle cx="40" cy="20" r="50" fill="url(#goldLeafGradient)" />
-                   
-                   {/* Trunk Junction Hiders */}
-                   <circle cx="0" cy="40" r="40" fill="url(#goldLeafGradient)" />
-                </g>
-
-                {/* Glitter / Sparkles - Distributed Wider */}
-                {[...Array(20)].map((_, i) => (
-                  <motion.circle
-                    key={`sparkle-${i}`}
-                    cx={(Math.random() - 0.5) * 250}
-                    cy={(Math.random() - 0.5) * 150 - 30}
-                    r={Math.random() * 2 + 1}
-                    fill="white"
-                    animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
-                    transition={{ duration: 1 + Math.random(), repeat: Infinity, delay: Math.random() * 2 }}
+                {/* Elliptical Leaf Clusters */}
+                {canopyClusters.map((cluster, idx) => (
+                  <ellipse
+                    key={`leaf-cluster-${idx}`}
+                    cx={cluster.x}
+                    cy={cluster.y}
+                    rx={cluster.rx}
+                    ry={cluster.ry}
+                    fill="url(#goldLeafGradient)"
+                    transform={`rotate(${cluster.rotate}, ${cluster.x}, ${cluster.y})`}
+                    style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }}
                   />
                 ))}
-
-                {/* Coin Fruits */}
+                
+                {/* Coin Fruits - Larger with big Y */}
                 <AnimatePresence>
                   {visibleFruits.map((fruit) => (
                     <motion.g
                       key={`fruit-${fruit.id}`}
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1, x: fruit.x, y: fruit.y }}
-                      exit={{ y: 500, opacity: 0, rotate: 180, transition: { duration: 0.8, ease: "easeIn" } }}
+                      exit={{ y: 800, opacity: 0, rotate: 180, transition: { duration: 1, ease: "easeIn" } }}
                       style={{ cursor: 'pointer' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleHarvestFruit(fruit.id);
                       }}
-                      whileHover={{ scale: 1.2 }}
-                      whileTap={{ scale: 0.9 }}
+                       whileHover={{ scale: 1.25 }}
+                       whileTap={{ scale: 0.9 }}
                     >
-                      <circle r="8" fill="#fbbf24" stroke="#b45309" strokeWidth="1.5" />
-                      <text x="0" y="3" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#b45309" style={{ pointerEvents: 'none' }}>¥</text>
-                      <circle r="6" fill="transparent" stroke="#fde047" strokeWidth="1" strokeDasharray="2 1" />
+                      {/* Fruit Graphic */}
+                      <circle r="14" fill="#fbbf24" stroke="#b45309" strokeWidth="2" />
+                      <circle r="11" fill="transparent" stroke="#fde047" strokeWidth="1" strokeDasharray="3 2" />
+                      <text 
+                        x="0" 
+                        y="6" 
+                        textAnchor="middle" 
+                        fontSize="16" 
+                        fontWeight="900" 
+                        fill="#b45309" 
+                        style={{ pointerEvents: 'none', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.5))' }}
+                      >
+                        ¥
+                      </text>
+                      
+                      {/* Shine Effect */}
+                      <motion.circle 
+                        r="4" 
+                        cx="-5" 
+                        cy="-5" 
+                        fill="white" 
+                        opacity="0.6"
+                        animate={{ opacity: [0.2, 0.8, 0.2] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
                     </motion.g>
                   ))}
                 </AnimatePresence>

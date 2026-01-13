@@ -77,7 +77,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dailyGachaCount: 0,
       unlockedSeals: [],
       treeCoins: 0,
-      monthlyHarvestedCoins: 0
+      monthlyHarvestedCoins: 0,
+      questionClearCounts: {},
+      monsters: []
     };
     setUser(newUser);
     storage.saveUser(newUser);

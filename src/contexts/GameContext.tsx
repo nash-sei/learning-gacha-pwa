@@ -1,7 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User, GameSettings } from '../types';
-import { DEFAULT_SETTINGS } from '../types';
 import { storage } from '../lib/storage';
+
+const DEFAULT_SETTINGS: GameSettings = {
+  maxDailyGacha: 3,
+  maxMonthlyCoins: 1000,
+  coinRewards: {
+    easy: 15,
+    normal: 22,
+    hard: 30,
+  },
+  parentPasscode: '0000', // Default
+};
 // import { v4 as uuidv4 } from 'uuid'; // Removed to avoid dependency
 
 // Simple ID generator if uuid is not available

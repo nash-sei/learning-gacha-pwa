@@ -3,6 +3,7 @@ import type { Difficulty } from '../../types';
 import { getQuestions, type Question } from '../../lib/questions';
 import { LucideCheckCircle, LucideXCircle, LucideArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGame } from '../../contexts/GameContext'; // Import context
 
 interface QuizProps {
   onComplete: (success: boolean, diff: Difficulty) => void;
@@ -11,10 +12,8 @@ interface QuizProps {
   initialDifficulty?: Difficulty;
 }
 
-import { useGame } from '../../contexts/GameContext'; // Import context
-
 export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }: QuizProps) => {
-  const { customQuestions } = useGame(); // Get custom questions
+  const { user, updateUser, customQuestions } = useGame(); // Get user and updater
   const [phase, setPhase] = useState<'difficulty' | 'playing' | 'result'>('difficulty');
   // If extra mode, skip difficulty selection
   if (mode === 'extra' && phase === 'difficulty') {
@@ -32,7 +31,9 @@ export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }:
   const startQuiz = (diff: Difficulty) => {
     // Extra Stage = 1 Question (Boss)
     const count = mode === 'extra' ? 1 : (diff === 'easy' ? 3 : diff === 'normal' ? 4 : 5);
-    const qs = getQuestions(diff, count, customQuestions); // Pass custom questions (3rd arg)
+    
+    // Use smart question selection based on user's clear counts
+    const qs = getQuestions(diff, count, customQuestions, user?.questionClearCounts || {}); 
     setDifficulty(diff);
     setQuestions(qs);
     setPhase('playing');
@@ -46,9 +47,16 @@ export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }:
     // Tiny delay for animation
     setTimeout(() => {
         const currentQ = questions[currentIndex];
-        const isCorrect = choice === currentQ.answer; // Simple string comparison for now
+        const isCorrect = choice === currentQ.answer; 
         const newResults = [...results, { isCorrect, q: currentQ }];
         setResults(newResults);
+
+        // Update clear count if correct
+        if (isCorrect && user) {
+            const newCounts = { ...(user.questionClearCounts || {}) };
+            newCounts[currentQ.id] = (newCounts[currentQ.id] || 0) + 1;
+            updateUser({ ...user, questionClearCounts: newCounts });
+        }
 
         if (currentIndex < questions.length - 1) {
             setCurrentIndex(currentIndex + 1);
@@ -145,14 +153,46 @@ export const Quiz = ({ onComplete, onBack, mode = 'normal', initialDifficulty }:
 
   // Playing Screen
   const currentQ = questions[currentIndex];
+  
+  // Safety check: if questions array is empty or currentQ is undefined, show error
+  if (!currentQ) {
+      return (
+          <div className="full-screen center-content" style={{ padding: '2rem' }}>
+              <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
+                  <h2>エラーが発生しました</h2>
+                  <p style={{ margin: '1rem 0', color: 'var(--color-text-sub)' }}>問題の読み込みに失敗しました</p>
+                  <button onClick={onBack} style={{ padding: '1rem 2rem', background: 'var(--color-primary)', color: 'white', borderRadius: 'var(--radius-md)' }}>
+                      ホームに戻る
+                  </button>
+              </div>
+          </div>
+      );
+  }
+  
   return (
       <div className="full-screen" style={{ padding: '1rem', paddingTop: '2rem' }}>
-          {/* Progress */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', padding: '0 1rem' }}>
-              <span style={{ fontWeight: 'bold', color: 'var(--color-text-sub)' }}>
-                  もんだい {currentIndex + 1} / {questions.length}
-              </span>
-              <span className={`badge ${difficulty}`}>{difficulty.toUpperCase()}</span>
+          {/* Header with Back Button and Progress */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', padding: '0 1rem' }}>
+              <button 
+                  onClick={onBack}
+                  style={{ 
+                      padding: '0.5rem 1rem',
+                      background: 'rgba(255,255,255,0.9)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text-main)',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer'
+                  }}
+              >
+                  ← もどる
+              </button>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 'bold', color: 'var(--color-text-sub)' }}>
+                      {currentIndex + 1} / {questions.length}
+                  </span>
+                  <span className={`badge ${difficulty}`}>{difficulty.toUpperCase()}</span>
+              </div>
           </div>
 
           {/* Question */}

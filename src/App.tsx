@@ -13,14 +13,15 @@ import { Settings } from './features/settings/Settings';
 
 // Helper for Seal Result
 const SealResult = ({ onBack }: any) => {
-    const { user, updateUser } = useGame();
+    const { user, updateUser, settings } = useGame();
     const [newSeal, setNewSeal] = useState<any>(null);
 
     // Effect to generate seal ONLY ONCE when mounted
     useEffect(() => {
         if (!user) return;
         
-        const seal = getRandomSeal();
+        // Use custom seals if available
+        const seal = getRandomSeal('easy', settings?.customSeals);
         setNewSeal(seal);
 
         // Save to user

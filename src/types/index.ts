@@ -10,6 +10,18 @@ export interface User {
   dailyGachaCount: number;
   unlockedSeals: string[]; // Seal IDs
   monthlyHarvestedCoins: number; // Coins harvested this month
+  questionClearCounts: Record<string, number>; // Track how many times each question was answered correctly
+  monsters: MonsterInstance[]; // Monster placements on home screen
+}
+
+// Monster placement on home screen
+export interface MonsterInstance {
+  id: string;
+  imageData: string; // Base64 data URL
+  x: number; // 0-100 (percentage)
+  y: number; // 0-100 (percentage)
+  scale: number; // 0.1 - 2.0
+  name?: string;
 }
 
 export interface Seal {
@@ -28,6 +40,7 @@ export interface GameSettings {
     [key in Difficulty]: number; // Average reward
   };
   parentPasscode?: string;
+  customSeals?: Seal[]; // User-defined seals for gacha
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -39,4 +52,5 @@ export const DEFAULT_SETTINGS: GameSettings = {
     hard: 30,
   },
   parentPasscode: '0000', // Default
+  customSeals: [], // Empty array, user adds their own
 };

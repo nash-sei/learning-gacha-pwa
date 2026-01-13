@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useGame } from "../../contexts/GameContext";
 import { LucideArrowLeft, LucideCoins, LucideSparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +14,22 @@ const playSound = (type: 'harvest' | 'button') => {
 export const CoinTree = ({ onBack }: CoinTreeProps) => {
   const { user, updateUser } = useGame();
   const [harvestingIds, setHarvestingIds] = useState<number[]>([]);
-
-  const fruitCount = Math.floor((user?.treeCoins || 0) / 10);
+  const [harvestedFruitIds, setHarvestedFruitIds] = useState<number[]>([]); // Permanently track harvested fruits
+  
+  // Stable fruit count at mount time - prevents slice shifting during harvest
+  const [stableFruitCount, setStableFruitCount] = useState(() => Math.floor((user?.treeCoins || 0) / 10));
+  const prevTreeCoinsRef = useRef(user?.treeCoins || 0);
+  
+  // Update stable count only when new coins are ADDED (not when harvesting)
+  useEffect(() => {
+    const currentTreeCoins = user?.treeCoins || 0;
+    if (currentTreeCoins > prevTreeCoinsRef.current) {
+      // New coins added - reset harvested list and update stable count
+      setHarvestedFruitIds([]);
+      setStableFruitCount(Math.floor(currentTreeCoins / 10));
+    }
+    prevTreeCoinsRef.current = currentTreeCoins;
+  }, [user?.treeCoins]);
   
   // Canopy centers for elliptical leaf clusters
   const canopyClusters = [
@@ -42,10 +56,13 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
     });
   }, []);
 
-  const visibleFruits = fruits.slice(0, fruitCount).filter(f => !harvestingIds.includes(f.id));
+  // Filter out both currently animating AND permanently harvested fruits
+  const visibleFruits = fruits
+    .slice(0, stableFruitCount)
+    .filter(f => !harvestingIds.includes(f.id) && !harvestedFruitIds.includes(f.id));
 
   const handleHarvestFruit = (fruitId: number) => {
-    if (harvestingIds.includes(fruitId)) return;
+    if (harvestingIds.includes(fruitId) || harvestedFruitIds.includes(fruitId)) return;
     playSound('harvest');
     setHarvestingIds(prev => [...prev, fruitId]);
     setTimeout(() => {
@@ -57,7 +74,9 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
           treeCoins: newTreeCoins,
           monthlyHarvestedCoins: newTotalHarvested 
         });
+        // Remove from animating, add to permanently harvested
         setHarvestingIds(prev => prev.filter(id => id !== fruitId));
+        setHarvestedFruitIds(prev => [...prev, fruitId]);
       }
     }, 800);
   };
@@ -405,13 +424,13 @@ export const CoinTree = ({ onBack }: CoinTreeProps) => {
             pointerEvents: 'auto',
           }}
         >
-          {fruitCount > 0 ? (
+          {visibleFruits.length > 0 ? (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <LucideSparkles style={{ color: '#eab308' }} size={24} />
               <div style={{ textAlign: 'left' }}>
                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#475569', fontWeight: 'bold' }}>収穫チャンス！</p>
                  <p style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b', fontWeight: 'bold' }}>
-                   あと <span style={{ color: '#ca8a04', fontSize: '1.4rem' }}>{fruitCount}</span> 個の実があるよ
+                   あと <span style={{ color: '#ca8a04', fontSize: '1.4rem' }}>{visibleFruits.length}</span> 個の実があるよ
                  </p>
               </div>
             </motion.div>

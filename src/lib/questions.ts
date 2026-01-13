@@ -41,9 +41,25 @@ export const QUESTIONS: Question[] = [
   { id: 'q15', category: 'math', difficulty: 'hard', type: 'choice', text: '九九の 7×8 は？', choices: ['48', '54', '56'], answer: '56' },
 ];
 
-export const getQuestions = (difficulty: Difficulty, count: number, additionalQuestions: Question[] = []): Question[] => {
+export const getQuestions = (
+  difficulty: Difficulty, 
+  count: number, 
+  additionalQuestions: Question[] = [], 
+  clearCounts: Record<string, number> = {}
+): Question[] => {
   const allQuestions = [...QUESTIONS, ...additionalQuestions];
   const filtered = allQuestions.filter(q => q.difficulty === difficulty);
-  // Shuffle and slice
-  return filtered.sort(() => Math.random() - 0.5).slice(0, count);
+  
+  // Sort by clear count (ascending), then random
+  const sorted = filtered.sort((a, b) => {
+    const countA = clearCounts[a.id] || 0;
+    const countB = clearCounts[b.id] || 0;
+    
+    if (countA !== countB) {
+      return countA - countB; // Prioritize lower counts
+    }
+    return Math.random() - 0.5; // Random shuffle if counts are equal
+  });
+
+  return sorted.slice(0, count);
 };

@@ -318,6 +318,260 @@ export const Settings = ({ onBack }: SettingsProps) => {
               </div>
           </section>
 
+          {/* Monster Management */}
+          <section className="glass-panel" style={{ padding: '1.5rem', background: 'white' }}>
+              <h3 style={{ borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
+                  🎨 モンスター設定
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+                  ホーム画面に表示するモンスター画像を追加・配置できます。
+              </p>
+              
+              {/* Add New Monster */}
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #86efac' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>画像を追加</label>
+                  <input 
+                    type="file" 
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const imageData = event.target?.result as string;
+                            const newMonster = {
+                                id: `monster_${Date.now()}`,
+                                imageData,
+                                x: 50,
+                                y: 50,
+                                scale: 1,
+                                name: file.name.replace(/\.[^/.]+$/, '')
+                            };
+                            if (user) {
+                                updateUser({ ...user, monsters: [...(user.monsters || []), newMonster] });
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                        e.target.value = '';
+                    }}
+                    style={{ marginBottom: '0.5rem' }}
+                  />
+                  <p style={{ fontSize: '0.75rem', color: '#666' }}>PNG, JPG, GIF, WEBP対応</p>
+              </div>
+
+              {/* Monster List */}
+              {user?.monsters && user.monsters.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {user.monsters.map((m: any, index: number) => (
+                          <div key={m.id} style={{ 
+                              padding: '1rem', 
+                              background: '#f8fafc', 
+                              borderRadius: '8px',
+                              border: '1px solid #e2e8f0'
+                          }}>
+                              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                                  <img 
+                                      src={m.imageData} 
+                                      alt={m.name || 'Monster'} 
+                                      style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: '4px', background: 'white' }}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{m.name || `モンスター ${index + 1}`}</div>
+                                      
+                                      {/* X Position */}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>X:</span>
+                                          <input 
+                                              type="range" 
+                                              min="0" 
+                                              max="100" 
+                                              value={m.x}
+                                              onChange={(e) => {
+                                                  const newMonsters = [...user.monsters];
+                                                  newMonsters[index] = { ...m, x: parseInt(e.target.value) };
+                                                  updateUser({ ...user, monsters: newMonsters });
+                                              }}
+                                              style={{ flex: 1 }}
+                                          />
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>{m.x}%</span>
+                                      </div>
+                                      
+                                      {/* Y Position */}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>Y:</span>
+                                          <input 
+                                              type="range" 
+                                              min="0" 
+                                              max="100" 
+                                              value={m.y}
+                                              onChange={(e) => {
+                                                  const newMonsters = [...user.monsters];
+                                                  newMonsters[index] = { ...m, y: parseInt(e.target.value) };
+                                                  updateUser({ ...user, monsters: newMonsters });
+                                              }}
+                                              style={{ flex: 1 }}
+                                          />
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>{m.y}%</span>
+                                      </div>
+                                      
+                                      {/* Scale */}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>大:</span>
+                                          <input 
+                                              type="range" 
+                                              min="10" 
+                                              max="200" 
+                                              value={m.scale * 100}
+                                              onChange={(e) => {
+                                                  const newMonsters = [...user.monsters];
+                                                  newMonsters[index] = { ...m, scale: parseInt(e.target.value) / 100 };
+                                                  updateUser({ ...user, monsters: newMonsters });
+                                              }}
+                                              style={{ flex: 1 }}
+                                          />
+                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>{Math.round(m.scale * 100)}%</span>
+                                      </div>
+                                  </div>
+                                  
+                                  {/* Delete Button */}
+                                  <button 
+                                      onClick={() => {
+                                          if (confirm('このモンスターを削除しますか？')) {
+                                              const newMonsters = user.monsters.filter((_: any, i: number) => i !== index);
+                                              updateUser({ ...user, monsters: newMonsters });
+                                          }
+                                      }}
+                                      style={{ 
+                                          padding: '0.3rem 0.6rem', 
+                                          background: '#fee2e2', 
+                                          color: '#dc2626', 
+                                          border: 'none', 
+                                          borderRadius: '4px',
+                                          fontSize: '0.8rem',
+                                          cursor: 'pointer'
+                                      }}
+                                  >
+                                      削除
+                                  </button>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
+              )}
+              
+              {(!user?.monsters || user.monsters.length === 0) && (
+                  <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>
+                      モンスターがまだ追加されていません
+                  </p>
+              )}
+          </section>
+
+          {/* Custom Seals (Gacha Rewards) */}
+          <section className="glass-panel" style={{ padding: '1.5rem', background: 'white' }}>
+              <h3 style={{ borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
+                  🎰 ガチャシール設定
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+                  ガチャで出現するシールを追加・管理できます。カスタムシールを登録すると、デフォルトのシールの代わりに使用されます。
+              </p>
+              
+              {/* Add New Seal */}
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fcd34d' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>シールを追加</label>
+                  <input 
+                    type="file" 
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const imageData = event.target?.result as string;
+                            const name = prompt('シールの名前を入力してください:') || file.name.replace(/\.[^/.]+$/, '');
+                            const rarityInput = prompt('レア度を選んでください (N, R, SR, UR):')?.toUpperCase() || 'N';
+                            const rarity = (['N', 'R', 'SR', 'UR'].includes(rarityInput) ? rarityInput : 'N') as 'N' | 'R' | 'SR' | 'UR';
+                            
+                            const newSeal = {
+                                id: `seal_${Date.now()}`,
+                                name,
+                                imageUrl: imageData,
+                                rarity,
+                                description: ''
+                            };
+                            const currentSeals = localSettings.customSeals || [];
+                            setLocalSettings({ ...localSettings, customSeals: [...currentSeals, newSeal] });
+                        };
+                        reader.readAsDataURL(file);
+                        e.target.value = '';
+                    }}
+                    style={{ marginBottom: '0.5rem' }}
+                  />
+                  <p style={{ fontSize: '0.75rem', color: '#666' }}>PNG, JPG, GIF, WEBP対応</p>
+              </div>
+
+              {/* Seals List */}
+              {localSettings.customSeals && localSettings.customSeals.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {localSettings.customSeals.map((seal: any, index: number) => (
+                          <div key={seal.id} style={{ 
+                              padding: '0.75rem', 
+                              background: '#f8fafc', 
+                              borderRadius: '8px',
+                              border: '1px solid #e2e8f0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.75rem'
+                          }}>
+                              <img 
+                                  src={seal.imageUrl} 
+                                  alt={seal.name} 
+                                  style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '4px', background: 'white' }}
+                              />
+                              <div style={{ flex: 1 }}>
+                                  <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{seal.name}</div>
+                                  <span style={{ 
+                                      fontSize: '0.75rem', 
+                                      padding: '2px 6px', 
+                                      borderRadius: '4px',
+                                      background: seal.rarity === 'UR' ? '#fbbf24' : seal.rarity === 'SR' ? '#a855f7' : seal.rarity === 'R' ? '#3b82f6' : '#9ca3af',
+                                      color: 'white'
+                                  }}>
+                                      {seal.rarity}
+                                  </span>
+                              </div>
+                              <button 
+                                  onClick={() => {
+                                      const newSeals = localSettings.customSeals.filter((_: any, i: number) => i !== index);
+                                      setLocalSettings({ ...localSettings, customSeals: newSeals });
+                                  }}
+                                  style={{ 
+                                      padding: '0.4rem 0.8rem', 
+                                      background: '#fee2e2', 
+                                      color: '#dc2626', 
+                                      border: 'none', 
+                                      borderRadius: '4px',
+                                      fontSize: '0.85rem',
+                                      cursor: 'pointer',
+                                      fontWeight: 'bold'
+                                  }}
+                              >
+                                  削除
+                              </button>
+                          </div>
+                      ))}
+                  </div>
+              )}
+              
+              {(!localSettings.customSeals || localSettings.customSeals.length === 0) && (
+                  <p style={{ color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>
+                      カスタムシールが登録されていません。<br/>
+                      <span style={{ fontSize: '0.8rem' }}>（デフォルトのシールが使用されます）</span>
+                  </p>
+              )}
+          </section>
+
           {/* Danger Zone */}
           <section className="glass-panel" style={{ padding: '1.5rem', background: '#fff1f2', border: '1px solid #fecdd3' }}>
               <h3 style={{ borderBottom: '2px solid #fecdd3', paddingBottom: '0.5rem', marginBottom: '1rem', color: '#be123c', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -368,7 +622,7 @@ export const Settings = ({ onBack }: SettingsProps) => {
           </button>
           
           <div style={{ textAlign: 'center', marginTop: '1rem', color: '#94a3b8', fontSize: '0.8rem' }}>
-              App Version: 0.1.0
+              App Version: 0.1.1
           </div>
       </div>
     </div>

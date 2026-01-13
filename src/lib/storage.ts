@@ -1,9 +1,20 @@
-import { DEFAULT_SETTINGS } from '../types';
-import type { User, GameSettings } from '../types';
+import type { User, GameSettings } from '../types/index';
+
+const DEFAULT_SETTINGS: GameSettings = {
+  maxDailyGacha: 3,
+  maxMonthlyCoins: 1000,
+  coinRewards: {
+    easy: 15,
+    normal: 22,
+    hard: 30,
+  },
+  parentPasscode: '0000', // Default
+};
 
 const STORAGE_KEY_USER = 'learning_gacha_user';
 const STORAGE_KEY_SETTINGS = 'learning_gacha_settings';
 
+// Storage utility
 export const storage = {
   getUser: (): User | null => {
     try {
@@ -22,7 +33,9 @@ export const storage = {
           dailyGachaCount: typeof parsed.dailyGachaCount === 'number' ? parsed.dailyGachaCount : 0,
           unlockedSeals: Array.isArray(parsed.unlockedSeals) ? parsed.unlockedSeals : [],
           treeCoins: typeof parsed.treeCoins === 'number' ? parsed.treeCoins : 0,
-          monthlyHarvestedCoins: typeof parsed.monthlyHarvestedCoins === 'number' ? parsed.monthlyHarvestedCoins : 0
+          monthlyHarvestedCoins: typeof parsed.monthlyHarvestedCoins === 'number' ? parsed.monthlyHarvestedCoins : 0,
+          questionClearCounts: parsed.questionClearCounts || {},
+          monsters: Array.isArray(parsed.monsters) ? parsed.monsters : []
       };
 
       

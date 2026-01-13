@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import type { Difficulty, User } from '../../types';
-import { LucideGift, LucideStar } from 'lucide-react';
+import { LucideGift, LucideStar, LucideCoins } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface GachaProps {
@@ -171,6 +171,35 @@ export const Gacha = ({ difficulty, onBack, onDanger }: GachaProps) => {
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-accent)', marginBottom: '1rem', marginTop: '2rem' }}>
                   + {rewardCoin} コイン
               </div>
+
+              {/* Coin Explosion Effect */}
+              {Array.from({ length: 30 }).map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+                    animate={{ 
+                        x: (Math.random() - 0.5) * 500, // Spread x
+                        y: [(Math.random() - 0.5) * 200, (Math.random() - 1) * 600], // Up then fall or just explode
+                        opacity: [1, 1, 0],
+                        scale: [1, 1.2, 0.5],
+                        rotate: Math.random() * 720
+                    }}
+                    transition={{ 
+                        duration: 2, 
+                        ease: "easeOut",
+                        delay: Math.random() * 0.3
+                    }}
+                    style={{ 
+                        position: 'absolute', 
+                        top: '50%', 
+                        left: '50%',
+                        zIndex: 10,
+                        pointerEvents: 'none'
+                    }}
+                  >
+                      <LucideCoins size={32} color="#fbbf24" fill="#fbbf24" />
+                  </motion.div>
+              ))}
 
                <p style={{ marginBottom: '2rem', color: 'var(--color-text-sub)', fontWeight: 'bold' }}>
                   のこり: {user ? settings.maxDailyGacha - user.dailyGachaCount : 0} 回

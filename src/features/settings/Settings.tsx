@@ -476,6 +476,35 @@ export const Settings = ({ onBack }: SettingsProps) => {
                   ガチャで出現するシールを追加・管理できます。カスタムシールを登録すると、デフォルトのシールの代わりに使用されます。
               </p>
               
+              {/* Rarity Statistics */}
+              {localSettings.customSeals && localSettings.customSeals.length > 0 && (
+                  <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#0369a1' }}>登録数</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                          {['UR', 'SR', 'R', 'N'].map(r => {
+                              const count = localSettings.customSeals?.filter((s: any) => s.rarity === r).length || 0;
+                              const recommended = r === 'UR' ? 1 : r === 'SR' ? 2 : r === 'R' ? 2 : 3;
+                              const isGood = count >= recommended;
+                              return (
+                                  <div key={r} style={{ 
+                                      padding: '0.5rem', 
+                                      background: isGood ? '#dcfce7' : '#fef3c7',
+                                      borderRadius: '6px',
+                                      textAlign: 'center',
+                                      border: `2px solid ${isGood ? '#86efac' : '#fcd34d'}`
+                                  }}>
+                                      <div style={{ fontSize: '0.75rem', color: '#666' }}>{r}</div>
+                                      <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: isGood ? '#166534' : '#92400e' }}>
+                                          {count}枚
+                                      </div>
+                                      <div style={{ fontSize: '0.65rem', color: '#666' }}>推奨{recommended}+</div>
+                                  </div>
+                              );
+                          })}
+                      </div>
+                  </div>
+              )}
+              
               {/* Add New Seal */}
               <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fcd34d' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>シールを追加</label>
@@ -501,66 +530,94 @@ export const Settings = ({ onBack }: SettingsProps) => {
                                 description: ''
                             };
                             const currentSeals = localSettings.customSeals || [];
-                            setLocalSettings({ ...localSettings, customSeals: [...currentSeals, newSeal] });
+                            const updatedSettings = { ...localSettings, customSeals: [...currentSeals, newSeal] };
+                            setLocalSettings(updatedSettings);
+                            // Auto-save immediately
+                            updateSettings(updatedSettings);
                         };
                         reader.readAsDataURL(file);
                         e.target.value = '';
                     }}
                     style={{ marginBottom: '0.5rem' }}
                   />
-                  <p style={{ fontSize: '0.75rem', color: '#666' }}>PNG, JPG, GIF, WEBP対応</p>
+                  <p style={{ fontSize: '0.75rem', color: '#666' }}>PNG, JPG, GIF, WEBP対応（追加後、自動保存されます）</p>
               </div>
 
-              {/* Seals List */}
+              {/* Seals List - Grouped by Rarity */}
               {localSettings.customSeals && localSettings.customSeals.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      {localSettings.customSeals.map((seal: any, index: number) => (
-                          <div key={seal.id} style={{ 
-                              padding: '0.75rem', 
-                              background: '#f8fafc', 
-                              borderRadius: '8px',
-                              border: '1px solid #e2e8f0',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.75rem'
-                          }}>
-                              <img 
-                                  src={seal.imageUrl} 
-                                  alt={seal.name} 
-                                  style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '4px', background: 'white' }}
-                              />
-                              <div style={{ flex: 1 }}>
-                                  <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{seal.name}</div>
-                                  <span style={{ 
-                                      fontSize: '0.75rem', 
-                                      padding: '2px 6px', 
-                                      borderRadius: '4px',
-                                      background: seal.rarity === 'UR' ? '#fbbf24' : seal.rarity === 'SR' ? '#a855f7' : seal.rarity === 'R' ? '#3b82f6' : '#9ca3af',
-                                      color: 'white'
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {['UR', 'SR', 'R', 'N'].map(rarityGroup => {
+                          const sealsInGroup = localSettings.customSeals?.filter((s: any) => s.rarity === rarityGroup) || [];
+                          if (sealsInGroup.length === 0) return null;
+                          
+                          return (
+                              <div key={rarityGroup}>
+                                  <div style={{ 
+                                      fontSize: '0.85rem', 
+                                      fontWeight: 'bold', 
+                                      marginBottom: '0.5rem',
+                                      color: rarityGroup === 'UR' ? '#b8860b' : rarityGroup === 'SR' ? '#a855f7' : rarityGroup === 'R' ? '#3b82f6' : '#6b7280'
                                   }}>
-                                      {seal.rarity}
-                                  </span>
+                                      {rarityGroup} ({sealsInGroup.length}枚)
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                      {sealsInGroup.map((seal: any) => {
+                                          const index = localSettings.customSeals?.indexOf(seal) || 0;
+                                          return (
+                                              <div key={seal.id} style={{ 
+                                                  padding: '0.75rem', 
+                                                  background: '#f8fafc', 
+                                                  borderRadius: '8px',
+                                                  border: '1px solid #e2e8f0',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: '0.75rem'
+                                              }}>
+                                                  <img 
+                                                      src={seal.imageUrl} 
+                                                      alt={seal.name} 
+                                                      style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '4px', background: 'white' }}
+                                                  />
+                                                  <div style={{ flex: 1 }}>
+                                                      <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{seal.name}</div>
+                                                      <span style={{ 
+                                                          fontSize: '0.75rem', 
+                                                          padding: '2px 6px', 
+                                                          borderRadius: '4px',
+                                                          background: seal.rarity === 'UR' ? '#fbbf24' : seal.rarity === 'SR' ? '#a855f7' : seal.rarity === 'R' ? '#3b82f6' : '#9ca3af',
+                                                          color: 'white'
+                                                      }}>
+                                                          {seal.rarity}
+                                                      </span>
+                                                  </div>
+                                                  <button 
+                                                      onClick={() => {
+                                                          const newSeals = localSettings.customSeals?.filter((_: any, i: number) => i !== index) || [];
+                                                          const updatedSettings = { ...localSettings, customSeals: newSeals };
+                                                          setLocalSettings(updatedSettings);
+                                                          // Auto-save immediately
+                                                          updateSettings(updatedSettings);
+                                                      }}
+                                                      style={{ 
+                                                          padding: '0.4rem 0.8rem', 
+                                                          background: '#fee2e2', 
+                                                          color: '#dc2626', 
+                                                          border: 'none', 
+                                                          borderRadius: '4px',
+                                                          fontSize: '0.85rem',
+                                                          cursor: 'pointer',
+                                                          fontWeight: 'bold'
+                                                      }}
+                                                  >
+                                                      削除
+                                                  </button>
+                                              </div>
+                                          );
+                                      })}
+                                  </div>
                               </div>
-                              <button 
-                                  onClick={() => {
-                                      const newSeals = localSettings.customSeals.filter((_: any, i: number) => i !== index);
-                                      setLocalSettings({ ...localSettings, customSeals: newSeals });
-                                  }}
-                                  style={{ 
-                                      padding: '0.4rem 0.8rem', 
-                                      background: '#fee2e2', 
-                                      color: '#dc2626', 
-                                      border: 'none', 
-                                      borderRadius: '4px',
-                                      fontSize: '0.85rem',
-                                      cursor: 'pointer',
-                                      fontWeight: 'bold'
-                                  }}
-                              >
-                                  削除
-                              </button>
-                          </div>
-                      ))}
+                          );
+                      })}
                   </div>
               )}
               

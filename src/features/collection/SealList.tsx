@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { SEALS } from '../../lib/seals';
 import { LucideArrowLeft, LucideLock, LucideX } from 'lucide-react';
@@ -10,8 +10,15 @@ interface SealListProps {
 }
 
 export const SealList = ({ onBack }: SealListProps) => {
-  const { user } = useGame();
+  const { user, settings } = useGame();
   const [selectedSeal, setSelectedSeal] = useState<Seal | null>(null);
+
+  // Use custom seals if available, otherwise use default SEALS
+  const sealsToDisplay = useMemo(() => {
+    return (settings?.customSeals && settings.customSeals.length > 0) 
+      ? settings.customSeals 
+      : SEALS;
+  }, [settings]);
 
   if (!user) return null;
 
@@ -48,7 +55,7 @@ export const SealList = ({ onBack }: SealListProps) => {
             シールずかん
         </h1>
         <div style={{ marginLeft: 'auto', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-            {user.unlockedSeals.length} / {SEALS.length}
+            {user.unlockedSeals.length} / {sealsToDisplay.length}
         </div>
       </header>
 
@@ -58,7 +65,7 @@ export const SealList = ({ onBack }: SealListProps) => {
           gap: '1rem',
           paddingBottom: '2rem'
       }}>
-        {SEALS.map((seal) => {
+        {sealsToDisplay.map((seal) => {
           const isUnlocked = user.unlockedSeals.includes(seal.id);
 
           return (

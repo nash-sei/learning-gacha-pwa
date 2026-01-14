@@ -381,7 +381,7 @@ export const Settings = ({ onBack }: SettingsProps) => {
                                       
                                       {/* X Position */}
                                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>X:</span>
+                                          <span style={{ width: '40px', fontSize: '0.8rem' }}>横:</span>
                                           <input 
                                               type="range" 
                                               min="0" 
@@ -394,12 +394,12 @@ export const Settings = ({ onBack }: SettingsProps) => {
                                               }}
                                               style={{ flex: 1 }}
                                           />
-                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>{m.x}%</span>
+                                          <span style={{ width: '40px', fontSize: '0.8rem' }}>{m.x}%</span>
                                       </div>
                                       
                                       {/* Y Position */}
                                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>Y:</span>
+                                          <span style={{ width: '40px', fontSize: '0.8rem' }}>縦:</span>
                                           <input 
                                               type="range" 
                                               min="0" 
@@ -412,7 +412,7 @@ export const Settings = ({ onBack }: SettingsProps) => {
                                               }}
                                               style={{ flex: 1 }}
                                           />
-                                          <span style={{ width: '30px', fontSize: '0.8rem' }}>{m.y}%</span>
+                                          <span style={{ width: '40px', fontSize: '0.8rem' }}>{m.y}%</span>
                                       </div>
                                       
                                       {/* Scale */}
@@ -577,6 +577,37 @@ export const Settings = ({ onBack }: SettingsProps) => {
               <h3 style={{ borderBottom: '2px solid #fecdd3', paddingBottom: '0.5rem', marginBottom: '1rem', color: '#be123c', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <LucideTrash2 size={20} /> データ管理
               </h3>
+              
+              {/* Reset Seal Collection */}
+              <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #fecdd3' }}>
+                  <p style={{ fontSize: '0.9rem', color: '#881337', marginBottom: '1rem' }}>
+                      獲得したシール図鑑をリセットします。（コインや進捗は保持されます）
+                  </p>
+                  <button 
+                    onClick={() => {
+                        if (window.confirm('シール図鑑をリセットしますか？獲得したシールがすべて削除されます。')) {
+                            if (user) {
+                                updateUser({ ...user, unlockedSeals: [] });
+                                alert('シール図鑑をリセットしました');
+                            }
+                        }
+                    }}
+                    style={{
+                        width: '100%',
+                        padding: '0.8rem',
+                        background: '#f97316',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-md)',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                    }}
+                  >
+                      シール図鑑をリセット
+                  </button>
+              </div>
+              
+              {/* Reset All Data */}
               <p style={{ fontSize: '0.9rem', color: '#881337', marginBottom: '1rem' }}>
                   ユーザーデータ、進捗、獲得シールなどすべてのデータを初期化します。
               </p>

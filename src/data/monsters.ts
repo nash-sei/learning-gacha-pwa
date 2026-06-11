@@ -2,7 +2,7 @@
  * モンスター図鑑マスター（spec §7・固定24体）
  * - レア度内訳: N=10 / R=8 / SR=5 / UR=1
  * - 全て完全オリジナル（自然・属性モチーフの造語名。実在キャラへの類似禁止＝spec §1-8）
- * - 画像は public/monsters/<id>.svg（現状はプレースホルダ。本番は Codex Image2 → 512px WebP に差し替え）
+ * - 画像は public/monsters/<id>.webp（Codex Image2 で生成 → 512px 透過 WebP・1体80KB以下。2026-06-12 本番差し替え済み）
  * - stages: SR/UR は 2（進化＝同一IDのまま stage が上がる方式・spec §7。1.0 では画像1枚で運用）
  */
 import type { MonsterDef } from '../types'
@@ -192,5 +192,5 @@ export function getMonster(id: string): MonsterDef | undefined {
  * @param _stage 将来用（進化で見た目が変わる第2弾以降。1.0 では未使用）
  */
 export function monsterSprite(monsterId: string, _stage?: number): string {
-  return `/monsters/${monsterId}.svg`
+  return `/monsters/${monsterId}.webp`
 }

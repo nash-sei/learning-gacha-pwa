@@ -1,114 +1,115 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  /* Color Palette - Premium & Playful */
-  --color-primary: #6366f1; /* Indigo 500 */
-  --color-primary-dark: #4f46e5;
-  --color-primary-light: #818cf8;
-  
-  --color-secondary: #ec4899; /* Pink 500 */
-  --color-secondary-dark: #db2777;
-  --color-secondary-light: #f472b6;
+/*
+ * 学習ガチャ v2 デザイントークン（Tailwind v4 CSS-first / @theme）
+ * 子供向け：大きい角丸・丸ゴシック・はっきりした色・ルビ前提の行間。
+ * 憲法（spec §1-4）外部通信ゼロのため Web フォントは使わず、端末内蔵の丸ゴシックのみを指定する。
+ */
+@theme {
+  /* ---- 基本パレット（あたたかく・はっきり） ---- */
+  --color-primary: #5b8def;
+  --color-primary-dark: #3f6fd6;
+  --color-primary-light: #8fb4ff;
+  --color-secondary: #ff7eb6;
+  --color-secondary-dark: #e85d9b;
+  --color-accent: #ffc043;
+  --color-accent-dark: #e7a01f;
+  --color-success: #4ade80;
+  --color-danger: #f87171;
 
-  --color-accent: #f59e0b; /* Amber 500 */
-  --color-success: #10b981; /* Emerald 500 */
-  --color-danger: #ef4444; /* Red 500 */
-  --color-warning: #f59e0b;
-
-  --color-background: #f8fafc; /* Slate 50 */
+  --color-bg: #fff8ed;
+  --color-bg-2: #ffeccf;
   --color-surface: #ffffff;
-  --color-surface-glass: rgba(255, 255, 255, 0.8);
-  
-  --color-text-main: #1e293b; /* Slate 800 */
-  --color-text-sub: #64748b; /* Slate 500 */
-  --color-text-inverse: #ffffff;
+  --color-ink: #3a2f2a;
+  --color-ink-soft: #7a6f68;
+  --color-ink-faint: #b6aaa2;
 
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
+  /* ---- レア度カラー（N/R/SR/UR） ---- */
+  --color-rarity-n: #9aa4b2;
+  --color-rarity-r: #4f9dff;
+  --color-rarity-sr: #ffb020;
+  --color-rarity-ur: #b06bff;
 
-  /* Radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-full: 9999px;
+  /* ---- 通貨カラー ---- */
+  --color-coin: #ffc043;
+  --color-shard: #5ad1e6;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  /* ---- 端末内蔵の丸ゴシックスタック（外部フォント読み込みなし） ---- */
+  --font-display: "Hiragino Maru Gothic ProN", "Hiragino Maru Gothic Pro",
+    "BIZ UDPGothic", "Yu Gothic UI", "YuGothic", "Meiryo",
+    "M PLUS Rounded 1c", "Rounded Mplus 1c", system-ui, sans-serif;
 
-  /* Font */
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 2rem;
+  /* ---- 大きめの角丸 ---- */
+  --radius-card: 1.5rem;
+  --radius-btn: 1.25rem;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--font-display);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--color-bg-2), transparent 60%),
+      var(--color-bg);
+    color: var(--color-ink);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ルビ（ふりがな）の見やすさ */
+  ruby {
+    ruby-align: center;
+  }
+  rt {
+    font-size: 0.52em;
+    color: var(--color-ink-soft);
+    font-weight: 600;
+    user-select: none;
+    letter-spacing: 0.02em;
+  }
 }
 
-body {
-  font-family: var(--font-family);
-  background-color: var(--color-background);
-  color: var(--color-text-main);
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow: hidden; /* Prevent scroll on PWA usually */
-  user-select: none; /* Game-like experience */
+@layer components {
+  /* 子供向けの大きな押しやすいボタン */
+  .btn-kid {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-btn)]
+      px-6 py-4 text-2xl font-extrabold text-white shadow-lg
+      transition-transform active:translate-y-0.5 active:scale-[0.98]
+      select-none;
+    min-height: 4rem;
+  }
+  .btn-kid:disabled {
+    @apply opacity-50;
+  }
+  .card-kid {
+    @apply rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-xl;
+  }
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
+/* ガチャ等の演出で使う共通アニメ */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.25); }
 }
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
-
-/* Utilities */
-.glass-panel {
-  background: var(--color-surface-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: var(--shadow-glass);
-  border-radius: var(--radius-lg);
-}
-
-.full-screen {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-
-.center-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+.anim-sparkle { animation: sparkle 1.4s ease-in-out infinite; }
+.anim-float { animation: float-y 3s ease-in-out infinite; }

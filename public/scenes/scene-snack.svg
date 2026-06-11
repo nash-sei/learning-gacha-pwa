@@ -1,0 +1,19 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#fff4e0"/>
+  <!-- クッキー -->
+  <circle cx="180" cy="230" r="110" fill="#d9a05f" stroke="#b07a3a" stroke-width="10"/>
+  <circle cx="140" cy="200" r="16" fill="#6b4a2a"/>
+  <circle cx="216" cy="186" r="14" fill="#6b4a2a"/>
+  <circle cx="186" cy="252" r="15" fill="#6b4a2a"/>
+  <circle cx="132" cy="266" r="12" fill="#6b4a2a"/>
+  <circle cx="236" cy="256" r="12" fill="#6b4a2a"/>
+  <!-- キャンディ -->
+  <circle cx="356" cy="330" r="62" fill="#f29bb4" stroke="#d96a8e" stroke-width="8"/>
+  <path d="M356 268C320 300 392 360 356 392M294 330C326 294 386 366 418 330" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M300 286L252 250L268 300Z" fill="#d96a8e"/>
+  <path d="M412 374L460 410L444 360Z" fill="#d96a8e"/>
+  <!-- ジュース -->
+  <path d="M120 360L140 470H220L240 360Z" fill="#ffe08a" stroke="#e0a93c" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M196 372L216 300" stroke="#e25c4a" stroke-width="10" stroke-linecap="round"/>
+</svg>

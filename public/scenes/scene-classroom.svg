@@ -1,0 +1,14 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#f3efe6"/>
+  <!-- こくばん（もじ・すうじなし、抽象的な線のみ） -->
+  <rect x="76" y="70" width="360" height="220" rx="16" fill="#8a6f4d"/>
+  <rect x="96" y="90" width="320" height="180" rx="8" fill="#3f7d5a"/>
+  <path d="M124 130H280M124 170H240M124 210H300" stroke="#f6f3e8" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 18"/>
+  <rect x="370" y="246" width="36" height="12" rx="6" fill="#f6f3e8"/>
+  <!-- つくえ といす -->
+  <rect x="130" y="350" width="250" height="26" rx="13" fill="#c89a5f"/>
+  <path d="M155 376V470M355 376V470" stroke="#a37a45" stroke-width="16" stroke-linecap="round"/>
+  <!-- ほん -->
+  <path d="M210 330Q255 312 300 330V346Q255 328 210 346Z" fill="#fff" stroke="#5b8dd9" stroke-width="8" stroke-linejoin="round"/>
+</svg>

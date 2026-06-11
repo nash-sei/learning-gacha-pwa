@@ -1,290 +1,493 @@
-import { useState } from 'react';
-import { useGame } from '../../contexts/GameContext';
-import type { Difficulty, User } from '../../types';
-import { LucideGift, LucideStar, LucideCoins } from 'lucide-react';
-import { motion } from 'framer-motion';
+/*
+ * タマゴガチャ画面（spec §6）
+ * - commit-then-animate（spec §6-1・最重要）：「あける！」のタップで
+ *   ①performGacha で抽選 → ②コイン報酬を加えた committed セーブを作る → ③先に updateSave で保存 →
+ *   ④その後に段階演出（ドラムロール→卵→ゆれ→ヒビ→シルエット→ジャーン）。
+ *   演出中に PWA 更新のリロードが走っても報酬は既に保存済みで消えない。
+ * - retryUsed=true なら実効難易度を1段階降格（spec §5-1）
+ * - レア度別演出：N=ふつう / R=青い光 / SR=金の光+紙吹雪 / UR=虹+特別カットイン
+ * - 月間コインは childSettings.maxMonthlyCoins で頭打ち（spec §6-3）
+ */
+import { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import type { Difficulty, Rarity, SaveData } from '../../types'
+import type { GachaResult } from '../../lib/gacha'
+import { demote, performGacha } from '../../lib/gacha'
+import { DIFFICULTY_LABEL, RARITY_COLOR, RARITY_LABEL } from '../../lib/constants'
+import { audio } from '../../lib/audio'
+import type { SeName } from '../../lib/audio'
+import { useGame } from '../../contexts/GameContext'
+import Dialog from '../../components/Dialog'
+import MonsterSprite from '../../components/MonsterSprite'
 
-interface GachaProps {
-  difficulty: Difficulty;
-  onBack: () => void;
-  onDanger?: () => void;
+export interface GachaProps {
+  difficulty: Difficulty
+  retryUsed: boolean
+  onDone: () => void
 }
 
-export const Gacha = ({ difficulty, onBack, onDanger }: GachaProps) => {
-  const { user, settings, updateUser } = useGame();
-  const [phase, setPhase] = useState<'ready' | 'animating' | 'result' | 'danger'>('ready');
-  const [rewardCoin, setRewardCoin] = useState(0);
+type Phase =
+  | 'ready'
+  | 'drumroll'
+  | 'egg'
+  | 'shake'
+  | 'crack'
+  | 'silhouette'
+  | 'reveal'
+  | 'result'
 
-  // Calculate rewards but don't commit until animation finishes (or start)
-  const handlePull = () => {
-    if (!user) return;
-    if (user.dailyGachaCount >= settings.maxDailyGacha) {
-        alert('今日のガチャはもう終わり！'); // Should handle this better in UI
-        onBack();
-        return;
+const REVEAL_SE: Record<Rarity, SeName> = {
+  N: 'reveal-n',
+  R: 'reveal-r',
+  SR: 'reveal-sr',
+  UR: 'reveal-ur',
+}
+
+/** レア度別の卵の見た目（色・光でレア度を予告する） */
+const EGG_STYLE: Record<Rarity, { base: string; glow: string }> = {
+  N: { base: 'linear-gradient(160deg, #f2f5f8, #9aa4b2)', glow: 'rgba(154,164,178,0.45)' },
+  R: { base: 'linear-gradient(160deg, #cfe4ff, #4f9dff)', glow: 'rgba(79,157,255,0.65)' },
+  SR: { base: 'linear-gradient(160deg, #ffe9b8, #ffb020)', glow: 'rgba(255,176,32,0.7)' },
+  UR: {
+    base: 'linear-gradient(135deg, #ff5e5e, #ffc043, #4ade80, #4f9dff, #b06bff)',
+    glow: 'rgba(176,107,255,0.75)',
+  },
+}
+
+interface ConfettiPiece {
+  id: number
+  x: number
+  delay: number
+  color: string
+  rotate: number
+}
+
+const CONFETTI_COLORS = ['#ffc043', '#ff7eb6', '#4f9dff', '#4ade80', '#b06bff']
+
+/** レンダー中でも使える決定的な擬似乱数 0..1（react-hooks/purity 対応。見た目のバラつき用途で十分） */
+function pseudoRandom(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+
+/** 紙吹雪（SR/UR の reveal で降らせる） */
+function Confetti({ pieces }: { pieces: ConfettiPiece[] }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {pieces.map((p) => (
+        <motion.span
+          key={p.id}
+          className="absolute top-0 block h-3 w-2 rounded-sm"
+          style={{ left: `${p.x}%`, backgroundColor: p.color }}
+          initial={{ y: -24, opacity: 0, rotate: 0 }}
+          animate={{ y: '110vh', opacity: [0, 1, 1, 0.6], rotate: p.rotate }}
+          transition={{ delay: p.delay, duration: 2.6, ease: 'easeIn' }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** 卵のヒビ（crack 以降に重ねる） */
+function EggCracks() {
+  return (
+    <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
+      <polyline
+        points="50,8 44,28 56,44 46,62"
+        fill="none"
+        stroke="rgba(60,47,42,0.55)"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <polyline
+        points="30,40 40,52 34,68"
+        fill="none"
+        stroke="rgba(60,47,42,0.4)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <polyline
+        points="70,36 62,50 70,66"
+        fill="none"
+        stroke="rgba(60,47,42,0.4)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
+  const { save, childSettings, updateSave } = useGame()
+
+  const [phase, setPhase] = useState<Phase>('ready')
+  const [outcome, setOutcome] = useState<{ result: GachaResult; reward: number } | null>(null)
+  const [saveWarnOpen, setSaveWarnOpen] = useState(false)
+
+  // 実効難易度：リトライを使った回は1段階降格（spec §5-1）
+  const effDiff = retryUsed ? demote(difficulty) : difficulty
+  const demoted = effDiff !== difficulty
+
+  const confetti = useMemo<ConfettiPiece[]>(
+    () =>
+      Array.from({ length: 22 }, (_, i) => ({
+        id: i,
+        x: pseudoRandom(i + 1) * 100,
+        delay: pseudoRandom(i + 101) * 0.7,
+        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        rotate: 180 + pseudoRandom(i + 201) * 540,
+      })),
+    []
+  )
+
+  // クイズBGMはここで止めて演出の音を立たせる
+  useEffect(() => {
+    audio.stopBgm()
+  }, [])
+
+  // 段階演出のタイマー進行（音と同期）
+  useEffect(() => {
+    let t: number | undefined
+    switch (phase) {
+      case 'drumroll':
+        t = window.setTimeout(() => setPhase('egg'), 1500)
+        break
+      case 'egg':
+        t = window.setTimeout(() => setPhase('shake'), 1000)
+        break
+      case 'shake':
+        t = window.setTimeout(() => setPhase('crack'), 1200)
+        break
+      case 'crack':
+        audio.playSe('crack')
+        t = window.setTimeout(() => setPhase('silhouette'), 800)
+        break
+      case 'silhouette':
+        t = window.setTimeout(() => setPhase('reveal'), 1000)
+        break
+      case 'reveal':
+        if (outcome) audio.playSe(REVEAL_SE[outcome.result.rarity])
+        t = window.setTimeout(() => setPhase('result'), 2000)
+        break
+      case 'ready':
+      case 'result':
+        break
+    }
+    return () => {
+      if (t !== undefined) window.clearTimeout(t)
+    }
+  }, [phase, outcome])
+
+  if (!save) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-xl items-center justify-center p-6">
+        <button className="btn-kid bg-[var(--color-primary)]" onClick={onDone}>
+          もどる
+        </button>
+      </div>
+    )
+  }
+
+  const canPull = save.dailyGachaCount < childSettings.maxDailyGacha
+
+  // ---- commit-then-animate：先に保存、あとから演出（spec §6-1） ----
+  const handleOpen = () => {
+    if (!canPull || phase !== 'ready') return
+    audio.unlock()
+
+    // ① 抽選（nextSave は monster/shards/dailyGachaCount/pity 確定済・コインは含まない）
+    const { result, nextSave } = performGacha(save, effDiff)
+
+    // ② コイン報酬（月間は maxMonthlyCoins で頭打ち・spec §6-3）
+    const reward = childSettings.coinRewards[effDiff]
+    const committed: SaveData = {
+      ...nextSave,
+      coins: nextSave.coins + reward,
+      treeCoins: nextSave.treeCoins + reward,
+      monthly: {
+        ...nextSave.monthly,
+        coins: Math.min(childSettings.maxMonthlyCoins, nextSave.monthly.coins + reward),
+      },
     }
 
-    setPhase('animating');
+    // ③ 先に保存（失敗は握りつぶさず警告・spec §9-5）
+    const r = updateSave(() => committed)
+    if (!r.ok) setSaveWarnOpen(true)
 
-    // Calculate Coin
-    const baseCoin = settings.coinRewards[difficulty];
-    const variance = Math.floor(Math.random() * 10) - 5; // +/- 5
-    const coin = Math.max(1, baseCoin + variance);
-
-    // Animation delay
-    setTimeout(() => {
-        const nextGachaCount = user.dailyGachaCount + 1;
-        
-        const newUser: User = {
-            ...user,
-            coins: Math.min(settings.maxMonthlyCoins, user.coins + coin),
-            monthlyCoins: Math.min(settings.maxMonthlyCoins, user.monthlyCoins + coin),
-            treeCoins: (user.treeCoins || 0) + coin, // Add to tree
-            dailyGachaCount: nextGachaCount,
-        };
-        updateUser(newUser);
-
-        setRewardCoin(coin);
-        setPhase('result');
-    }, 2500);
-  };
-  
-  if (phase === 'danger') {
-      return (
-          <div className="full-screen center-content" style={{ background: '#300', color: 'red' }}>
-             <div 
-                className="glass-panel"
-                style={{ 
-                    border: '4px solid red', 
-                    padding: '2rem', 
-                    textAlign: 'center',
-                    animation: 'pulse-border 1s infinite' // Use CSS keyframe or simple style
-                }}
-             >
-                 <motion.h1 
-                    animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
-                    transition={{ repeat: Infinity, duration: 0.8 }}
-                    style={{ fontSize: '3rem', fontWeight: 'bold' }}
-                 >
-                    WARNING!!
-                 </motion.h1>
-                 <p style={{ fontSize: '1.5rem', margin: '1rem 0', color: 'white' }}>
-                    きけんモード はつどう！
-                 </p>
-                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-                    <button 
-                        onClick={onDanger}
-                        style={{ 
-                            padding: '1rem 2rem', 
-                            fontSize: '1.5rem', 
-                            background: 'red', 
-                            color: 'white', 
-                            border: '2px solid white', 
-                            borderRadius: 'var(--radius-md)',
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        ちょうせんする
-                    </button>
-                    <button 
-                        onClick={onBack}
-                        style={{ 
-                            padding: '1rem', 
-                            background: '#3b82f6', // Blue to differentiate from red "Challenge"
-                            color: 'white', 
-                            border: '2px solid white',
-                            borderRadius: 'var(--radius-md)',
-                            cursor: 'pointer',
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        にげる（ホームへ）
-                    </button>
-                 </div>
-             </div>
-          </div>
-      );
+    // ④ ここから演出
+    setOutcome({ result, reward })
+    audio.playSe('drumroll')
+    setPhase('drumroll')
   }
 
-  if (phase === 'ready') {
-      return (
-          <div className="full-screen center-content">
-              <div style={{ textAlign: 'center' }}>
-                  <motion.div 
-                    animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                      <LucideGift size={128} color="var(--color-primary)" />
-                  </motion.div>
-                  <h2 className="text-gradient" style={{ fontSize: '2rem', margin: '2rem 0' }}>
-                      ごほうびガチャ！
-                  </h2>
-                  <button 
-                    onClick={handlePull}
-                    style={{
-                        padding: '1rem 3rem',
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        color: 'white',
-                        background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
-                        borderRadius: 'var(--radius-full)',
-                        boxShadow: 'var(--shadow-lg)'
-                    }}
-                  >
-                      ひく！
-                  </button>
-              </div>
-          </div>
-      );
-  }
-
-  if (phase === 'animating') {
-       return (
-          <div className="full-screen center-content" style={{ background: 'black' }}>
-               <motion.div
-                 initial={{ scale: 0.5, opacity: 0 }}
-                 animate={{ scale: [1, 1.5, 0], opacity: [1, 1, 0], rotate: 720 }}
-                 transition={{ duration: 2 }}
-               >
-                   <LucideStar size={200} color="gold" />
-               </motion.div>
-          </div>
-       );
-  }
+  const result = outcome?.result ?? null
+  const eggStyle = result ? EGG_STYLE[result.rarity] : EGG_STYLE.N
+  const showEgg = phase === 'egg' || phase === 'shake' || phase === 'crack'
 
   return (
-      <div className="full-screen center-content" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', position: 'relative', overflow: 'hidden' }}>
-          {/* Sparkle background effects */}
-          {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={`sparkle-${i}`}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ 
-                    opacity: [0, 1, 0],
-                    scale: [0, 1, 0],
-                    rotate: Math.random() * 360
-                }}
-                transition={{ 
-                    duration: 2, 
-                    repeat: Infinity,
-                    delay: Math.random() * 2,
-                    ease: "easeInOut"
-                }}
-                style={{ 
-                    position: 'absolute', 
-                    top: `${Math.random() * 100}%`,
-                    left: `${Math.random() * 100}%`,
-                    width: '4px',
-                    height: '4px',
-                    borderRadius: '50%',
-                    background: '#ffd700',
-                    boxShadow: '0 0 10px #ffd700'
-                }}
-              />
-          ))}
+    <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center p-4">
+      {/* ヘッダー：ガチャ回数 */}
+      <div className="mb-2 flex w-full items-center justify-between">
+        <span className="rounded-full bg-[var(--color-bg-2)] px-4 py-2 text-base font-bold text-[var(--color-ink-soft)]">
+          きょうのガチャ {Math.min(save.dailyGachaCount, childSettings.maxDailyGacha)}/
+          {childSettings.maxDailyGacha}
+        </span>
+        <span className="rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-sm font-bold text-white">
+          {DIFFICULTY_LABEL[effDiff]}のタマゴ
+        </span>
+      </div>
 
-          <div style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
-              {/* Treasure Chest Image */}
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', duration: 1, bounce: 0.5 }}
-                style={{ marginBottom: '1rem' }}
-              >
-                  <img 
-                      src="/treasure_chest.png" 
-                      alt="Treasure Chest" 
-                      style={{ 
-                          width: '280px', 
-                          height: 'auto',
-                          filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))'
-                      }} 
-                  />
-              </motion.div>
-
-              {/* Coin Amount Display */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                style={{
-                    background: 'rgba(255, 215, 0, 0.95)',
-                    padding: '1rem 2rem',
-                    borderRadius: '50px',
-                    border: '3px solid #b8860b',
-                    boxShadow: '0 8px 20px rgba(0,0,0,0.3), inset 0 2px 10px rgba(255,255,255,0.3)',
-                    display: 'inline-block',
-                    marginBottom: '1.5rem'
-                }}
-              >
-                  <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1a1a2e' }}>
-                      +{rewardCoin}
-                  </div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#5a4a0a' }}>
-                      コイン獲得！
-                  </div>
-              </motion.div>
-
-              {/* Coin rain effect */}
-              {Array.from({ length: 25 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ x: 0, y: -100, opacity: 0, scale: 0 }}
-                    animate={{ 
-                        x: (Math.random() - 0.5) * 400,
-                        y: [0, 600],
-                        opacity: [0, 1, 1, 0],
-                        scale: [0, 1.2, 1, 0.8],
-                        rotate: Math.random() * 720
-                    }}
-                    transition={{ 
-                        duration: 2.5, 
-                        ease: "easeOut",
-                        delay: 0.3 + Math.random() * 0.5
-                    }}
-                    style={{ 
-                        position: 'absolute', 
-                        top: '30%', 
-                        left: '50%',
-                        zIndex: 5,
-                        pointerEvents: 'none'
-                    }}
-                  >
-                      <LucideCoins size={28} color="#fbbf24" fill="#fbbf24" />
-                  </motion.div>
-              ))}
-
-               <p style={{ color: 'white', marginBottom: '1.5rem', fontSize: '1rem', fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                   のこり: {user ? settings.maxDailyGacha - user.dailyGachaCount : 0} 回
-               </p>
-               
-               <motion.button 
-                  onClick={() => {
-                      if (user && user.dailyGachaCount >= settings.maxDailyGacha) {
-                          setPhase('danger');
-                      } else {
-                          onBack();
-                      }
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+      {/* ステージ */}
+      <div className="card-kid relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden p-6">
+        {/* ---- かまえ ---- */}
+        {phase === 'ready' && (
+          <div className="flex flex-col items-center gap-5">
+            {canPull ? (
+              <>
+                <motion.div
+                  className="anim-float h-40 w-32 rounded-[50%_50%_50%_50%/60%_60%_42%_42%]"
                   style={{
-                      padding: '1rem 3rem',
-                      background: 'linear-gradient(180deg, #ffd700 0%, #b8860b 100%)',
-                      color: '#1a1a2e',
-                      borderRadius: '50px',
-                      fontSize: '1.3rem',
-                      fontWeight: 'bold',
-                      border: '3px solid #b8860b',
-                      boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
-                      cursor: 'pointer'
+                    background: 'linear-gradient(160deg, #fff4dd, #e8d5b5)',
+                    boxShadow: '0 10px 24px rgba(58,47,42,0.18)',
+                  }}
+                  initial={{ scale: 0.7, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                />
+                <p className="text-center text-2xl font-extrabold text-[var(--color-ink)]">
+                  ごほうびの タマゴが とどいたよ！
+                </p>
+                {demoted && (
+                  <p className="text-center text-sm font-bold text-[var(--color-ink-soft)]">
+                    「もういちど」を つかったから
+                    <br />
+                    タマゴは「{DIFFICULTY_LABEL[effDiff]}」に なったよ
+                  </p>
+                )}
+                <button className="btn-kid bg-[var(--color-secondary)] px-10" onClick={handleOpen}>
+                  あける！
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl">🌙</div>
+                <p className="text-center text-2xl font-extrabold text-[var(--color-ink)]">
+                  きょうの ガチャは おしまい！
+                  <br />
+                  <span className="text-lg font-bold text-[var(--color-ink-soft)]">
+                    また あした あそぼうね
+                  </span>
+                </p>
+                <button
+                  className="btn-kid bg-[var(--color-primary)]"
+                  onClick={() => {
+                    audio.playSe('tap')
+                    onDone()
                   }}
                 >
-                  ホームへ
-                </motion.button>
+                  とじる
+                </button>
+              </>
+            )}
           </div>
+        )}
+
+        {/* ---- ドラムロール ---- */}
+        {phase === 'drumroll' && (
+          <div className="flex flex-col items-center gap-6">
+            <motion.div
+              className="text-6xl"
+              animate={{ rotate: [0, -12, 12, 0], scale: [1, 1.12, 1] }}
+              transition={{ repeat: Infinity, duration: 0.45 }}
+            >
+              🥁
+            </motion.div>
+            <p className="text-2xl font-extrabold text-[var(--color-ink)]">
+              なにが でるかな…
+              <motion.span
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ repeat: Infinity, duration: 0.9 }}
+              >
+                …
+              </motion.span>
+            </p>
+          </div>
+        )}
+
+        {/* ---- 卵（色・光でレア度予告）→ ゆれる → ヒビ ---- */}
+        {showEgg && result && (
+          <div className="flex flex-col items-center gap-4">
+            <motion.div
+              className="relative h-48 w-40 rounded-[50%_50%_50%_50%/60%_60%_42%_42%]"
+              style={{
+                background: eggStyle.base,
+                boxShadow: `0 0 56px 18px ${eggStyle.glow}, 0 10px 24px rgba(58,47,42,0.2)`,
+              }}
+              initial={{ scale: 0, y: 40 }}
+              animate={
+                phase === 'shake' || phase === 'crack'
+                  ? { scale: 1, y: 0, rotate: [0, -7, 7, -7, 7, 0] }
+                  : { scale: 1, y: 0 }
+              }
+              transition={
+                phase === 'shake' || phase === 'crack'
+                  ? { rotate: { repeat: Infinity, duration: 0.55 }, scale: { type: 'spring' } }
+                  : { type: 'spring', stiffness: 260, damping: 16 }
+              }
+            >
+              {phase === 'crack' && <EggCracks />}
+            </motion.div>
+            {result.pityTriggered && (
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-full bg-[var(--color-accent)] px-4 py-1 text-base font-extrabold text-white"
+              >
+                やくそくの ごほうび！
+              </motion.p>
+            )}
+          </div>
+        )}
+
+        {/* ---- シルエット ---- */}
+        {phase === 'silhouette' && result && (
+          <motion.div
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <MonsterSprite monsterId={result.monster.id} size={150} silhouette />
+            <p className="text-2xl font-extrabold text-[var(--color-ink-soft)]">だれかな…？</p>
+          </motion.div>
+        )}
+
+        {/* ---- ジャーン！（レア度別） ---- */}
+        {(phase === 'reveal' || phase === 'result') && result && (
+          <div className="flex w-full flex-col items-center gap-3">
+            {/* UR 特別カットイン */}
+            <AnimatePresence>
+              {phase === 'reveal' && result.rarity === 'UR' && (
+                <motion.div
+                  className="absolute inset-x-0 top-6 z-10 py-3 text-center text-3xl font-extrabold text-white"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, #ff5e5e, #ffc043, #4ade80, #4f9dff, #b06bff)',
+                  }}
+                  initial={{ x: '-110%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '110%', opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+                >
+                  ✨ ウルトラレア！！ ✨
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* 光のバースト（R 以上） */}
+            {result.rarity !== 'N' && (
+              <motion.div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `radial-gradient(circle at 50% 42%, ${eggStyle.glow}, transparent 62%)`,
+                }}
+                animate={{ opacity: [0.3, 0.9, 0.55] }}
+                transition={{ repeat: Infinity, duration: 1.6 }}
+              />
+            )}
+            {(result.rarity === 'SR' || result.rarity === 'UR') && phase === 'reveal' && (
+              <Confetti pieces={confetti} />
+            )}
+
+            <motion.div
+              initial={{ scale: 0.3, rotate: -8 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 14 }}
+              className="relative"
+            >
+              <MonsterSprite monsterId={result.monster.id} size={160} />
+              {result.isNew && (
+                <motion.span
+                  className="absolute -top-2 -right-6 rounded-full bg-[var(--color-danger)] px-3 py-1 text-lg font-extrabold text-white"
+                  animate={{ rotate: [-8, 8, -8], scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.1 }}
+                >
+                  NEW!
+                </motion.span>
+              )}
+            </motion.div>
+
+            <p className="text-3xl font-extrabold text-[var(--color-ink)]">{result.monster.name}</p>
+            <span
+              className="rounded-full px-4 py-1 text-lg font-extrabold text-white"
+              style={{ backgroundColor: RARITY_COLOR[result.rarity] }}
+            >
+              {RARITY_LABEL[result.rarity]}
+            </span>
+
+            {/* ---- 結果のくわしい表示 ---- */}
+            {phase === 'result' && outcome && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex w-full max-w-sm flex-col items-center gap-2"
+              >
+                {!result.isNew && result.shardGain > 0 && (
+                  <p className="text-xl font-extrabold text-[var(--color-shard)]">
+                    ホシのかけら +{result.shardGain}
+                  </p>
+                )}
+                <p className="text-xl font-extrabold text-[var(--color-accent-dark)]">
+                  コイン +{outcome.reward}
+                </p>
+                {result.pityTriggered && (
+                  <p className="text-base font-bold text-[var(--color-ink-soft)]">
+                    やくそくの ごほうびが でたよ！
+                  </p>
+                )}
+                {demoted && (
+                  <p className="text-sm font-bold text-[var(--color-ink-soft)]">
+                    「もういちど」を つかったから「{DIFFICULTY_LABEL[effDiff]}」のタマゴだったよ
+                  </p>
+                )}
+                <p className="text-sm text-[var(--color-ink-faint)]">
+                  きょうのガチャ {save.dailyGachaCount}/{childSettings.maxDailyGacha} かい
+                </p>
+                <button
+                  className="btn-kid mt-2 w-full bg-[var(--color-primary)]"
+                  onClick={() => {
+                    audio.playSe('tap')
+                    onDone()
+                  }}
+                >
+                  とじる
+                </button>
+              </motion.div>
+            )}
+          </div>
+        )}
       </div>
-  );
-};
+
+      {/* 保存失敗の警告（spec §9-5・握りつぶさない） */}
+      <Dialog
+        open={saveWarnOpen}
+        title="ほぞんエラー"
+        onClose={() => setSaveWarnOpen(false)}
+        actions={
+          <button
+            className="btn-kid bg-[var(--color-primary)]"
+            onClick={() => setSaveWarnOpen(false)}
+          >
+            OK
+          </button>
+        }
+      >
+        <p className="text-center text-base">
+          データの保存に失敗しました（容量不足の可能性）。
+          <br />
+          おうちのひとへ：親メニューでカスタムシール等の容量を確認してください。
+          この画面の獲得結果は端末に保存されていない可能性があります。
+        </p>
+      </Dialog>
+    </div>
+  )
+}

@@ -1,0 +1,17 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#e7f4e2"/>
+  <!-- たいよう -->
+  <circle cx="108" cy="108" r="44" fill="#ffd34d"/>
+  <path d="M108 36V12M108 204V180M36 108H12M204 108H180M57 57L40 40M176 176L159 159M159 57L176 40M40 176L57 159" stroke="#ffd34d" stroke-width="10" stroke-linecap="round"/>
+  <!-- じめん -->
+  <path d="M8 420Q256 380 504 420V456A48 48 0 0 1 456 504H56A48 48 0 0 1 8 456Z" fill="#9fcf85"/>
+  <!-- すべりだい -->
+  <path d="M300 150L440 410" stroke="#5b8dd9" stroke-width="34" stroke-linecap="round"/>
+  <path d="M300 150L440 410" stroke="#9cc1f0" stroke-width="18" stroke-linecap="round"/>
+  <path d="M300 160V410" stroke="#8a6f4d" stroke-width="14" stroke-linecap="round"/>
+  <path d="M252 200H300M252 250H300M252 300H300M252 350H300M252 180V410" stroke="#8a6f4d" stroke-width="12" stroke-linecap="round"/>
+  <!-- ボール -->
+  <circle cx="150" cy="382" r="38" fill="#fff" stroke="#e25c4a" stroke-width="8"/>
+  <path d="M118 362Q150 382 182 362M118 402Q150 382 182 402" fill="none" stroke="#e25c4a" stroke-width="8"/>
+</svg>

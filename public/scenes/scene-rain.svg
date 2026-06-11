@@ -1,0 +1,17 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#e8edf5"/>
+  <!-- くも -->
+  <circle cx="170" cy="140" r="56" fill="#b9c3d3"/>
+  <circle cx="256" cy="116" r="68" fill="#b9c3d3"/>
+  <circle cx="342" cy="140" r="56" fill="#b9c3d3"/>
+  <rect x="130" y="140" width="252" height="56" rx="28" fill="#b9c3d3"/>
+  <!-- あめ -->
+  <path d="M150 240L138 280M230 230L218 270M310 240L298 280M390 230L378 270M190 310L178 350M350 310L338 350" stroke="#7aa7d9" stroke-width="12" stroke-linecap="round"/>
+  <!-- かさ -->
+  <path d="M256 300Q160 300 140 388Q170 368 200 388Q228 368 256 388Q284 368 312 388Q342 368 372 388Q352 300 256 300Z" fill="#e25c4a" stroke="#b03a2a" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M256 300V270" stroke="#b03a2a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M256 388V452Q256 474 234 474" fill="none" stroke="#8a6f4d" stroke-width="12" stroke-linecap="round"/>
+  <!-- みずたまり -->
+  <ellipse cx="160" cy="466" rx="60" ry="14" fill="#bfd4ee"/>
+</svg>

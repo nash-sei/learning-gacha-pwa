@@ -1,0 +1,15 @@
+<!-- placeholder: app icon (monster egg) — may be replaced with final art later -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8e8"/>
+      <stop offset="1" stop-color="#ffe1a8"/>
+    </linearGradient>
+  </defs>
+  <!-- タマゴ -->
+  <path d="M32 4C46 4 56 22 56 38A24 24 0 0 1 8 38C8 22 18 4 32 4Z" fill="url(#eg)" stroke="#e0a93c" stroke-width="3"/>
+  <!-- ヒビ -->
+  <path d="M22 34L28 40L24 46L30 52" fill="none" stroke="#e0a93c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- ほし -->
+  <path d="M41 22L43.2 27L48.5 27.6L44.6 31.2L45.7 36.4L41 33.7L36.3 36.4L37.4 31.2L33.5 27.6L38.8 27Z" fill="#f6b73c"/>
+</svg>

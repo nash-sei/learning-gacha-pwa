@@ -1,0 +1,23 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#fdf0e0"/>
+  <!-- ねこ -->
+  <path d="M110 190L130 120L180 165Z" fill="#f0b46c"/>
+  <path d="M250 190L230 120L180 165Z" fill="#f0b46c"/>
+  <circle cx="180" cy="240" r="86" fill="#f0b46c"/>
+  <circle cx="150" cy="228" r="11" fill="#3a3a40"/>
+  <circle cx="210" cy="228" r="11" fill="#3a3a40"/>
+  <path d="M170 262Q180 272 190 262" fill="none" stroke="#3a3a40" stroke-width="7" stroke-linecap="round"/>
+  <path d="M88 240H128M88 266H130M272 240H232M272 266H230" stroke="#3a3a40" stroke-width="6" stroke-linecap="round"/>
+  <!-- うさぎ -->
+  <ellipse cx="320" cy="170" rx="20" ry="62" fill="#f5f0ea" stroke="#d9cbbd" stroke-width="6"/>
+  <ellipse cx="384" cy="170" rx="20" ry="62" fill="#f5f0ea" stroke="#d9cbbd" stroke-width="6"/>
+  <circle cx="352" cy="300" r="80" fill="#f5f0ea" stroke="#d9cbbd" stroke-width="6"/>
+  <circle cx="324" cy="290" r="10" fill="#3a3a40"/>
+  <circle cx="380" cy="290" r="10" fill="#3a3a40"/>
+  <path d="M344 318Q352 326 360 318" fill="none" stroke="#3a3a40" stroke-width="7" stroke-linecap="round"/>
+  <!-- あしあと -->
+  <circle cx="120" cy="420" r="14" fill="#d9b58a"/>
+  <circle cx="160" cy="440" r="14" fill="#d9b58a"/>
+  <circle cx="200" cy="420" r="14" fill="#d9b58a"/>
+</svg>

@@ -1,0 +1,19 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#e9f2fb"/>
+  <!-- みち -->
+  <rect x="8" y="408" width="496" height="60" fill="#c5c9cf"/>
+  <path d="M40 438H100M150 438H210M260 438H320M370 438H430" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <!-- バスのからだ -->
+  <rect x="60" y="170" width="392" height="200" rx="36" fill="#f6b73c" stroke="#c98a18" stroke-width="10"/>
+  <!-- まど -->
+  <rect x="96" y="204" width="80" height="70" rx="12" fill="#bfe0f5" stroke="#c98a18" stroke-width="6"/>
+  <rect x="216" y="204" width="80" height="70" rx="12" fill="#bfe0f5" stroke="#c98a18" stroke-width="6"/>
+  <rect x="336" y="204" width="80" height="70" rx="12" fill="#bfe0f5" stroke="#c98a18" stroke-width="6"/>
+  <!-- ライトとタイヤ -->
+  <circle cx="86" cy="336" r="14" fill="#fff3c2" stroke="#c98a18" stroke-width="6"/>
+  <circle cx="150" cy="382" r="40" fill="#3a3a40"/>
+  <circle cx="150" cy="382" r="18" fill="#c5c9cf"/>
+  <circle cx="362" cy="382" r="40" fill="#3a3a40"/>
+  <circle cx="362" cy="382" r="18" fill="#c5c9cf"/>
+</svg>

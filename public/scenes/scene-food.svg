@@ -1,0 +1,15 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#fef2ec"/>
+  <!-- ゆげ -->
+  <path d="M180 110Q165 140 180 165Q195 190 180 215M256 90Q241 125 256 152Q271 179 256 210M332 110Q317 140 332 165Q347 190 332 215" fill="none" stroke="#c9cdd4" stroke-width="12" stroke-linecap="round"/>
+  <!-- ごはんのおちゃわん -->
+  <path d="M120 260H392Q392 360 256 380Q120 360 120 260Z" fill="#5b8dd9"/>
+  <path d="M150 262Q256 226 362 262" fill="#fff" stroke="#e8e4da" stroke-width="4"/>
+  <rect x="226" y="378" width="60" height="22" rx="8" fill="#41699f"/>
+  <!-- おにぎり -->
+  <path d="M380 330Q416 330 446 386Q462 420 430 426H330Q298 420 314 386Q344 330 380 330Z" fill="#fff" stroke="#dcd6c8" stroke-width="8"/>
+  <rect x="356" y="392" width="48" height="34" rx="6" fill="#3a4a3a"/>
+  <!-- はし -->
+  <path d="M80 420L210 446M80 446L210 462" stroke="#a37a45" stroke-width="10" stroke-linecap="round"/>
+</svg>

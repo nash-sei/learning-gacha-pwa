@@ -1,0 +1,22 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#eef6e4"/>
+  <!-- つち -->
+  <path d="M8 400Q130 370 256 400Q382 430 504 400V456A48 48 0 0 1 456 504H56A48 48 0 0 1 8 456Z" fill="#b08a5e"/>
+  <!-- めばえ -->
+  <path d="M150 400V330" stroke="#5a8f3c" stroke-width="14" stroke-linecap="round"/>
+  <path d="M150 340Q100 330 92 282Q146 286 150 340Z" fill="#7fb45a"/>
+  <path d="M150 340Q200 330 208 282Q154 286 150 340Z" fill="#7fb45a"/>
+  <!-- はな -->
+  <path d="M330 400V300" stroke="#5a8f3c" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="330" cy="250" r="26" fill="#ffd34d"/>
+  <circle cx="330" cy="200" r="24" fill="#f29bb4"/>
+  <circle cx="378" cy="235" r="24" fill="#f29bb4"/>
+  <circle cx="360" cy="292" r="24" fill="#f29bb4"/>
+  <circle cx="300" cy="292" r="24" fill="#f29bb4"/>
+  <circle cx="282" cy="235" r="24" fill="#f29bb4"/>
+  <!-- じょうろ -->
+  <rect x="396" y="356" width="76" height="56" rx="12" fill="#7aa7d9"/>
+  <path d="M396 372L360 350" stroke="#7aa7d9" stroke-width="14" stroke-linecap="round"/>
+  <path d="M408 356Q434 330 460 356" fill="none" stroke="#7aa7d9" stroke-width="10"/>
+</svg>

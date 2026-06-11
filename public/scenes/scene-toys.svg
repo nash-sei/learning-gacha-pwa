@@ -1,0 +1,15 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#f0ecfa"/>
+  <!-- つみき（もじ・すうじなし、図形マークのみ） -->
+  <rect x="110" y="290" width="140" height="140" rx="18" fill="#7aa7d9" stroke="#4a76ab" stroke-width="8"/>
+  <circle cx="180" cy="360" r="36" fill="#e9f2fb"/>
+  <rect x="146" y="146" width="140" height="140" rx="18" fill="#f2a25c" stroke="#c87a32" stroke-width="8"/>
+  <path d="M216 180L262 252H170Z" fill="#fff4e0"/>
+  <!-- ボール -->
+  <circle cx="370" cy="350" r="80" fill="#fff" stroke="#e25c4a" stroke-width="10"/>
+  <path d="M300 314Q370 350 440 314M300 386Q370 350 440 386" fill="none" stroke="#e25c4a" stroke-width="10"/>
+  <!-- こま -->
+  <path d="M390 130L450 130L420 200Z" fill="#7fb069" stroke="#558044" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M420 200V230" stroke="#558044" stroke-width="8" stroke-linecap="round"/>
+</svg>

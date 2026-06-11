@@ -1,0 +1,18 @@
+<!-- placeholder: replace with Codex Image2 512px WebP (spec §7) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#fdf3e3"/>
+  <!-- かいものカゴ -->
+  <path d="M120 220L152 420H360L392 220Z" fill="#e8a13c" stroke="#a96f1f" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M150 250L370 250M158 300L362 300M166 350L354 350" stroke="#a96f1f" stroke-width="6"/>
+  <path d="M178 220C178 150 334 150 334 220" fill="none" stroke="#a96f1f" stroke-width="12" stroke-linecap="round"/>
+  <!-- カゴの中のりんご -->
+  <circle cx="220" cy="208" r="34" fill="#e25c4a"/>
+  <path d="M220 176Q224 160 236 156" fill="none" stroke="#5a7a3a" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="300" cy="208" r="34" fill="#7fb069"/>
+  <!-- ねふだ（数字なし） -->
+  <g transform="rotate(-15 420 140)">
+    <rect x="380" y="110" width="96" height="60" rx="10" fill="#fff" stroke="#c9b18a" stroke-width="6"/>
+    <circle cx="396" cy="140" r="7" fill="#c9b18a"/>
+    <path d="M414 130H462M414 152H450" stroke="#c9b18a" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

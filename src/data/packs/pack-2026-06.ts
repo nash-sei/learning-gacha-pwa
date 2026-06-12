@@ -905,7 +905,8 @@ export const PACK_2026_06: Question[] = [
     text: 'たて 4cm、よこ 6cmの ちょうほうけいが あります。まわりの ながさは なんcm？',
     figure: {
       type: 'shape',
-      params: { kind: 'rectangle', sides: [4, 6], labels: ['4cm', '6cm'] },
+      // ShapeFigure の辺順は [した(よこ), みぎ(たて)]。本文「たて4・よこ6」→ [よこ6, たて4]
+      params: { kind: 'rectangle', sides: [6, 4], labels: ['6cm', '4cm'] },
     },
     answer: { kind: 'number', value: 20, unit: 'cm' },
     explain: [

@@ -180,8 +180,9 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
       </header>
 
       {/* ===== 木（本番イラスト・モンスターと同テイスト）===== */}
-      <main className="pointer-events-none absolute inset-0 z-10 flex items-end justify-center">
-        <div className="pointer-events-auto relative aspect-square w-full max-w-[520px]">
+      {/* 縦長スマホで木が画面最下部に張り付いて見にくいため、中央やや下に配置（実機FB 2026-06-13） */}
+      <main className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+        <div className="pointer-events-auto relative aspect-square w-full max-w-[520px] translate-y-[7vh]">
           {/* 木全体がゆっくりゆれる（実も一緒にゆれて樹冠に張り付いたまま） */}
           <motion.div
             className="absolute inset-0"
@@ -234,7 +235,7 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
           {/* ようせい キララ（この画面だけの案内役・図鑑/ガチャ対象外。タップで説明） */}
           <motion.button
             aria-label="ようせいの キララと はなす"
-            className="absolute top-[52%] right-[0.5%] z-10 w-[16%] cursor-pointer"
+            className="absolute top-[50%] right-[0.5%] z-10 w-[21%] cursor-pointer"
             animate={{ y: [0, -12, 0] }}
             transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
             whileTap={{ scale: 0.85 }}
@@ -252,19 +253,19 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
             <p className="mb-1 text-sm font-extrabold text-[var(--color-ink-soft)]">
               ✨ きの ようせい キララ
             </p>
-            <p className="text-lg leading-relaxed font-extrabold">{fairyLines[fairyMsg]}</p>
+            <p className="wrap-kid text-lg leading-relaxed font-extrabold">{fairyLines[fairyMsg]}</p>
             <div className="mt-2 flex justify-end gap-2">
               <button
-                className="btn-kid bg-[var(--color-bg-2)] px-4 py-1 text-base"
+                className="btn-kid bg-[var(--color-accent-dark)] px-5 py-2 text-lg"
                 onClick={() => {
                   audio.playSe('tap')
                   setFairyMsg(null)
                 }}
               >
-                ばいばい
+                👋 ばいばい
               </button>
               <button
-                className="btn-kid bg-[var(--color-primary)] px-4 py-1 text-base"
+                className="btn-kid bg-[var(--color-primary)] px-5 py-2 text-lg"
                 onClick={handleFairyTap}
               >
                 つぎへ ▶
@@ -276,7 +277,7 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
         <footer className="absolute right-0 bottom-5 left-0 z-20 text-center">
           <div className="card-kid inline-block px-6 py-3">
             {visibleFruits.length > 0 ? (
-              <p className="text-lg font-extrabold">
+              <p className="wrap-kid text-lg font-extrabold">
                 ✨ あと{' '}
                 <span className="text-2xl text-[var(--color-accent-dark)]">
                   {visibleFruits.length}
@@ -284,7 +285,7 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
                 こ じゅくしてるよ！タップで しゅうかく！
               </p>
             ) : (
-              <p className="text-lg font-extrabold text-[var(--color-ink-soft)]">
+              <p className="wrap-kid text-lg font-extrabold text-[var(--color-ink-soft)]">
                 クイズに せいかいすると
                 <br />
                 きに コインが みのるよ！

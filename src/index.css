@@ -100,6 +100,11 @@
   .card-kid {
     @apply rounded-[var(--radius-card)] bg-[var(--color-surface)] shadow-xl;
   }
+  /* 分かち書きひらがな文を語の途中で折り返さない（スペース位置でだけ改行） */
+  .wrap-kid {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
 }
 
 /* ガチャ等の演出で使う共通アニメ */

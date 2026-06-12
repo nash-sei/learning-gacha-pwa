@@ -1,8 +1,8 @@
 /*
- * モンスター図鑑マスター（spec §7・固定24体）
- * - レア度内訳: N=10 / R=8 / SR=5 / UR=1
+ * モンスター図鑑マスター（spec §7 を 2026-06-13 子供FBで48体に倍増）
+ * - レア度内訳: N=20 / R=16 / SR=10 / UR=2（m25-m48 追加。比率は当初の N10:R8:SR5:UR1 を維持）
  * - 全て完全オリジナル（自然・属性モチーフの造語名。実在キャラへの類似禁止＝spec §1-8）
- * - 画像は public/monsters/<id>.webp（Codex Image2 で生成 → 512px 透過 WebP・1体80KB以下。2026-06-12 本番差し替え済み）
+ * - 画像は public/monsters/<id>.webp（Codex Image2 で生成 → 512px 透過 WebP・1体80KB以下）
  * - stages: SR/UR は 2（進化＝同一IDのまま stage が上がる方式・spec §7。1.0 では画像1枚で運用）
  */
 import type { MonsterDef } from '../types'
@@ -178,6 +178,179 @@ export const MONSTERS: MonsterDef[] = [
     name: 'ニジマール',
     rarity: 'UR',
     blurb: 'あめあがりの にじに すむ でんせつの モンスター。',
+    stages: 2,
+  },
+  // ========== 第2弾 m25-m48（2026-06-13 追加・24体）==========
+  // ===== N（10体）=====
+  {
+    id: 'm25',
+    name: 'イチゴルン',
+    rarity: 'N',
+    blurb: 'あまい においで みんなを よびよせる いちごのこ。',
+    stages: 1,
+  },
+  {
+    id: 'm26',
+    name: 'カイカラン',
+    rarity: 'N',
+    blurb: 'うみべで ひろった かいがらの おうちに すんでいる。',
+    stages: 1,
+  },
+  {
+    id: 'm27',
+    name: 'アワプクン',
+    rarity: 'N',
+    blurb: 'ぷくぷく シャボンだまを とばして あそぶ。',
+    stages: 1,
+  },
+  {
+    id: 'm28',
+    name: 'マツボックン',
+    rarity: 'N',
+    blurb: 'まつの きの うえから ころんと おりてきた。',
+    stages: 1,
+  },
+  {
+    id: 'm29',
+    name: 'クローバン',
+    rarity: 'N',
+    blurb: 'よつばを みつけた ひは いいことが あるらしい。',
+    stages: 1,
+  },
+  {
+    id: 'm30',
+    name: 'テントウン',
+    rarity: 'N',
+    blurb: 'せなかの ほしの かずは ひみつ。',
+    stages: 1,
+  },
+  {
+    id: 'm31',
+    name: 'カタツムン',
+    rarity: 'N',
+    blurb: 'あめのひの さんぽが だいすきな のんびりやさん。',
+    stages: 1,
+  },
+  {
+    id: 'm32',
+    name: 'オチバーン',
+    rarity: 'N',
+    blurb: 'あきになると おちばの やまで かくれんぼ する。',
+    stages: 1,
+  },
+  {
+    id: 'm33',
+    name: 'クルミン',
+    rarity: 'N',
+    blurb: 'かたい からの なかに たからものを しまっている。',
+    stages: 1,
+  },
+  {
+    id: 'm34',
+    name: 'ヒトデコ',
+    rarity: 'N',
+    blurb: 'すなはまで ほしの かたちに ねころんでいる。',
+    stages: 1,
+  },
+  // ===== R（8体）=====
+  {
+    id: 'm35',
+    name: 'サクラリン',
+    rarity: 'R',
+    blurb: 'はるかぜに のせて はなびらを まいあげる。',
+    stages: 1,
+  },
+  {
+    id: 'm36',
+    name: 'モミジン',
+    rarity: 'R',
+    blurb: 'あきの やまを まっかに そめる おしゃれさん。',
+    stages: 1,
+  },
+  {
+    id: 'm37',
+    name: 'スイショウン',
+    rarity: 'R',
+    blurb: 'どうくつの おくで きらきら そだった すいしょうのこ。',
+    stages: 1,
+  },
+  {
+    id: 'm38',
+    name: 'マグマロン',
+    rarity: 'R',
+    blurb: 'あつあつの マグマで おんせんを わかしてくれる。',
+    stages: 1,
+  },
+  {
+    id: 'm39',
+    name: 'タツマキン',
+    rarity: 'R',
+    blurb: 'くるくる まわって はっぱを そらに まきあげる。',
+    stages: 1,
+  },
+  {
+    id: 'm40',
+    name: 'フブキン',
+    rarity: 'R',
+    blurb: 'ゆきあらしの なかで たのしそうに ダンスする。',
+    stages: 1,
+  },
+  {
+    id: 'm41',
+    name: 'シンジュン',
+    rarity: 'R',
+    blurb: 'うみのそこで まんまるに みがかれた しんじゅのこ。',
+    stages: 1,
+  },
+  {
+    id: 'm42',
+    name: 'コハクン',
+    rarity: 'R',
+    blurb: 'むかしの もりの ひかりを からだに とじこめている。',
+    stages: 1,
+  },
+  // ===== SR（5体・進化2段階）=====
+  {
+    id: 'm43',
+    name: 'スイセイン',
+    rarity: 'SR',
+    blurb: 'ながい ひかりの しっぽを ひいて よぞらを かける。',
+    stages: 2,
+  },
+  {
+    id: 'm44',
+    name: 'シンカイン',
+    rarity: 'SR',
+    blurb: 'ふかい うみの そこで ぼんやり ひかる ふしぎなこ。',
+    stages: 2,
+  },
+  {
+    id: 'm45',
+    name: 'シンキロン',
+    rarity: 'SR',
+    blurb: 'さばくの ちへいせんに ゆらゆら まぼろしを みせる。',
+    stages: 2,
+  },
+  {
+    id: 'm46',
+    name: 'ユメミン',
+    rarity: 'SR',
+    blurb: 'ねむっている こどもの ゆめを そっと まもっている。',
+    stages: 2,
+  },
+  {
+    id: 'm47',
+    name: 'ヤマビコン',
+    rarity: 'SR',
+    blurb: 'やまの こえを とどけてくれる もりの ばんにん。',
+    stages: 2,
+  },
+  // ===== UR（1体・進化2段階）=====
+  {
+    id: 'm48',
+    name: 'コスモルン',
+    rarity: 'UR',
+    blurb: 'うちゅうの はてから きた でんせつの ほしの まもりびと。',
     stages: 2,
   },
 ]

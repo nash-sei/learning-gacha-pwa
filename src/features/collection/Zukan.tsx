@@ -225,7 +225,7 @@ export default function Zukan({ onBack }: ZukanProps) {
         }
       >
         <p className="text-center">
-          24ひき ぜんぶ あつめたよ！
+          {MONSTERS.length}ひき ぜんぶ あつめたよ！
           <br />
           しょうごう「<span className="font-extrabold text-[var(--color-accent-dark)]">{TITLE_NAME}</span>
           」を かくとく！

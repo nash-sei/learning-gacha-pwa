@@ -10,7 +10,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGame } from '../../contexts/GameContext'
-import { COINS_PER_FRUIT } from '../../lib/constants'
+import { COINS_PER_FRUIT, FRUIT_IMG, TREE_IMG } from '../../lib/constants'
 import { audio } from '../../lib/audio'
 import Dialog from '../../components/Dialog'
 
@@ -21,15 +21,21 @@ export interface CoinTreeProps {
 /** 表示する実の最大数（これ以上は木に乗り切らない。超過分は収穫で減ると順次見える運用） */
 const MAX_FRUITS = 50
 
-/** 樹冠の楕円クラスタ（実の配置先・旧版の座標を踏襲） */
+/**
+ * 樹冠のクラスタ（実の配置先）。本番イラスト coin-tree.webp の樹冠形状に合わせた
+ * コンテナ比%座標（コンテナは正方形なので x/y とも同じスケール）。
+ */
 const CANOPY_CLUSTERS = [
-  { x: 0, y: -450, rx: 120, ry: 100, rotate: 0 },
-  { x: -130, y: -380, rx: 100, ry: 80, rotate: -30 },
-  { x: 130, y: -380, rx: 100, ry: 80, rotate: 30 },
-  { x: -180, y: -280, rx: 90, ry: 70, rotate: -45 },
-  { x: 180, y: -280, rx: 90, ry: 70, rotate: 45 },
-  { x: 0, y: -320, rx: 110, ry: 90, rotate: 0 },
+  { x: 50, y: 16, rx: 22, ry: 7 },
+  { x: 27, y: 30, rx: 15, ry: 9 },
+  { x: 73, y: 30, rx: 15, ry: 9 },
+  { x: 50, y: 34, rx: 20, ry: 8 },
+  { x: 16, y: 45, rx: 8, ry: 6 },
+  { x: 84, y: 45, rx: 8, ry: 6 },
 ]
+
+/** 実の表示幅（コンテナ比%・タップしやすさ優先で実画像の余白込み） */
+const FRUIT_W_PCT = 11
 
 /** 決定的な疑似乱数（実の位置がレンダーごとに変わらない） */
 function mulberry32(seed: number): () => number {
@@ -155,91 +161,57 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
         </div>
       </header>
 
-      {/* ===== 木（SVG）===== */}
+      {/* ===== 木（本番イラスト・モンスターと同テイスト）===== */}
       <main className="pointer-events-none absolute inset-0 z-10 flex items-end justify-center">
-        <div className="pointer-events-auto relative h-full w-full max-w-[500px]">
-          <svg viewBox="0 0 500 800" className="h-full w-full overflow-visible">
-            <defs>
-              <radialGradient id="goldLeafGradient" cx="50%" cy="30%" r="70%">
-                <stop offset="0%" stopColor="#fef08a" />
-                <stop offset="40%" stopColor="#facc15" />
-                <stop offset="100%" stopColor="#a16207" />
-              </radialGradient>
-              <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3f1d0b" />
-                <stop offset="50%" stopColor="#7c3a1b" />
-                <stop offset="100%" stopColor="#3f1d0b" />
-              </linearGradient>
-            </defs>
-
-            <g transform="translate(250, 800)">
-              {/* 幹 */}
-              <path
-                d="M-40,0 Q-60,-5 -90,20 L-130,-10 Q-90,-20 -70,-80 Q-50,-150 -60,-250 Q-80,-350 -120,-420 L-80,-450 Q-40,-400 0,-360 Q40,-400 80,-450 L120,-420 Q80,-350 60,-250 Q50,-150 70,-80 Q90,-20 130,-10 L90,20 Q60,-5 40,0 Z"
-                fill="url(#trunkGradient)"
-              />
-
-              {/* ゆれる樹冠＋実 */}
-              <motion.g
-                animate={{ rotate: [-0.5, 0.5, -0.5] }}
-                transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ transformOrigin: '0px -300px' }}
-              >
-                {CANOPY_CLUSTERS.map((c, idx) => (
-                  <ellipse
-                    key={idx}
-                    cx={c.x}
-                    cy={c.y}
-                    rx={c.rx}
-                    ry={c.ry}
-                    fill="url(#goldLeafGradient)"
-                    transform={`rotate(${c.rotate}, ${c.x}, ${c.y})`}
+        <div className="pointer-events-auto relative aspect-square w-full max-w-[520px]">
+          {/* 木全体がゆっくりゆれる（実も一緒にゆれて樹冠に張り付いたまま） */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{ rotate: [-0.6, 0.6, -0.6] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ transformOrigin: '50% 92%' }}
+          >
+            <img
+              src={TREE_IMG}
+              alt="コインのき"
+              draggable={false}
+              className="h-full w-full select-none object-contain"
+            />
+            <AnimatePresence>
+              {visibleFruits.map((fruit) => (
+                <motion.button
+                  key={fruit.id}
+                  aria-label="みを しゅうかくする"
+                  className="absolute cursor-pointer"
+                  style={{
+                    width: `${FRUIT_W_PCT}%`,
+                    left: `${fruit.x - FRUIT_W_PCT / 2}%`,
+                    top: `${fruit.y - FRUIT_W_PCT / 2}%`,
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{
+                    y: 420,
+                    opacity: 0,
+                    rotate: 180,
+                    transition: { duration: 0.9, ease: 'easeIn' },
+                  }}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleHarvest(fruit.id)
+                  }}
+                >
+                  <img
+                    src={FRUIT_IMG}
+                    alt=""
+                    draggable={false}
+                    className="h-full w-full select-none"
                   />
-                ))}
-
-                <AnimatePresence>
-                  {visibleFruits.map((fruit) => (
-                    <motion.g
-                      key={fruit.id}
-                      initial={{ scale: 0, opacity: 0, x: fruit.x, y: fruit.y }}
-                      animate={{ scale: 1, opacity: 1, x: fruit.x, y: fruit.y }}
-                      exit={{
-                        y: 800,
-                        opacity: 0,
-                        rotate: 180,
-                        transition: { duration: 0.9, ease: 'easeIn' },
-                      }}
-                      style={{ cursor: 'pointer' }}
-                      whileTap={{ scale: 0.85 }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleHarvest(fruit.id)
-                      }}
-                    >
-                      <circle r="15" fill="#fbbf24" stroke="#b45309" strokeWidth="2" />
-                      <circle
-                        r="11"
-                        fill="transparent"
-                        stroke="#fde047"
-                        strokeWidth="1"
-                        strokeDasharray="3 2"
-                      />
-                      <text
-                        y="6"
-                        textAnchor="middle"
-                        fontSize="16"
-                        fontWeight="900"
-                        fill="#b45309"
-                        style={{ pointerEvents: 'none' }}
-                      >
-                        ¥
-                      </text>
-                    </motion.g>
-                  ))}
-                </AnimatePresence>
-              </motion.g>
-            </g>
-          </svg>
+                </motion.button>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </main>
 

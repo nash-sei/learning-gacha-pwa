@@ -11,7 +11,7 @@ import type { Screen } from '../../App'
 import type { MonsterOwned } from '../../types'
 import { useGame } from '../../contexts/GameContext'
 import { MONSTERS } from '../../data/monsters'
-import { COINS_PER_FRUIT, SHARD_EGG_COST } from '../../lib/constants'
+import { COINS_PER_FRUIT, SHARD_EGG_COST, TREE_IMG } from '../../lib/constants'
 import { weekStr } from '../../lib/dateUtil'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
@@ -168,7 +168,12 @@ export default function Home({ go }: HomeProps) {
           className="absolute right-3 bottom-2 flex flex-col items-center active:scale-95"
           onClick={() => navTap('tree')}
         >
-          <span className="anim-float text-7xl drop-shadow-md sm:text-8xl">🌳</span>
+          <img
+            src={TREE_IMG}
+            alt=""
+            draggable={false}
+            className="anim-float h-24 w-24 select-none object-contain drop-shadow-md sm:h-28 sm:w-28"
+          />
           {fruitCount > 0 && (
             <span className="-mt-3 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-sm font-extrabold text-white shadow">
               🪙 ×{fruitCount}

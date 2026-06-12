@@ -101,6 +101,11 @@ export const SHARD_EGG_UR_RATE = 0.2
 /** 実1個 = 10コイン（v1踏襲） */
 export const COINS_PER_FRUIT = 10
 
+/** コインの木の本番イラスト（public/tree/ 同梱・外部URL禁止＝spec §1-3） */
+export const TREE_IMG = '/tree/coin-tree.webp'
+/** コインの実の本番イラスト */
+export const FRUIT_IMG = '/tree/coin-fruit.webp'
+
 // ========== リトライ時のレア率降格（spec §5-1） ==========
 export const DIFFICULTY_DEMOTE: Record<Difficulty, Difficulty> = {
   hard: 'normal',

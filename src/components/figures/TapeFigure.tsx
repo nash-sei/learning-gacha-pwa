@@ -4,7 +4,8 @@
  * 規約（問題データ係と共通）：
  * - 既定（部分‐全体）… parts を1本のテープに連結し、下に「ぜんぶで {total}」を出す
  *   - unknown==='total' … 「ぜんぶ」の数字を ？ にする
- *   - unknown==='part'  … parts の最後の要素の数字を ？ にする（値は幅の比率計算にのみ使用）
+ *   - unknown==='part'  … parts の最後の要素と value===0 の要素の数字を ？ にする（値は幅の比率計算にのみ使用。
+ *     等分のわり算は全パート value:0 で「？/？/？」になる＝「0」を描いて誤誘導しない）
  * - mode==='compare' … 2量の「ちがい（差）」用。2本のバーを並べて差を「ちがい ？」で示す。
  *   （差を問う問題で「ぜんぶで（合計）」を出すと子供が合計を答えと誤読するため別レイアウトにする）
  * params が不正でも壊さず控えめなプレースホルダを出す。
@@ -30,11 +31,13 @@ interface Seg extends TapePart {
 
 /** レイアウト計算（レンダー外の純関数・値の比率→x座標と幅） */
 function layoutSegments(parts: TapePart[]): Seg[] {
-  const sum = parts.reduce((s, p) => s + p.value, 0) || 1
+  const sum = parts.reduce((s, p) => s + p.value, 0)
   const flexible = Math.max(TAPE_W - MIN_W * parts.length, 0)
   let cursor = X0
   return parts.map((p, i) => {
-    const w = MIN_W + (p.value / sum) * flexible
+    // 全パート未知（等分のわり算＝値が全て0）のときは均等割りにして、下の「ぜんぶで」ブレース幅と一致させる
+    const ratio = sum > 0 ? p.value / sum : 1 / parts.length
+    const w = MIN_W + ratio * flexible
     const seg = { ...p, x: cursor, w, i }
     cursor += w
     return seg
@@ -194,7 +197,9 @@ export default function TapeFigure({ params }: { params: Record<string, unknown>
             fontWeight={700}
             fill="var(--color-ink)"
           >
-            {unknown === 'part' && seg.i === segs.length - 1 ? '？' : seg.value}
+            {unknown === 'part' && (seg.i === segs.length - 1 || seg.value === 0)
+              ? '？'
+              : seg.value}
           </text>
           {seg.label !== '' && (
             <text

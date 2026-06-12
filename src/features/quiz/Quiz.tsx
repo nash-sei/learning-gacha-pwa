@@ -3,7 +3,8 @@
  * - 入口で難易度選択（かんたん3問/ふつう4問/むずかしい5問）→ 全問正解で onComplete（App がガチャへ）
  * - check 付き問題（文章題・読解）は「よむ→わかる→とく」2ステップ（spec §5-2・最重要）
  *   理解チェック正解＝ホシのかけら+1（updateSave で即保存）。不正解でも段階解説を見て「とく」へ進める（かけら無し）
- * - 解答不正解＝段階解説を最後まで読み終えた後のみ「もういちど」（spec §5-1 リトライ規則）。
+ * - 解答不正解＝段階ヒント方式：間違えた回数ぶんだけ解説行を開放（1回目=ヒント1行のみ）。
+ *   全行（=答え）が見えるのは間違え続けた最終段階だけ（spec §5-1 を実機FB 2026-06-13 で改訂）。
  *   リトライ時は選択肢・ならべかえを再シャッフル。1度でも使うと retryUsed=true（ガチャ側でレア率1段階降格）
  * - 正解は都度 questionClearCounts に保存（途中でやめても苦手記録は残る）
  */
@@ -221,6 +222,8 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
   const [step, setStep] = useState<Step>({ kind: 'read' })
   const [ui, setUi] = useState<SolveUi>({ asked: null, choice: null, order: null })
   const [retryUsed, setRetryUsed] = useState(false)
+  /** 段階ヒントの開放行数（間違えるたびに+1。最終行=答えは最後の手段・実機FB 2026-06-13） */
+  const [hintLevel, setHintLevel] = useState(0)
   const [numberInput, setNumberInput] = useState('')
   /** ならべかえ：シャッフル済みトークン配列の index を、子供が並べた順に持つ */
   const [orderPicked, setOrderPicked] = useState<number[]>([])
@@ -243,6 +246,10 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
     return q.explain.length > 0 ? q.explain : ['もういちど ゆっくり かんがえて みよう！']
   }, [q])
 
+  /** いま見せてよい解説行数（段階ヒント）。全行開放=答えまで見えている状態 */
+  const explainVisible = Math.max(1, Math.min(hintLevel, explainLines.length))
+  const explainFull = explainVisible >= explainLines.length
+
   const tapTokens = useMemo(
     () => (q && q.check?.kind === 'number-tap' ? buildTapTokens(q.text) : null),
     [q]
@@ -257,6 +264,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
     })
     setNumberInput('')
     setOrderPicked([])
+    setHintLevel(0)
     setStep(question.check ? { kind: 'read' } : { kind: 'solve' })
   }, [])
 
@@ -311,8 +319,9 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
       audio.playSe('correct')
       setStep({ kind: 'check-reward' })
     } else {
-      // 不正解でも段階解説を見せて「とく」へは進める（かけらは無し）
+      // 不正解＝ヒント1行だけ見せて「とく」へ進める（答えまでは見せない・かけらは無し）
       audio.playSe('wrong')
+      setHintLevel((h) => Math.max(h, 1))
       setStep({ kind: 'explain', lineIndex: 0, after: 'solve' })
     }
   }
@@ -348,6 +357,8 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
       setStep({ kind: 'celebrate' })
     } else {
       audio.playSe('wrong')
+      // 間違えるたびにヒントを1行ずつ開放（最終行=答えに届くのは間違え続けた時だけ）
+      setHintLevel((h) => Math.min(h + 1, explainLines.length))
       setStep({ kind: 'explain', lineIndex: 0, after: 'retry' })
     }
   }
@@ -377,7 +388,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
   const advanceExplain = () => {
     if (step.kind !== 'explain' || !q) return
     audio.playSe('tap')
-    if (step.lineIndex < explainLines.length - 1) {
+    if (step.lineIndex < explainVisible - 1) {
       setStep({ kind: 'explain', lineIndex: step.lineIndex + 1, after: step.after })
       return
     }
@@ -686,6 +697,9 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
                 </motion.div>
               )}
               <div className="flex-1 rounded-2xl border-4 border-[var(--color-bg-2)] bg-[var(--color-bg)] p-4">
+                <p className="mb-2 text-sm font-extrabold text-[var(--color-ink-soft)]">
+                  {explainFull ? '📖 かいせつ' : '💡 ヒント'}
+                </p>
                 <div className="flex flex-col gap-3">
                   {explainLines.slice(0, step.lineIndex + 1).map((line, i) => (
                     <ExplainLine key={i} text={line} active={i === step.lineIndex} />
@@ -694,7 +708,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
               </div>
             </div>
             <button className="btn-kid mx-auto bg-[var(--color-primary)]" onClick={advanceExplain}>
-              {step.lineIndex < explainLines.length - 1
+              {step.lineIndex < explainVisible - 1
                 ? 'つぎへ'
                 : step.after === 'retry'
                   ? 'もういちど とく！'

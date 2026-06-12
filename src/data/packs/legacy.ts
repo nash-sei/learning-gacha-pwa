@@ -53,7 +53,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'easy',
     text: '5 + 5 は？',
     answer: { kind: 'choice', options: ['5', '10', '15'], correct: 1 },
-    explain: ['5と 5を あわせると 10', 'りょうての ゆびを ぜんぶ ひろげた かずと おなじだね！'],
+    explain: ['りょうての ゆびを ぜんぶ ひろげた かずと おなじだよ！', '5と 5を あわせると 10！'],
     pack: 'legacy',
   },
   {
@@ -147,7 +147,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'normal',
     text: '{九九|くく}の 3×4 は？',
     answer: { kind: 'choice', options: ['7', '12', '15'], correct: 1 },
-    explain: ['さんし 12！', '3が 4こぶんで 3 + 3 + 3 + 3 = 12 だね'],
+    explain: ['3が 4こぶん。3 + 3 + 3 + 3 を かぞえて みよう', 'さんし 12！'],
     pack: 'legacy',
   },
   {
@@ -193,7 +193,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'hard',
     text: '8×7 は？',
     answer: { kind: 'choice', options: ['54', '56', '63'], correct: 1 },
-    explain: ['はちしち 56！', '8×7 と 7×8 は おなじ こたえだよ'],
+    explain: ['8×7 と 7×8 は おなじ こたえ。7のだんで おもいだしても いいよ', 'はちしち 56！'],
     pack: 'legacy',
   },
   {
@@ -267,7 +267,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'hard',
     text: '{九九|くく}の 7×8 は？',
     answer: { kind: 'choice', options: ['48', '54', '56'], correct: 2 },
-    explain: ['しちは ごじゅうろく、56！', '7×7 = 49に 7を たして 56 と かんがえても いいね'],
+    explain: ['7×7 = 49に 7を たすと かんがえても いいね', 'しちは ごじゅうろく、56！'],
     pack: 'legacy',
   },
 ]

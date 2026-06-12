@@ -10,7 +10,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGame } from '../../contexts/GameContext'
-import { COINS_PER_FRUIT, FRUIT_IMG, TREE_IMG } from '../../lib/constants'
+import { COINS_PER_FRUIT, FRUIT_IMG, TREE_BG, TREE_IMG } from '../../lib/constants'
 import { audio } from '../../lib/audio'
 import Dialog from '../../components/Dialog'
 
@@ -119,10 +119,13 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden">
-      {/* ===== 空と地面 ===== */}
-      <div className="absolute inset-0 bg-gradient-to-b from-sky-500 via-sky-300 to-sky-100" />
-      <div className="absolute top-[8%] right-[10%] h-14 w-14 rounded-full bg-[var(--color-accent)] shadow-[0_0_40px_12px_rgba(255,192,67,0.55)]" />
-      <div className="absolute bottom-0 left-[-10%] h-[30%] w-[120%] rounded-t-[50%] bg-gradient-to-b from-green-300 to-green-500" />
+      {/* ===== 聖域の背景（神秘の森・縦長をobject-coverで全画面に） ===== */}
+      <img
+        src={TREE_BG}
+        alt=""
+        draggable={false}
+        className="absolute inset-0 h-full w-full select-none object-cover"
+      />
 
       {/* ===== ヘッダー ===== */}
       <header className="relative z-20 flex items-start justify-between p-4">

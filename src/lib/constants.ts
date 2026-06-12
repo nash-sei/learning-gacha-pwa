@@ -105,6 +105,8 @@ export const COINS_PER_FRUIT = 10
 export const TREE_IMG = '/tree/coin-tree.webp'
 /** コインの実の本番イラスト */
 export const FRUIT_IMG = '/tree/coin-fruit.webp'
+/** コインの木の画面の聖域背景（縦1024x1536・object-coverで全画面） */
+export const TREE_BG = '/tree/sanctuary-bg.webp'
 
 // ========== リトライ時のレア率降格（spec §5-1） ==========
 export const DIFFICULTY_DEMOTE: Record<Difficulty, Difficulty> = {

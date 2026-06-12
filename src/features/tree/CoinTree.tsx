@@ -10,7 +10,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGame } from '../../contexts/GameContext'
-import { COINS_PER_FRUIT, FRUIT_IMG, TREE_BG, TREE_IMG } from '../../lib/constants'
+import { COINS_PER_FRUIT, FAIRY_IMG, FRUIT_IMG, TREE_BG, TREE_IMG } from '../../lib/constants'
 import { audio } from '../../lib/audio'
 import Dialog from '../../components/Dialog'
 
@@ -66,6 +66,8 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
   const [saveWarn, setSaveWarn] = useState(false)
   /** 「+10」ポップ演出のキー（収穫ごとに増える） */
   const [gainPulse, setGainPulse] = useState(0)
+  /** ようせいキララのセリフ番号（null=ふきだし非表示） */
+  const [fairyMsg, setFairyMsg] = useState<number | null>(null)
 
   const fruits = useMemo<FruitPos[]>(() => {
     const rand = mulberry32(20260611)
@@ -85,6 +87,19 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
 
   const cap = childSettings.maxMonthlyCoins
   const capReached = save.monthly.harvested >= cap
+
+  /** キララのセリフ（木とコインの説明・タップで順送り） */
+  const fairyLines = [
+    'こんにちは！わたしは きの ようせい キララ。ここは「コインの き」の せいいきだよ',
+    'クイズに せいかいすると、この きに きんいろの コインの みが みのるんだ',
+    'みを タップすると しゅうかく！「こんげつの おこづかい」に かわるよ',
+    `みは 1つで ${COINS_PER_FRUIT}コイン。おこづかいは 1かげつに ${cap}コインまでだよ`,
+    'じょうげんに なったら つづきは らいげつ。まいにち こつこつが いちばん つよいよ！',
+  ]
+  const handleFairyTap = () => {
+    audio.playSe('tap')
+    setFairyMsg((m) => (m === null ? 0 : (m + 1) % fairyLines.length))
+  }
   const visibleFruits = fruits
     .slice(0, initialFruitCount)
     .filter((f) => !harvestedIds.includes(f.id))
@@ -215,29 +230,69 @@ export default function CoinTree({ onBack }: CoinTreeProps) {
               ))}
             </AnimatePresence>
           </motion.div>
+
+          {/* ようせい キララ（この画面だけの案内役・図鑑/ガチャ対象外。タップで説明） */}
+          <motion.button
+            aria-label="ようせいの キララと はなす"
+            className="absolute top-[52%] right-[0.5%] z-10 w-[16%] cursor-pointer"
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+            whileTap={{ scale: 0.85 }}
+            onClick={handleFairyTap}
+          >
+            <img src={FAIRY_IMG} alt="" draggable={false} className="h-full w-full select-none" />
+          </motion.button>
         </div>
       </main>
 
-      {/* ===== 足元の案内 ===== */}
-      <footer className="absolute right-0 bottom-5 left-0 z-20 text-center">
-        <div className="card-kid inline-block px-6 py-3">
-          {visibleFruits.length > 0 ? (
-            <p className="text-lg font-extrabold">
-              ✨ あと{' '}
-              <span className="text-2xl text-[var(--color-accent-dark)]">
-                {visibleFruits.length}
-              </span>{' '}
-              こ じゅくしてるよ！タップで しゅうかく！
+      {/* ===== 足元：キララのふきだし or 案内カード ===== */}
+      {fairyMsg !== null ? (
+        <div className="absolute inset-x-3 bottom-5 z-20">
+          <div className="card-kid mx-auto max-w-[480px] px-5 py-3 text-left">
+            <p className="mb-1 text-sm font-extrabold text-[var(--color-ink-soft)]">
+              ✨ きの ようせい キララ
             </p>
-          ) : (
-            <p className="text-lg font-extrabold text-[var(--color-ink-soft)]">
-              クイズに せいかいすると
-              <br />
-              きに コインが みのるよ！
-            </p>
-          )}
+            <p className="text-lg leading-relaxed font-extrabold">{fairyLines[fairyMsg]}</p>
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                className="btn-kid bg-[var(--color-bg-2)] px-4 py-1 text-base"
+                onClick={() => {
+                  audio.playSe('tap')
+                  setFairyMsg(null)
+                }}
+              >
+                ばいばい
+              </button>
+              <button
+                className="btn-kid bg-[var(--color-primary)] px-4 py-1 text-base"
+                onClick={handleFairyTap}
+              >
+                つぎへ ▶
+              </button>
+            </div>
+          </div>
         </div>
-      </footer>
+      ) : (
+        <footer className="absolute right-0 bottom-5 left-0 z-20 text-center">
+          <div className="card-kid inline-block px-6 py-3">
+            {visibleFruits.length > 0 ? (
+              <p className="text-lg font-extrabold">
+                ✨ あと{' '}
+                <span className="text-2xl text-[var(--color-accent-dark)]">
+                  {visibleFruits.length}
+                </span>{' '}
+                こ じゅくしてるよ！タップで しゅうかく！
+              </p>
+            ) : (
+              <p className="text-lg font-extrabold text-[var(--color-ink-soft)]">
+                クイズに せいかいすると
+                <br />
+                きに コインが みのるよ！
+              </p>
+            )}
+          </div>
+        </footer>
+      )}
 
       {/* ===== 月上限 Dialog ===== */}
       <Dialog

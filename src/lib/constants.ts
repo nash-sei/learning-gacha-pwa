@@ -107,6 +107,8 @@ export const TREE_IMG = '/tree/coin-tree.webp'
 export const FRUIT_IMG = '/tree/coin-fruit.webp'
 /** コインの木の画面の聖域背景（縦1024x1536・object-coverで全画面） */
 export const TREE_BG = '/tree/sanctuary-bg.webp'
+/** きの ようせい キララ（コインの木の画面だけの案内役・図鑑/ガチャ対象外） */
+export const FAIRY_IMG = '/tree/fairy.webp'
 
 // ========== リトライ時のレア率降格（spec §5-1） ==========
 export const DIFFICULTY_DEMOTE: Record<Difficulty, Difficulty> = {

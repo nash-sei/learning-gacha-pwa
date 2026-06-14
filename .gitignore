@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 _drafts
+
+# 画像生成の一時フォルダ（Codex image_gen の作業用）
+tmp/

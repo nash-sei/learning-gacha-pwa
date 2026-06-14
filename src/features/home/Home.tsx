@@ -16,6 +16,7 @@ import { weekStr } from '../../lib/dateUtil'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
 import SoundToggle from '../../components/SoundToggle'
+import TitleLogo from '../../components/TitleLogo'
 
 export interface HomeProps {
   go: (s: Screen) => void
@@ -157,6 +158,10 @@ export default function Home({ go }: HomeProps) {
 
       {/* ===== にわ（木＋歩き回るモンスター） ===== */}
       <div className="relative mb-4 min-h-[40dvh] flex-1 overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-b from-sky-200 via-sky-100 to-green-200 shadow-xl">
+        {/* タイトルロゴ「ガクモン」（追加機能1-A）：空にふわっと浮かべる */}
+        <div className="anim-float pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2">
+          <TitleLogo className="text-5xl sm:text-6xl" />
+        </div>
         {/* 太陽 */}
         <div className="absolute top-4 left-5 h-12 w-12 rounded-full bg-[var(--color-accent)] opacity-90 shadow-[0_0_30px_10px_rgba(255,192,67,0.5)]" />
         {/* 地面 */}

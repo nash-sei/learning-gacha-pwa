@@ -27,6 +27,7 @@ import Quiz from './features/quiz/Quiz'
 import Gacha from './features/gacha/Gacha'
 import ShardEgg from './features/gacha/ShardEgg'
 import ParentMenu from './features/settings/ParentMenu'
+import Opening from './features/opening/Opening'
 
 export type Screen = 'home' | 'quiz' | 'gacha' | 'shard-egg' | 'zukan' | 'tree' | 'parent'
 
@@ -37,6 +38,8 @@ interface PendingGacha {
 
 function AppContent() {
   const { ready, settings, currentProfileId } = useGame()
+  // オープニング演出（起動時に1回だけ。リロードで true に戻る＝アプリを開くたびに流れる）
+  const [showOpening, setShowOpening] = useState(true)
 
   // 設定の音 ON/OFF を audio ラッパーへ同期（起動時・変更時）
   useEffect(() => {
@@ -51,6 +54,11 @@ function AppContent() {
         </p>
       </div>
     )
+  }
+
+  // オープニング（起動時に1回・追加機能1-B）。タップで既存フロー（パスコード/プロフィール/ホーム）へ
+  if (showOpening) {
+    return <Opening onDone={() => setShowOpening(false)} />
   }
 
   // ゲート1: パスコードが 0000 のまま → 変更するまで先へ進めない（spec §10）

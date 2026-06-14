@@ -110,6 +110,12 @@ export const TREE_BG = '/tree/sanctuary-bg.webp'
 /** きの ようせい キララ（コインの木の画面だけの案内役・図鑑/ガチャ対象外） */
 export const FAIRY_IMG = '/tree/fairy.webp'
 
+// ========== タイトル・オープニング（追加機能1） ==========
+/** タイトルロゴ「ガクモン」（public/title/ 同梱・外部URL禁止＝spec §1-3） */
+export const TITLE_LOGO_IMG = '/title/logo.webp'
+/** オープニングでシルエット表示するモンスター（N=m01 / R=m12 / SR=m46 / UR=m49） */
+export const OPENING_MONSTER_IDS = ['m01', 'm12', 'm46', 'm49'] as const
+
 // ========== リトライ時のレア率降格（spec §5-1） ==========
 export const DIFFICULTY_DEMOTE: Record<Difficulty, Difficulty> = {
   hard: 'normal',

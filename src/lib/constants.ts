@@ -91,8 +91,8 @@ export const SHARD_BY_RARITY: Record<Rarity, number> = {
   UR: 20,
 }
 
-/** かけらタマゴ：50かけら=SR以上確定・週1（spec §8） */
-export const SHARD_EGG_COST = 50
+/** かけらタマゴ：30かけら=SR以上確定・週1（spec §8） */
+export const SHARD_EGG_COST = 30
 
 /** かけらタマゴで UR が出る確率（残りは SR・SR以上確定） */
 export const SHARD_EGG_UR_RATE = 0.2

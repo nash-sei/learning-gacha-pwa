@@ -1,13 +1,8 @@
 /*
- * オープニング演出（追加機能1-B）
- * 起動時に N/R/SR/UR モンスターのシルエットが「一部だけ大きく見切れて」次々あらわれ、
- * 上から斜め下へゆっくり流れる。中身が分からず「これ何のモンスター!?」をかき立てる。
- * 最後に「ガクモン」タイトルロゴがボンっと登場。画面タップでホームへ進む。
- * - 拡大＋位置ずらし＋親の overflow-hidden で体の一部分だけを見せる（全身は出さない）
- * - 半透明＋青い発光で輪郭だけうっすら見せる
- * - 毎起動で1回（App 側の showOpening がリロードで true に戻る）
- * - シルエット中にタップすると即タイトルへスキップ（子供が待ちきれない時の救済）
- * - 音はタップ前は鳴らない場合がある（iOS 自動再生制限）が、演出は崩れない
+ * オープニング演出（追加機能1-B）＝見比べ用に「4パターン切り替え」版
+ * モンスターのカラー絵が「一部だけ」大きく見切れて次々あらわれ、最後に「ガクモン」ロゴが登場。
+ * 画面タップでホームへ。右下の「つぎ▶」ボタンで演出パターンを切り替えて見比べできる。
+ * ※採用パターンが決まったら PATTERNS を1つに絞り、切り替えボタンを外す予定。
  */
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -15,19 +10,78 @@ import { monsterSprite } from '../../data/monsters'
 import { audio } from '../../lib/audio'
 import TitleLogo from '../../components/TitleLogo'
 
-/** シルエット1体あたりの表示時間（ms）。ゆっくり流す */
+/** 1体あたりの表示時間（ms）。ゆっくり流す */
 const SILHOUETTE_MS = 1200
 
-/**
- * オープニングに出すシルエット（N=m01 / R=m12 / SR=m46 / UR=m49）。
- * scale で拡大して画面からはみ出させ、from→to の移動で「見える部分」と「斜め下へ流れる動き」を作る。
- * 数値は px（モバイル縦を基準にした感覚値・実機で微調整可）。
- */
-const SILHOUETTES = [
-  { id: 'm01', fromX: '-12%', fromY: '-32%', toX: '-6%', toY: '-12%', exitX: '0%', exitY: '8%' },
-  { id: 'm12', fromX: '14%', fromY: '-34%', toX: '8%', toY: '-6%', exitX: '14%', exitY: '12%' },
-  { id: 'm46', fromX: '-14%', fromY: '-24%', toX: '4%', toY: '10%', exitX: '10%', exitY: '28%' },
-  { id: 'm49', fromX: '10%', fromY: '-36%', toX: '-3%', toY: '6%', exitX: '4%', exitY: '24%' },
+/** オープニングに出すモンスター（N=m01 / R=m12 / SR=m46 / UR=m49） */
+const MONSTER_IDS = ['m01', 'm12', 'm46', 'm49']
+
+interface Frame {
+  fromX: string
+  fromY: string
+  toX: string
+  toY: string
+  exitX: string
+  exitY: string
+  scaleFrom?: number
+  scaleTo?: number
+}
+
+interface Pattern {
+  label: string
+  width: string
+  duration: number
+  zoom?: boolean
+  frames: Frame[]
+}
+
+/** 見比べ用の4パターン（社長が「つぎ▶」で切り替えて選ぶ） */
+const PATTERNS: Pattern[] = [
+  {
+    label: 'ジグザグ',
+    width: 'max(150vw, 150vh)',
+    duration: 1.15,
+    frames: [
+      { fromX: '-26%', fromY: '-24%', toX: '-3%', toY: '-2%', exitX: '20%', exitY: '24%' },
+      { fromX: '26%', fromY: '-24%', toX: '3%', toY: '-2%', exitX: '-20%', exitY: '24%' },
+      { fromX: '-26%', fromY: '-22%', toX: '-2%', toY: '3%', exitX: '20%', exitY: '26%' },
+      { fromX: '26%', fromY: '-24%', toX: '2%', toY: '1%', exitX: '-20%', exitY: '24%' },
+    ],
+  },
+  {
+    label: 'よこながれ',
+    width: 'max(150vw, 150vh)',
+    duration: 1.25,
+    frames: [
+      { fromX: '-36%', fromY: '-2%', toX: '0%', toY: '-2%', exitX: '36%', exitY: '-2%' },
+      { fromX: '36%', fromY: '2%', toX: '0%', toY: '2%', exitX: '-36%', exitY: '2%' },
+      { fromX: '-36%', fromY: '-5%', toX: '0%', toY: '-5%', exitX: '36%', exitY: '-5%' },
+      { fromX: '36%', fromY: '5%', toX: '0%', toY: '5%', exitX: '-36%', exitY: '5%' },
+    ],
+  },
+  {
+    label: 'ズームイン',
+    width: 'max(130vw, 130vh)',
+    duration: 1.1,
+    zoom: true,
+    frames: [
+      { fromX: '-6%', fromY: '-8%', toX: '-2%', toY: '-2%', exitX: '6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
+      { fromX: '6%', fromY: '-8%', toX: '2%', toY: '-2%', exitX: '-6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
+      { fromX: '-6%', fromY: '-6%', toX: '-2%', toY: '2%', exitX: '6%', exitY: '12%', scaleFrom: 0.6, scaleTo: 1.2 },
+      { fromX: '6%', fromY: '-8%', toX: '2%', toY: '0%', exitX: '-6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
+    ],
+  },
+  {
+    label: 'ゆっくりパン',
+    width: 'max(175vw, 175vh)',
+    duration: 1.5,
+    frames: [
+      { fromX: '-30%', fromY: '-30%', toX: '0%', toY: '0%', exitX: '30%', exitY: '30%' },
+      { fromX: '30%', fromY: '-30%', toX: '0%', toY: '0%', exitX: '-30%', exitY: '30%' },
+      { fromX: '-30%', fromY: '-28%', toX: '2%', toY: '2%', exitX: '30%', exitY: '30%' },
+      { fromX: '30%', fromY: '-30%', toX: '-2%', toY: '0%', exitX: '-30%', exitY: '30%' },
+    ],
+  },
 ]
 
 const STARS = [
@@ -46,6 +100,7 @@ export interface OpeningProps {
 }
 
 export default function Opening({ onDone }: OpeningProps) {
+  const [patternIndex, setPatternIndex] = useState(0)
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState<'silhouettes' | 'title'>('silhouettes')
   const doneRef = useRef(false)
@@ -56,7 +111,7 @@ export default function Opening({ onDone }: OpeningProps) {
     audio.playSe('drumroll')
     const timer = window.setInterval(() => {
       setIndex((i) => {
-        if (i + 1 >= SILHOUETTES.length) {
+        if (i + 1 >= MONSTER_IDS.length) {
           window.clearInterval(timer)
           setPhase('title')
           return i
@@ -65,7 +120,7 @@ export default function Opening({ onDone }: OpeningProps) {
       })
     }, SILHOUETTE_MS)
     return () => window.clearInterval(timer)
-  }, [phase])
+  }, [phase, patternIndex])
 
   // タイトル登場で派手な音
   useEffect(() => {
@@ -85,7 +140,17 @@ export default function Opening({ onDone }: OpeningProps) {
     else setPhase('title')
   }
 
-  const cur = SILHOUETTES[index]
+  // 「つぎ▶」：次の演出パターンへ＋最初から再生（ボタンのタップは親に伝えない）
+  const nextPattern = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation()
+    audio.playSe('tap')
+    setPatternIndex((p) => (p + 1) % PATTERNS.length)
+    setIndex(0)
+    setPhase('silhouettes')
+  }
+
+  const v = PATTERNS[patternIndex]
+  const f = v.frames[index]
 
   return (
     <div
@@ -111,32 +176,30 @@ export default function Opening({ onDone }: OpeningProps) {
         />
       ))}
 
-      {/* mode 指定なし＝入れ替えを重ねてクロスフェード（mode="wait" だと前の退場を待ち間延びする） */}
+      {/* mode 指定なし＝入れ替えを重ねてクロスフェード */}
       <AnimatePresence>
         {phase === 'silhouettes' ? (
           <motion.img
-            key={cur.id}
-            src={monsterSprite(cur.id)}
+            key={`${patternIndex}-${MONSTER_IDS[index]}`}
+            src={monsterSprite(MONSTER_IDS[index])}
             alt=""
             draggable={false}
             className="pointer-events-none col-start-1 row-start-1 max-w-none select-none object-contain"
             style={{
-              // 画面の長い辺より大きく＝どの端末でも必ず一部だけ見える
-              width: 'max(118vw, 118vh)',
-              // カラーのまま見せる（白く塗りつぶさない）。青い発光で縁を少し際立たせる
+              width: v.width,
               filter: 'drop-shadow(0 0 26px rgba(150,180,255,0.5))',
             }}
-            initial={{ x: cur.fromX, y: cur.fromY, opacity: 0 }}
-            animate={{ x: cur.toX, y: cur.toY, opacity: 0.95 }}
-            exit={{ x: cur.exitX, y: cur.exitY, opacity: 0 }}
-            transition={{ duration: 1.15, ease: 'easeInOut' }}
+            initial={{ x: f.fromX, y: f.fromY, opacity: 0, ...(v.zoom ? { scale: f.scaleFrom } : {}) }}
+            animate={{ x: f.toX, y: f.toY, opacity: 0.95, ...(v.zoom ? { scale: f.scaleTo } : {}) }}
+            exit={{ x: f.exitX, y: f.exitY, opacity: 0, ...(v.zoom ? { scale: f.scaleTo } : {}) }}
+            transition={{ duration: v.duration, ease: 'easeInOut' }}
           />
         ) : (
           <motion.div key="title" className="col-start-1 row-start-1 flex flex-col items-center gap-7 px-6">
             <motion.div
-              initial={{ scale: 0.2, opacity: 0, rotate: -6 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 14 }}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.12 }}
             >
               <TitleLogo className="text-7xl sm:text-8xl" />
             </motion.div>
@@ -152,6 +215,14 @@ export default function Opening({ onDone }: OpeningProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 見比べ用：演出パターン切り替えボタン（採用が決まったら外す） */}
+      <button
+        onClick={nextPattern}
+        className="absolute right-4 bottom-5 z-20 rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-[var(--color-ink)] shadow-lg active:scale-95"
+      >
+        えんしゅつ {patternIndex + 1}/{PATTERNS.length}（{v.label}）つぎ ▶
+      </button>
     </div>
   )
 }

@@ -1,8 +1,11 @@
 /*
- * オープニング演出（追加機能1-B）＝見比べ用に「4パターン切り替え」版
- * モンスターのカラー絵が「一部だけ」大きく見切れて次々あらわれ、最後に「ガクモン」ロゴが登場。
- * 画面タップでホームへ。右下の「つぎ▶」ボタンで演出パターンを切り替えて見比べできる。
- * ※採用パターンが決まったら PATTERNS を1つに絞り、切り替えボタンを外す予定。
+ * オープニング演出（追加機能1-B）＝「よこながれ」採用版（社長決定: 2番）
+ * モンスターのカラー絵が左右交互に横からスーッと流れ、画面中央で顔・体がよく見える。
+ * 全身は見せず（画面より少し大きい＝端が切れる）「これ何のモンスター!?」を残す。
+ * 最後に「ガクモン」タイトルロゴが登場。画面タップでホームへ。
+ *
+ * 大きさ：width=max(120vw,120vh)＝画面より少しだけ大きい。大きすぎず、形が分かる。
+ * 位置：to を中央(x:0)にして、一番見える瞬間にモンスターの真ん中が画面中央に来る。
  */
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -10,78 +13,21 @@ import { monsterSprite } from '../../data/monsters'
 import { audio } from '../../lib/audio'
 import TitleLogo from '../../components/TitleLogo'
 
-/** 1体あたりの表示時間（ms）。ゆっくり流す */
-const SILHOUETTE_MS = 1200
+/** 1体あたりの表示時間（ms）。ゆっくり見せる */
+const SILHOUETTE_MS = 1400
 
-/** オープニングに出すモンスター（N=m01 / R=m12 / SR=m46 / UR=m49） */
-const MONSTER_IDS = ['m01', 'm12', 'm46', 'm49']
+/** モンスターの画像の大きさ（画面の長い辺より少し大きく＝端が少し切れる程度） */
+const IMG_WIDTH = 'max(120vw, 120vh)'
 
-interface Frame {
-  fromX: string
-  fromY: string
-  toX: string
-  toY: string
-  exitX: string
-  exitY: string
-  scaleFrom?: number
-  scaleTo?: number
-}
-
-interface Pattern {
-  label: string
-  width: string
-  duration: number
-  zoom?: boolean
-  frames: Frame[]
-}
-
-/** 見比べ用の4パターン（社長が「つぎ▶」で切り替えて選ぶ） */
-const PATTERNS: Pattern[] = [
-  {
-    label: 'ジグザグ',
-    width: 'max(150vw, 150vh)',
-    duration: 1.15,
-    frames: [
-      { fromX: '-26%', fromY: '-24%', toX: '-3%', toY: '-2%', exitX: '20%', exitY: '24%' },
-      { fromX: '26%', fromY: '-24%', toX: '3%', toY: '-2%', exitX: '-20%', exitY: '24%' },
-      { fromX: '-26%', fromY: '-22%', toX: '-2%', toY: '3%', exitX: '20%', exitY: '26%' },
-      { fromX: '26%', fromY: '-24%', toX: '2%', toY: '1%', exitX: '-20%', exitY: '24%' },
-    ],
-  },
-  {
-    label: 'よこながれ',
-    width: 'max(150vw, 150vh)',
-    duration: 1.25,
-    frames: [
-      { fromX: '-36%', fromY: '-2%', toX: '0%', toY: '-2%', exitX: '36%', exitY: '-2%' },
-      { fromX: '36%', fromY: '2%', toX: '0%', toY: '2%', exitX: '-36%', exitY: '2%' },
-      { fromX: '-36%', fromY: '-5%', toX: '0%', toY: '-5%', exitX: '36%', exitY: '-5%' },
-      { fromX: '36%', fromY: '5%', toX: '0%', toY: '5%', exitX: '-36%', exitY: '5%' },
-    ],
-  },
-  {
-    label: 'ズームイン',
-    width: 'max(130vw, 130vh)',
-    duration: 1.1,
-    zoom: true,
-    frames: [
-      { fromX: '-6%', fromY: '-8%', toX: '-2%', toY: '-2%', exitX: '6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
-      { fromX: '6%', fromY: '-8%', toX: '2%', toY: '-2%', exitX: '-6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
-      { fromX: '-6%', fromY: '-6%', toX: '-2%', toY: '2%', exitX: '6%', exitY: '12%', scaleFrom: 0.6, scaleTo: 1.2 },
-      { fromX: '6%', fromY: '-8%', toX: '2%', toY: '0%', exitX: '-6%', exitY: '10%', scaleFrom: 0.6, scaleTo: 1.2 },
-    ],
-  },
-  {
-    label: 'ゆっくりパン',
-    width: 'max(175vw, 175vh)',
-    duration: 1.5,
-    frames: [
-      { fromX: '-30%', fromY: '-30%', toX: '0%', toY: '0%', exitX: '30%', exitY: '30%' },
-      { fromX: '30%', fromY: '-30%', toX: '0%', toY: '0%', exitX: '-30%', exitY: '30%' },
-      { fromX: '-30%', fromY: '-28%', toX: '2%', toY: '2%', exitX: '30%', exitY: '30%' },
-      { fromX: '30%', fromY: '-30%', toX: '-2%', toY: '0%', exitX: '-30%', exitY: '30%' },
-    ],
-  },
+/**
+ * 左右交互の横ながれ（N=m01 / R=m12 / SR=m46 / UR=m49）。
+ * to は中央(x:0)＝一番見える瞬間に顔・体が画面中央に来る。y は少しだけずらして単調さを防ぐ。
+ */
+const SLIDES = [
+  { id: 'm01', fromX: '-32%', toX: '0%', exitX: '32%', y: '-2%' },
+  { id: 'm12', fromX: '32%', toX: '0%', exitX: '-32%', y: '2%' },
+  { id: 'm46', fromX: '-32%', toX: '0%', exitX: '32%', y: '-2%' },
+  { id: 'm49', fromX: '32%', toX: '0%', exitX: '-32%', y: '2%' },
 ]
 
 const STARS = [
@@ -100,18 +46,17 @@ export interface OpeningProps {
 }
 
 export default function Opening({ onDone }: OpeningProps) {
-  const [patternIndex, setPatternIndex] = useState(0)
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState<'silhouettes' | 'title'>('silhouettes')
   const doneRef = useRef(false)
 
-  // シルエットを順番に送り、最後まで来たらタイトルへ
+  // モンスターを順番に流し、最後まで来たらタイトルへ
   useEffect(() => {
     if (phase !== 'silhouettes') return
     audio.playSe('drumroll')
     const timer = window.setInterval(() => {
       setIndex((i) => {
-        if (i + 1 >= MONSTER_IDS.length) {
+        if (i + 1 >= SLIDES.length) {
           window.clearInterval(timer)
           setPhase('title')
           return i
@@ -120,7 +65,7 @@ export default function Opening({ onDone }: OpeningProps) {
       })
     }, SILHOUETTE_MS)
     return () => window.clearInterval(timer)
-  }, [phase, patternIndex])
+  }, [phase])
 
   // タイトル登場で派手な音
   useEffect(() => {
@@ -134,23 +79,13 @@ export default function Opening({ onDone }: OpeningProps) {
     onDone()
   }
 
-  // タップ：タイトルならホームへ進む / シルエット中ならスキップしてタイトルへ
+  // タップ：タイトルならホームへ進む / 流れている途中ならスキップしてタイトルへ
   const handleTap = () => {
     if (phase === 'title') finish()
     else setPhase('title')
   }
 
-  // 「つぎ▶」：次の演出パターンへ＋最初から再生（ボタンのタップは親に伝えない）
-  const nextPattern = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation()
-    audio.playSe('tap')
-    setPatternIndex((p) => (p + 1) % PATTERNS.length)
-    setIndex(0)
-    setPhase('silhouettes')
-  }
-
-  const v = PATTERNS[patternIndex]
-  const f = v.frames[index]
+  const s = SLIDES[index]
 
   return (
     <div
@@ -161,16 +96,16 @@ export default function Opening({ onDone }: OpeningProps) {
       onClick={handleTap}
     >
       {/* きらめく星 */}
-      {STARS.map((s, i) => (
+      {STARS.map((st, i) => (
         <span
           key={i}
           className="anim-sparkle pointer-events-none absolute rounded-full bg-white"
           style={{
-            left: s.left,
-            top: s.top,
-            width: s.size,
-            height: s.size,
-            animationDelay: s.delay,
+            left: st.left,
+            top: st.top,
+            width: st.size,
+            height: st.size,
+            animationDelay: st.delay,
             filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.8))',
           }}
         />
@@ -180,19 +115,19 @@ export default function Opening({ onDone }: OpeningProps) {
       <AnimatePresence>
         {phase === 'silhouettes' ? (
           <motion.img
-            key={`${patternIndex}-${MONSTER_IDS[index]}`}
-            src={monsterSprite(MONSTER_IDS[index])}
+            key={s.id}
+            src={monsterSprite(s.id)}
             alt=""
             draggable={false}
             className="pointer-events-none col-start-1 row-start-1 max-w-none select-none object-contain"
             style={{
-              width: v.width,
+              width: IMG_WIDTH,
               filter: 'drop-shadow(0 0 26px rgba(150,180,255,0.5))',
             }}
-            initial={{ x: f.fromX, y: f.fromY, opacity: 0, ...(v.zoom ? { scale: f.scaleFrom } : {}) }}
-            animate={{ x: f.toX, y: f.toY, opacity: 0.95, ...(v.zoom ? { scale: f.scaleTo } : {}) }}
-            exit={{ x: f.exitX, y: f.exitY, opacity: 0, ...(v.zoom ? { scale: f.scaleTo } : {}) }}
-            transition={{ duration: v.duration, ease: 'easeInOut' }}
+            initial={{ x: s.fromX, y: s.y, opacity: 0 }}
+            animate={{ x: s.toX, y: s.y, opacity: 0.95 }}
+            exit={{ x: s.exitX, y: s.y, opacity: 0 }}
+            transition={{ duration: 1.4, ease: 'easeInOut' }}
           />
         ) : (
           <motion.div key="title" className="col-start-1 row-start-1 flex flex-col items-center gap-7 px-6">
@@ -215,14 +150,6 @@ export default function Opening({ onDone }: OpeningProps) {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* 見比べ用：演出パターン切り替えボタン（採用が決まったら外す） */}
-      <button
-        onClick={nextPattern}
-        className="absolute right-4 bottom-5 z-20 rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-[var(--color-ink)] shadow-lg active:scale-95"
-      >
-        えんしゅつ {patternIndex + 1}/{PATTERNS.length}（{v.label}）つぎ ▶
-      </button>
     </div>
   )
 }

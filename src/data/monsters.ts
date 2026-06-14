@@ -201,16 +201,16 @@ export const MONSTERS: MonsterDef[] = [
   },
   {
     id: 'm27',
-    name: 'イチゴルン',
+    name: 'ドラゴルン',
     rarity: 'N',
-    blurb: 'あまい においの いちごの ぼうしを かぶった げんきっこ。',
+    blurb: 'ドラゴンフルーツから うまれた ちいさな りゅうの こ。',
     stages: 1,
   },
   {
     id: 'm28',
-    name: 'ブドウン',
+    name: 'クワガース',
     rarity: 'N',
-    blurb: 'むらさきの つぶが いっぱい つながった ぶどうの こ。',
+    blurb: 'りっぱな おおあごが じまんの クワガタの こ。カブトンの ライバル。',
     stages: 1,
   },
   {

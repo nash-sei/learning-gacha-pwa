@@ -2,10 +2,10 @@
  * オープニング演出（追加機能1-B）＝「よこながれ」採用版（社長決定: 2番）
  * モンスターのカラー絵が左右交互に横からスーッと流れ、画面中央で顔・体がよく見える。
  * 全身は見せず（画面より少し大きい＝端が切れる）「これ何のモンスター!?」を残す。
- * 最後に「ガクモン」タイトルロゴが登場。画面タップでホームへ。
+ * 最後に「ガクモン」タイトルロゴが画面中央に登場。画面タップでホームへ。
  *
- * 大きさ：width=max(120vw,120vh)＝画面より少しだけ大きい。大きすぎず、形が分かる。
- * 位置：to を中央(x:0)にして、一番見える瞬間にモンスターの真ん中が画面中央に来る。
+ * タイトルは「画面全体の中央レイヤー」として別に出す（モンスター画像の大きさに引っぱられて
+ * 位置がズレる＝『が』が右に出る不具合を防ぐ）。モンスターはグリッド中央、タイトルは absolute 中央。
  */
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -16,7 +16,7 @@ import TitleLogo from '../../components/TitleLogo'
 /** 1体あたりの表示時間（ms）。ゆっくり見せる */
 const SILHOUETTE_MS = 1400
 
-/** モンスターの画像の大きさ（画面の長い辺より少し大きく＝端が少し切れる程度） */
+/** モンスター画像の大きさ（画面の長い辺より少し大きく＝端が少し切れる程度） */
 const IMG_WIDTH = 'max(120vw, 120vh)'
 
 /**
@@ -111,9 +111,9 @@ export default function Opening({ onDone }: OpeningProps) {
         />
       ))}
 
-      {/* mode 指定なし＝入れ替えを重ねてクロスフェード */}
+      {/* モンスター（横ながれ）。タイトル中は出さない */}
       <AnimatePresence>
-        {phase === 'silhouettes' ? (
+        {phase === 'silhouettes' && (
           <motion.img
             key={s.id}
             src={monsterSprite(s.id)}
@@ -129,27 +129,35 @@ export default function Opening({ onDone }: OpeningProps) {
             exit={{ x: s.exitX, y: s.y, opacity: 0 }}
             transition={{ duration: 1.4, ease: 'easeInOut' }}
           />
-        ) : (
-          <motion.div key="title" className="col-start-1 row-start-1 flex flex-col items-center gap-7 px-6">
-            <motion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.12 }}
-            >
-              <TitleLogo className="text-7xl sm:text-8xl" />
-            </motion.div>
-            <motion.p
-              className="text-xl font-extrabold text-white"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ delay: 0.6, duration: 1.6, repeat: Infinity }}
-            >
-              タップして はじめる
-            </motion.p>
-          </motion.div>
         )}
       </AnimatePresence>
+
+      {/* タイトル（画面全体の中央レイヤー＝モンスターの大きさに影響されない） */}
+      {phase === 'title' && (
+        <motion.div
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-7 px-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.12 }}
+          >
+            <TitleLogo className="text-7xl sm:text-8xl" />
+          </motion.div>
+          <motion.p
+            className="text-xl font-extrabold text-white"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ delay: 0.6, duration: 1.6, repeat: Infinity }}
+          >
+            タップして はじめる
+          </motion.p>
+        </motion.div>
+      )}
     </div>
   )
 }

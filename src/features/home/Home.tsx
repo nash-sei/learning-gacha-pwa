@@ -96,7 +96,9 @@ export default function Home({ go }: HomeProps) {
 
   if (!save || !currentProfile) return null
 
-  const ownedCount = save.monsters.filter((m) => m.count > 0).length
+  // 図鑑進捗は通常モンスターだけで数える（DANGER限定は別枠・図鑑のDANGER欄で表示）
+  const regularIds = new Set(MONSTERS.filter((m) => !m.isDanger).map((m) => m.id))
+  const ownedCount = save.monsters.filter((m) => m.count > 0 && regularIds.has(m.monsterId)).length
   const fruitCount = Math.floor(save.treeCoins / COINS_PER_FRUIT)
 
   // かけらタマゴ（spec §8）：50かけら＋今週未使用のときだけ目立たせる
@@ -151,7 +153,7 @@ export default function Home({ go }: HomeProps) {
         <span className="card-kid px-4 py-2 text-base font-extrabold">
           📖 ずかん{' '}
           <span className="text-[var(--color-primary-dark)]">
-            {ownedCount}/{MONSTERS.length}
+            {ownedCount}/{regularIds.size}
           </span>
         </span>
       </div>

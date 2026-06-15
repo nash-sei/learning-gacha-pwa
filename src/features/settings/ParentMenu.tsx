@@ -24,7 +24,8 @@ import type {
   Rarity,
   Subject,
 } from '../../types'
-import { DEFAULT_CHILD_SETTINGS, DIFFICULTY_LABEL } from '../../lib/constants'
+import { DANGER_YEN, DEFAULT_CHILD_SETTINGS, DIFFICULTY_LABEL } from '../../lib/constants'
+import { getMonster } from '../../data/monsters'
 import { storage } from '../../lib/storage'
 import { audio } from '../../lib/audio'
 import { useGame } from '../../contexts/GameContext'
@@ -618,6 +619,74 @@ export default function ParentMenu({ onBack }: ParentMenuProps) {
         ) : (
           <p className="text-base text-[var(--color-ink-soft)]">
             プロフィール未選択のため補正できません。
+          </p>
+        )}
+      </Section>
+
+      {/* ---- 現金ごほうび（DANGER討伐・追加機能1-C） ---- */}
+      <Section title="げんきんごほうび（DANGER討伐）">
+        {save && currentProfile ? (
+          <div className="flex flex-col gap-2">
+            <p className="text-base text-[var(--color-ink)]">
+              対象: <b>{currentProfile.name}</b>（いま遊んでいる子）
+            </p>
+            <p className="text-base font-extrabold text-[var(--color-ink)]">
+              まだ渡していない:{' '}
+              <span className="text-[var(--color-secondary-dark)]">
+                {save.dangerYenAwarded.filter((a) => !a.received).length}件 ＝ ￥
+                {save.dangerYenAwarded.filter((a) => !a.received).length * DANGER_YEN}
+              </span>
+              <span className="ml-2 text-sm font-bold text-[var(--color-ink-soft)]">
+                （累計 {save.dangerYenAwarded.length}件 ／ ￥{save.dangerYenAwarded.length * DANGER_YEN}）
+              </span>
+            </p>
+            {save.dangerYenAwarded.length === 0 ? (
+              <p className="text-sm text-[var(--color-ink-soft)]">
+                まだ DANGER討伐の ごほうびは ありません。
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {[...save.dangerYenAwarded].reverse().map((a) => {
+                  const m = a.monsterId ? getMonster(a.monsterId) : undefined
+                  return (
+                    <div
+                      key={a.id}
+                      className="flex items-center justify-between gap-2 rounded-lg bg-[var(--color-bg)] p-2 text-sm"
+                    >
+                      <span className="text-[var(--color-ink-soft)]">
+                        {new Date(a.awardedAt).toLocaleDateString('ja-JP')}
+                      </span>
+                      <span className="font-extrabold text-[var(--color-ink)]">￥{DANGER_YEN}</span>
+                      <span className="flex-1 truncate text-right text-[var(--color-ink-soft)]">
+                        {m ? m.name : ''}
+                      </span>
+                      <button
+                        className={`rounded-lg px-3 py-1.5 text-sm font-bold text-white ${
+                          a.received ? 'bg-[var(--color-success)]' : 'bg-[var(--color-secondary)]'
+                        }`}
+                        onClick={() =>
+                          updateSave((s) => ({
+                            ...s,
+                            dangerYenAwarded: s.dangerYenAwarded.map((x) =>
+                              x.id === a.id ? { ...x, received: !x.received } : x
+                            ),
+                          }))
+                        }
+                      >
+                        {a.received ? '済み' : '未受取'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            <p className="text-sm text-[var(--color-ink-faint)]">
+              「未受取」を押すと「済み」に切り替わります（実際に現金を渡したら押してください）。
+            </p>
+          </div>
+        ) : (
+          <p className="text-base text-[var(--color-ink-soft)]">
+            プロフィール未選択のため表示できません。
           </p>
         )}
       </Section>

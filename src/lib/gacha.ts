@@ -41,7 +41,8 @@ function pickByWeights(weights: Record<Rarity, number>, rng: () => number): Rari
 }
 
 function urOwned(save: SaveData, monsters: MonsterDef[]): boolean {
-  const urIds = new Set(monsters.filter((m) => m.rarity === 'UR').map((m) => m.id))
+  // DANGER限定（isDanger）は通常ガチャの天井対象外＝UR所持判定に含めない
+  const urIds = new Set(monsters.filter((m) => m.rarity === 'UR' && !m.isDanger).map((m) => m.id))
   return save.monsters.some((o) => o.count > 0 && urIds.has(o.monsterId))
 }
 
@@ -75,9 +76,10 @@ export function pickMonster(
   monsters: MonsterDef[],
   rng: () => number
 ): MonsterDef {
-  const pool = monsters.filter((m) => m.rarity === rarity)
-  // フォールバック：万一そのレア度の定義が無ければ全体から
-  const candidates = pool.length > 0 ? pool : monsters
+  // DANGER限定（isDanger）は通常ガチャ・かけらタマゴの母集団から除外する
+  const pool = monsters.filter((m) => m.rarity === rarity && !m.isDanger)
+  // フォールバック：万一そのレア度の定義が無ければ（DANGER限定を除く）全体から
+  const candidates = pool.length > 0 ? pool : monsters.filter((m) => !m.isDanger)
   const ownedIds = new Set(save.monsters.filter((o) => o.count > 0).map((o) => o.monsterId))
   const fresh = candidates.filter((m) => !ownedIds.has(m.id))
   // 7割で未所持を優先、3割は通常抽選（ダブり→かけらの楽しみも残す）

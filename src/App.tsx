@@ -28,8 +28,10 @@ import Gacha from './features/gacha/Gacha'
 import ShardEgg from './features/gacha/ShardEgg'
 import ParentMenu from './features/settings/ParentMenu'
 import Opening from './features/opening/Opening'
+import DangerEvent from './features/danger/DangerEvent'
+import { DANGER_RATE } from './lib/constants'
 
-export type Screen = 'home' | 'quiz' | 'gacha' | 'shard-egg' | 'zukan' | 'tree' | 'parent'
+export type Screen = 'home' | 'quiz' | 'gacha' | 'shard-egg' | 'zukan' | 'tree' | 'parent' | 'danger'
 
 interface PendingGacha {
   difficulty: Difficulty
@@ -109,10 +111,12 @@ function SessionScreens() {
             retryUsed={pendingGacha.retryUsed}
             onDone={() => {
               setPendingGacha(null)
-              setScreen('home')
+              // ガチャのあと、低確率で DANGER 討伐イベントが発生（追加機能1-C）
+              setScreen(Math.random() < DANGER_RATE ? 'danger' : 'home')
             }}
           />
         )}
+        {effectiveScreen === 'danger' && <DangerEvent onDone={() => setScreen('home')} />}
         {effectiveScreen === 'shard-egg' && <ShardEgg onDone={() => setScreen('home')} />}
         {effectiveScreen === 'zukan' && <Zukan onBack={() => setScreen('home')} />}
         {effectiveScreen === 'tree' && <CoinTree onBack={() => setScreen('home')} />}

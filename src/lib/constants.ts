@@ -66,6 +66,7 @@ export function newSaveData(today: string, month: string): SaveData {
     unlockedSeals: [],
     questionClearCounts: {},
     pityCounters: { noRareStreak: 0, totalSinceUR: 0 },
+    dangerYenAwarded: [],
   }
 }
 
@@ -96,6 +97,17 @@ export const SHARD_EGG_COST = 30
 
 /** かけらタマゴで UR が出る確率（残りは SR・SR以上確定） */
 export const SHARD_EGG_UR_RATE = 0.2
+
+// ========== DANGER討伐イベント（追加機能1-C） ==========
+/**
+ * 通常クイズ全問正解（→ガチャ）後に DANGER が発生する確率。
+ * 🚧 Phase 1テスト中のみ 1.0（必ず発生）。本番(main)へマージする前に 0.2（5回に1回）へ戻すこと。
+ */
+export const DANGER_RATE = 1.0
+/** 討伐成功でもらえる現金（円・コインとは別枠の特別ごほうび） */
+export const DANGER_YEN = 200
+/** 討伐で出題する難問の数（全問正解で成功・1問でも間違えたら即終了） */
+export const DANGER_QUESTION_COUNT = 3
 
 // ========== コインの木 ==========
 /** 実1個 = 10コイン（v1踏襲） */

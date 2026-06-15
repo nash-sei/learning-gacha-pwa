@@ -377,6 +377,24 @@ export const MONSTERS: MonsterDef[] = [
     blurb: 'そらに かがやく たいようの かみさま。',
     stages: 2,
   },
+  // ===== DANGER討伐限定（isDanger=通常ガチャには出ない・図鑑は別枠）=====
+  // 🚧 Phase 1（仮）＝2体・画像は既存を一時流用。Phase 2で10体＋専用画像に差し替える。
+  {
+    id: 'd01',
+    name: 'ヤミグルム',
+    rarity: 'UR',
+    blurb: 'きけんな よるにだけ あらわれる、かげの けもの。',
+    stages: 1,
+    isDanger: true,
+  },
+  {
+    id: 'd02',
+    name: 'ガレオキバ',
+    rarity: 'UR',
+    blurb: 'するどい きばを もつ、でんせつの あばれもの。',
+    stages: 1,
+    isDanger: true,
+  },
 ]
 
 /** id からモンスター定義を引く（見つからなければ undefined） */

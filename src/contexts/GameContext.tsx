@@ -99,6 +99,10 @@ export function normalizeSaveForToday(
   if (next.monthly.month !== month) {
     next = { ...next, monthly: { month, coins: 0, harvested: 0 } }
   }
+  // 旧セーブ（dangerYenAwarded 未定義）に既定の空配列を補う（追加機能1-C・後方互換）
+  if (!Array.isArray(next.dangerYenAwarded)) {
+    next = { ...next, dangerYenAwarded: [] }
+  }
   return next
 }
 

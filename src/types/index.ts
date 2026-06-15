@@ -111,6 +111,8 @@ export interface MonsterDef {
   blurb: string
   /** 進化段階数（1=進化なし／2,3 で stage が上がると見た目が変わる・母数は増えない） */
   stages: number
+  /** DANGER討伐限定モンスター（通常ガチャには出さず・図鑑は別枠表示・追加機能1-C） */
+  isDanger?: boolean
 }
 
 /** セーブ内のモンスター所持状態 */
@@ -142,6 +144,21 @@ export interface PityCounters {
   totalSinceUR: number
 }
 
+/**
+ * DANGER討伐の「現金200円」ごほうび1件（追加機能1-C）。
+ * コイン（おこづかい）とは別枠。親が実際に現金を渡す管理に使う。
+ */
+export interface DangerAward {
+  /** 一意ID（"danger-" + 時刻 + 乱数） */
+  id: string
+  /** 付与日時（ISO8601 文字列） */
+  awardedAt: string
+  /** 同時に渡した DANGER 限定モンスターの ID（無ければ空文字） */
+  monsterId: string
+  /** 親が現金を渡したか（受け渡しチェック用） */
+  received: boolean
+}
+
 export interface SaveData {
   /** 総コイン（累積・参考表示用） */
   coins: number
@@ -164,6 +181,8 @@ export interface SaveData {
   /** 問題 ID → 正解回数（苦手優先出題に使う） */
   questionClearCounts: Record<string, number>
   pityCounters: PityCounters
+  /** DANGER討伐の現金200円ごほうび履歴（コインとは別枠・親メニューで受け渡し管理・追加機能1-C） */
+  dangerYenAwarded: DangerAward[]
 }
 
 // ========== 設定（spec §10） ==========

@@ -40,8 +40,12 @@ export default function Zukan({ onBack }: ZukanProps) {
     return map
   }, [save])
 
-  const ownedTotal = ownedCounts.size
-  const remaining = MONSTERS.length - ownedTotal
+  // 通常モンスター（図鑑の完成度はこちらだけで数える）と DANGER 限定（別枠）に分ける
+  const regular = useMemo(() => MONSTERS.filter((m) => !m.isDanger), [])
+  const dangerList = useMemo(() => MONSTERS.filter((m) => m.isDanger), [])
+
+  const ownedTotal = regular.filter((m) => ownedCounts.has(m.id)).length
+  const remaining = regular.length - ownedTotal
   const complete = remaining === 0
   const titleEarned = save?.unlockedSeals.includes(TITLE_ID) ?? false
 
@@ -71,6 +75,50 @@ export default function Zukan({ onBack }: ZukanProps) {
   const selectedOwned = selectedId ? ownedCounts.get(selectedId) : undefined
   const isPartner = (id: string) => save?.partnerId === id
 
+  // 1体ぶんのカード（通常／DANGER 共通。danger=true でレア度ラベルを「DANGER」赤バッジに）
+  const renderCard = (def: MonsterDef, i: number, danger = false) => {
+    const owned = ownedCounts.get(def.id)
+    return (
+      <motion.button
+        key={def.id}
+        className="card-kid relative flex flex-col items-center gap-1 p-3"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: Math.min(i * 0.02, 0.4) }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => {
+          audio.playSe('tap')
+          setSelectedId(def.id)
+        }}
+      >
+        {owned && isPartner(def.id) && (
+          <span className="absolute top-1 left-1 rounded-full bg-[var(--color-secondary)] px-1.5 py-0.5 text-xs font-extrabold text-white">
+            ❤ あいぼう
+          </span>
+        )}
+        {owned && owned.count > 1 && (
+          <span className="absolute top-1 right-1 rounded-full bg-[var(--color-bg-2)] px-1.5 py-0.5 text-xs font-extrabold text-[var(--color-ink-soft)]">
+            ×{owned.count}
+          </span>
+        )}
+        <MonsterSprite monsterId={def.id} stage={owned?.stage ?? 1} size={72} silhouette={!owned} />
+        <span className="text-sm font-extrabold">{owned ? def.name : '？？？'}</span>
+        {danger ? (
+          <span className="rounded-full bg-[var(--color-danger)] px-2 py-0.5 text-xs font-extrabold text-white">
+            DANGER
+          </span>
+        ) : (
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
+            style={{ backgroundColor: RARITY_COLOR[def.rarity] }}
+          >
+            {RARITY_LABEL[def.rarity]}
+          </span>
+        )}
+      </motion.button>
+    )
+  }
+
   if (!save) return null
 
   return (
@@ -89,7 +137,7 @@ export default function Zukan({ onBack }: ZukanProps) {
         </button>
         <h1 className="text-3xl font-extrabold text-[var(--color-primary-dark)]">ずかん</h1>
         <span className="card-kid px-3 py-2 text-base font-extrabold">
-          {ownedTotal}/{MONSTERS.length}
+          {ownedTotal}/{regular.length}
         </span>
       </header>
 
@@ -107,50 +155,25 @@ export default function Zukan({ onBack }: ZukanProps) {
         )}
       </p>
 
-      {/* ===== グリッド（24体・レア度順） ===== */}
+      {/* ===== グリッド（通常モンスター・レア度順） ===== */}
       <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4">
-        {MONSTERS.map((def, i) => {
-          const owned = ownedCounts.get(def.id)
-          return (
-            <motion.button
-              key={def.id}
-              className="card-kid relative flex flex-col items-center gap-1 p-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.02, 0.4) }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                audio.playSe('tap')
-                setSelectedId(def.id)
-              }}
-            >
-              {owned && isPartner(def.id) && (
-                <span className="absolute top-1 left-1 rounded-full bg-[var(--color-secondary)] px-1.5 py-0.5 text-xs font-extrabold text-white">
-                  ❤ あいぼう
-                </span>
-              )}
-              {owned && owned.count > 1 && (
-                <span className="absolute top-1 right-1 rounded-full bg-[var(--color-bg-2)] px-1.5 py-0.5 text-xs font-extrabold text-[var(--color-ink-soft)]">
-                  ×{owned.count}
-                </span>
-              )}
-              <MonsterSprite
-                monsterId={def.id}
-                stage={owned?.stage ?? 1}
-                size={72}
-                silhouette={!owned}
-              />
-              <span className="text-sm font-extrabold">{owned ? def.name : '？？？'}</span>
-              <span
-                className="rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
-                style={{ backgroundColor: RARITY_COLOR[def.rarity] }}
-              >
-                {RARITY_LABEL[def.rarity]}
-              </span>
-            </motion.button>
-          )
-        })}
+        {regular.map((def, i) => renderCard(def, i))}
       </div>
+
+      {/* ===== DANGER 別枠（討伐限定・通常の完成度には含めない） ===== */}
+      {dangerList.length > 0 && (
+        <>
+          <h2 className="mt-2 mb-1 text-center text-xl font-extrabold text-[var(--color-danger)]">
+            ⚔️ DANGER モンスター
+          </h2>
+          <p className="mb-3 text-center text-sm font-bold text-[var(--color-ink-soft)]">
+            DANGER討伐でしか であえない とくべつな なかま
+          </p>
+          <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4">
+            {dangerList.map((def, i) => renderCard(def, i, true))}
+          </div>
+        </>
+      )}
 
       {/* ===== 詳細 Dialog ===== */}
       <Dialog
@@ -189,12 +212,18 @@ export default function Zukan({ onBack }: ZukanProps) {
               size={140}
               silhouette={!selectedOwned}
             />
-            <span
-              className="rounded-full px-3 py-1 text-sm font-extrabold text-white"
-              style={{ backgroundColor: RARITY_COLOR[selected.rarity] }}
-            >
-              {RARITY_LABEL[selected.rarity]}
-            </span>
+            {selected.isDanger ? (
+              <span className="rounded-full bg-[var(--color-danger)] px-3 py-1 text-sm font-extrabold text-white">
+                DANGER
+              </span>
+            ) : (
+              <span
+                className="rounded-full px-3 py-1 text-sm font-extrabold text-white"
+                style={{ backgroundColor: RARITY_COLOR[selected.rarity] }}
+              >
+                {RARITY_LABEL[selected.rarity]}
+              </span>
+            )}
             {selectedOwned ? (
               <>
                 <p>{selected.blurb}</p>
@@ -225,7 +254,7 @@ export default function Zukan({ onBack }: ZukanProps) {
         }
       >
         <p className="text-center">
-          {MONSTERS.length}ひき ぜんぶ あつめたよ！
+          {regular.length}ひき ぜんぶ あつめたよ！
           <br />
           しょうごう「<span className="font-extrabold text-[var(--color-accent-dark)]">{TITLE_NAME}</span>
           」を かくとく！

@@ -137,8 +137,8 @@ export const DIFFICULTY_DEMOTE: Record<Difficulty, Difficulty> = {
 
 // ========== 難易度ごとの出題数（spec §5-1） ==========
 export const QUESTION_COUNT: Record<Difficulty, number> = {
-  easy: 3,
-  normal: 4,
+  easy: 5,
+  normal: 5,
   hard: 5,
 }
 

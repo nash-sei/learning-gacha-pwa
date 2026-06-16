@@ -33,6 +33,7 @@ import Ruby from '../../components/Ruby'
 import Dialog from '../../components/Dialog'
 import MonsterSprite from '../../components/MonsterSprite'
 import FigureView from '../../components/figures/FigureView'
+import HintDisclosure from '../../components/HintDisclosure'
 
 export interface QuizProps {
   onComplete: (r: { difficulty: Difficulty; retryUsed: boolean }) => void
@@ -724,6 +725,9 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
             <p className="text-2xl">
               <Ruby text={q.text} />
             </p>
+
+            {/* 折り畳み1行ヒント（むずかしい/ふつうのみ・答えそのものは出さない） */}
+            {difficulty !== 'easy' && <HintDisclosure line={explainLines[0] ?? ''} />}
 
             {q.answer.kind === 'number' && (
               <NumberPad

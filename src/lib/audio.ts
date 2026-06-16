@@ -12,6 +12,7 @@ export type SeName =
   | 'correct'
   | 'wrong'
   | 'drumroll'
+  | 'danger'
   | 'crack'
   | 'reveal-n'
   | 'reveal-r'
@@ -27,6 +28,7 @@ const SE_NAMES: SeName[] = [
   'correct',
   'wrong',
   'drumroll',
+  'danger',
   'crack',
   'reveal-n',
   'reveal-r',
@@ -73,6 +75,21 @@ function arpeggio(freqs: number[], noteDur: number, gain: number): SynthNote[] {
   }))
 }
 
+/** DANGER出現音：低音squareの不協和な脈打ち＋下降（怖すぎない・短い・約1.2秒） */
+function dangerNotes(): SynthNote[] {
+  return [
+    { f: 110, t: 0.0, d: 0.14, type: 'square', g: 0.18 },
+    { f: 110, t: 0.18, d: 0.14, type: 'square', g: 0.18 },
+    { f: 104, t: 0.36, d: 0.14, type: 'square', g: 0.18 },
+    { f: 104, t: 0.54, d: 0.14, type: 'square', g: 0.18 },
+    // 薄い半音上のうなり（不協和で緊張感）
+    { f: 116.5, t: 0.0, d: 0.7, type: 'sawtooth', g: 0.06 },
+    // 締めの下降（ドキッ）
+    { f: 98, t: 0.74, d: 0.16, type: 'square', g: 0.2 },
+    { f: 73.4, t: 0.9, d: 0.28, type: 'square', g: 0.2 },
+  ]
+}
+
 const SYNTH_SE: Record<SeName, SynthNote[]> = {
   tap: [{ f: 880, t: 0, d: 0.06, type: 'triangle', g: 0.16 }],
   correct: [
@@ -84,6 +101,7 @@ const SYNTH_SE: Record<SeName, SynthNote[]> = {
     { f: 164.8, t: 0.13, d: 0.22, type: 'square', g: 0.1 },
   ],
   drumroll: drumrollNotes(),
+  danger: dangerNotes(),
   crack: [
     { f: 620, t: 0, d: 0.04, type: 'square', g: 0.14 },
     { f: 340, t: 0.05, d: 0.05, type: 'square', g: 0.14 },

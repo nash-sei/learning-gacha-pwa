@@ -7,7 +7,7 @@
  * - success：pickDangerMonster で DANGER 限定を1体、awardDanger で付与＋現金200円を別枠記録（commit-then-animate）。
  * - 既存の出題エンジン（selectQuestions / checkAnswer / buildChoiceOptions / buildOrderTokens）を再利用。
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import type { MonsterDef, Question } from '../../types'
 import { DANGER_QUESTION_COUNT, DANGER_YEN } from '../../lib/constants'
@@ -26,6 +26,7 @@ import Ruby from '../../components/Ruby'
 import Dialog from '../../components/Dialog'
 import MonsterSprite from '../../components/MonsterSprite'
 import FigureView from '../../components/figures/FigureView'
+import HintDisclosure from '../../components/HintDisclosure'
 
 export interface DangerEventProps {
   onDone: () => void
@@ -123,6 +124,14 @@ export default function DangerEvent({ onDone }: DangerEventProps) {
   const [saveWarn, setSaveWarn] = useState(false)
 
   const q: Question | null = phase === 'fight' ? (questions[qIndex] ?? null) : null
+
+  // DANGER 出現音：intro が表示された時に一度だけ鳴らす（怖すぎない緊張音）
+  useEffect(() => {
+    if (phase === 'intro') {
+      audio.unlock()
+      audio.playSe('danger')
+    }
+  }, [phase])
 
   // 問題の解答UIを準備
   const prep = (question: Question) => {
@@ -302,16 +311,9 @@ export default function DangerEvent({ onDone }: DangerEventProps) {
             <Ruby text={q.text} />
           </p>
 
-          {/* 例ヒント（最初から常時表示・答えそのものではない） */}
-          <div className="mb-4 rounded-2xl border-4 border-[var(--color-accent)] bg-[var(--color-bg)] p-3">
-            <p className="mb-1 text-sm font-extrabold text-[var(--color-ink-soft)]">💡 ヒント（れい）</p>
-            <div className="flex flex-col gap-1.5">
-              {q.explain.map((line, i) => (
-                <p key={i} className="text-base text-[var(--color-ink)]">
-                  <Ruby text={line} />
-                </p>
-              ))}
-            </div>
+          {/* ヒント（タップで開く1行・答えそのものではない） */}
+          <div className="mb-4">
+            <HintDisclosure line={q.explain[0] ?? ''} />
           </div>
 
           {/* 解答入力 */}

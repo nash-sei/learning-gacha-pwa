@@ -26,3 +26,4 @@ _drafts
 
 # 画像生成の一時フォルダ（Codex image_gen の作業用）
 tmp/
+tmp_danger/

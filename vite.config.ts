@@ -18,8 +18,8 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
       },
       manifest: {
-        name: 'モンスターべんきょう',
-        short_name: 'モンべん',
+        name: 'ガクモン',
+        short_name: 'ガクモン',
         description: 'べんきょうが、モンスターのせかいを育てる学習アプリ',
         lang: 'ja',
         dir: 'ltr',

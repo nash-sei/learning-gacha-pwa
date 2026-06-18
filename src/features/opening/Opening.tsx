@@ -66,14 +66,10 @@ export interface OpeningProps {
 
 export default function Opening({ onDone }: OpeningProps) {
   const [index, setIndex] = useState(0)
-  const [phase, setPhase] = useState<'silhouettes' | 'title'>('silhouettes')
+  // 'start'=「タップしてはじめる」画面。最初のタップで音を解禁してから本編が始まる
+  // （iPhone等は仕様上、画面タップ前は音が鳴らせないため。これでどの端末でも頭から曲が鳴る）
+  const [phase, setPhase] = useState<'start' | 'silhouettes' | 'title'>('start')
   const doneRef = useRef(false)
-
-  // オープニングBGM（起動時に開始）。スマホは最初の画面タップで音が解禁されてから鳴り始める。
-  // ここでは止めない＝オープニング後もそのまま流れ続ける（当面の全体BGM代わり・後で方針調整可）。
-  useEffect(() => {
-    audio.playBgm('opening')
-  }, [])
 
   // モンスターを順番に流し、最後まで来たらタイトルへ
   useEffect(() => {
@@ -103,10 +99,17 @@ export default function Opening({ onDone }: OpeningProps) {
     onDone()
   }
 
-  // タップ：タイトルならホームへ進む / 流れている途中ならスキップしてタイトルへ
+  // タップ：start なら音を鳴らして本編開始 / 流れている途中ならスキップ / タイトルならホームへ
   const handleTap = () => {
-    if (phase === 'title') finish()
-    else setPhase('title')
+    if (phase === 'start') {
+      // この瞬間（ユーザー操作）に音が解禁される＝どの端末でもOP曲が頭から鳴る
+      audio.playBgm('opening')
+      setPhase('silhouettes')
+    } else if (phase === 'title') {
+      finish()
+    } else {
+      setPhase('title')
+    }
   }
 
   const s = SLIDES[index]
@@ -134,6 +137,36 @@ export default function Opening({ onDone }: OpeningProps) {
           }}
         />
       ))}
+
+      {/* スタート画面「タップして はじめる」＝最初のタップで音を解禁してから本編へ */}
+      {phase === 'start' && (
+        <motion.div
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-8 px-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <img
+            src="/ui/book.webp"
+            alt=""
+            draggable={false}
+            className="anim-float select-none"
+            style={{
+              width: 'min(56vw, 236px)',
+              animationDuration: '3.4s',
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.4))',
+            }}
+          />
+          <motion.p
+            className="text-2xl font-extrabold text-white sm:text-3xl"
+            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.55)' }}
+            animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.06, 1] }}
+            transition={{ duration: 1.6, repeat: Infinity }}
+          >
+            タップして はじめる
+          </motion.p>
+        </motion.div>
+      )}
 
       {/* モンスターのシルエット（影絵）＝タイトル登場シーンの背景。中央は空けて縁に配置 */}
       {phase === 'title' && (

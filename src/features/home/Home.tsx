@@ -137,8 +137,16 @@ export default function Home({ go }: HomeProps) {
         <SoundToggle />
       </header>
 
-      {/* ===== ステータス（おこづかい・かけら・ずかん） ===== */}
+      {/* ===== ステータス（チャレンジ回数・おこづかい・かけら・ずかん） ===== */}
       <div className="mb-3 flex flex-wrap justify-center gap-2">
+        <span className="card-kid px-4 py-2 text-base font-extrabold">
+          🔥 きょうのチャレンジ{' '}
+          <span className="text-[var(--color-secondary)]">
+            {Math.min(save.dailyGachaCount, childSettings.maxDailyGacha)}/
+            {childSettings.maxDailyGacha}
+          </span>
+          <span className="text-sm text-[var(--color-ink-soft)]"> かい</span>
+        </span>
         <span className="card-kid px-4 py-2 text-base font-extrabold">
           💰 こんげつ{' '}
           <span className="text-[var(--color-accent-dark)]">{save.monthly.harvested}</span>

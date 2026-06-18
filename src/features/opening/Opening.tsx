@@ -41,6 +41,25 @@ const STARS = [
   { left: '92%', top: '40%', size: 10, delay: '0.9s' },
 ]
 
+/*
+ * タイトル登場シーンの背景に散りばめる「モンスターのシルエット（影絵）」。
+ * 新規画像は作らず既存 public/monsters/*.webp を暗いフィルタ＋青いふちの光で影絵にする。
+ * 中央（タイトル＋本の場所）は空けて、タイトルをぐるりと囲むように配置する。
+ * left/top は「中央520pxの枠」基準の中心点（widescreen でもタイトルから離れすぎない）。
+ * 要素は translate(-50%,-50%) で中央寄せ。dur/delay でゆらゆらをバラす。
+ */
+const SILHOUETTES = [
+  { id: 'm07', left: '50%', top: '7%', size: 74, delay: '0.9s', dur: '4.5s' }, // 真上
+  { id: 'm03', left: '22%', top: '13%', size: 94, delay: '0s', dur: '4.2s' }, // 左上
+  { id: 'm46', left: '78%', top: '12%', size: 100, delay: '0.5s', dur: '3.7s' }, // 右上
+  { id: 'm24', left: '12%', top: '35%', size: 78, delay: '0.7s', dur: '4.0s' }, // 左
+  { id: 'm31', left: '88%', top: '35%', size: 76, delay: '0.3s', dur: '4.8s' }, // 右
+  { id: 'm12', left: '11%', top: '64%', size: 84, delay: '0.6s', dur: '4.6s' }, // 左下
+  { id: 'm49', left: '89%', top: '64%', size: 90, delay: '0.2s', dur: '4.3s' }, // 右下
+  { id: 'd04', left: '27%', top: '85%', size: 84, delay: '1.0s', dur: '3.9s' }, // 下左
+  { id: 'm20', left: '73%', top: '85%', size: 74, delay: '0.4s', dur: '4.4s' }, // 下右
+]
+
 export interface OpeningProps {
   onDone: () => void
 }
@@ -116,6 +135,46 @@ export default function Opening({ onDone }: OpeningProps) {
         />
       ))}
 
+      {/* モンスターのシルエット（影絵）＝タイトル登場シーンの背景。中央は空けて縁に配置 */}
+      {phase === 'title' && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9 }}
+        >
+          {/* 中央520pxの枠に閉じ込める＝画面が広いPCでもタイトルの近くに集まる */}
+          <div
+            className="absolute left-1/2 top-0 h-full -translate-x-1/2"
+            style={{ width: 'min(100vw, 520px)' }}
+          >
+            {SILHOUETTES.map((sil, i) => (
+              <div
+                key={i}
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: sil.left, top: sil.top }}
+              >
+                <img
+                  src={monsterSprite(sil.id)}
+                  alt=""
+                  draggable={false}
+                  className="anim-float select-none"
+                  style={{
+                    width: sil.size,
+                    animationDuration: sil.dur,
+                    animationDelay: sil.delay,
+                    // 色を消した真っ黒の影＋うっすら青い光。気配だけ感じる薄さにする
+                    opacity: 0.3,
+                    filter:
+                      'brightness(0) drop-shadow(0 0 9px rgba(130,160,255,0.35))',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       {/* モンスター（横ながれ）。タイトル中は出さない */}
       <AnimatePresence>
         {phase === 'silhouettes' && (
@@ -140,11 +199,29 @@ export default function Opening({ onDone }: OpeningProps) {
       {/* タイトル（画面全体の中央レイヤー＝モンスターの大きさに影響されない） */}
       {phase === 'title' && (
         <motion.div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-7 px-6"
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 px-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
+          {/* タイトルの上に載せる「開いた本」（勉強アプリだと一目で分かる目印） */}
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0, y: -12 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+          >
+            <img
+              src="/ui/book.webp"
+              alt=""
+              draggable={false}
+              className="anim-float select-none"
+              style={{
+                width: 'min(58vw, 248px)',
+                animationDuration: '3.4s',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.4))',
+              }}
+            />
+          </motion.div>
           <motion.div
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

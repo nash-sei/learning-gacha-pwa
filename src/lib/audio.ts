@@ -21,7 +21,7 @@ export type SeName =
   | 'harvest'
   | 'partner-happy'
 
-export type BgmName = 'home' | 'quiz'
+export type BgmName = 'opening' | 'home' | 'quiz'
 
 const SE_NAMES: SeName[] = [
   'tap',
@@ -38,7 +38,7 @@ const SE_NAMES: SeName[] = [
   'partner-happy',
 ]
 
-const BGM_NAMES: BgmName[] = ['home', 'quiz']
+const BGM_NAMES: BgmName[] = ['opening', 'home', 'quiz']
 
 const SE_VOLUME = 0.6
 const BGM_VOLUME = 0.32
@@ -268,8 +268,14 @@ function tryStartDesiredBgm(): void {
   if (currentBgm === desiredBgm && bgmSource) return
   const state = buffers.get(desiredBgm)
   const buf = asBuffer(state)
-  if (buf) startBgmBuffer(desiredBgm, buf)
-  else if (state === undefined) void loadBuffer(desiredBgm)
+  if (buf) {
+    startBgmBuffer(desiredBgm, buf)
+    return
+  }
+  // 望む曲がまだ鳴らせない（読み込み中 or ファイル無し）。別の曲が鳴っているなら止める。
+  // ＝画面が変わったら前の曲は必ず止まる（曲ファイルが未用意でも鳴りっぱなしにしない）。
+  if (currentBgm && currentBgm !== desiredBgm) stopBgmInternal()
+  if (state === undefined) void loadBuffer(desiredBgm)
   // 'loading' → 読み込み完了時に再試行 / 'missing' → 無音のまま
 }
 

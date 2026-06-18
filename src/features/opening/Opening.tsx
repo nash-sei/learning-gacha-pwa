@@ -50,10 +50,15 @@ export default function Opening({ onDone }: OpeningProps) {
   const [phase, setPhase] = useState<'silhouettes' | 'title'>('silhouettes')
   const doneRef = useRef(false)
 
+  // オープニングBGM（起動時に開始）。スマホは最初の画面タップで音が解禁されてから鳴り始める。
+  // ここでは止めない＝オープニング後もそのまま流れ続ける（当面の全体BGM代わり・後で方針調整可）。
+  useEffect(() => {
+    audio.playBgm('opening')
+  }, [])
+
   // モンスターを順番に流し、最後まで来たらタイトルへ
   useEffect(() => {
     if (phase !== 'silhouettes') return
-    audio.playSe('drumroll')
     const timer = window.setInterval(() => {
       setIndex((i) => {
         if (i + 1 >= SLIDES.length) {

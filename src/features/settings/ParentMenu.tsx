@@ -12,7 +12,7 @@
  * - 親向け画面なので文言は大人向け・装飾は控えめ
  */
 import { useState } from 'react'
-import type { ReactNode } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import Papa from 'papaparse'
 import type {
   Answer,
@@ -439,6 +439,107 @@ export default function ParentMenu({ onBack }: ParentMenuProps) {
     })
   }
 
+  // ---- データお引っこし（バックアップ／復元） ----
+  const exportData = async () => {
+    try {
+      const payload = { type: 'gakumon-backup', version: 2, data: storage.exportAllRaw() }
+      const json = JSON.stringify(payload)
+      const d = new Date()
+      const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(
+        d.getDate()
+      ).padStart(2, '0')}`
+      const filename = `gakumon-backup-${stamp}.json`
+
+      // iPhone（ホーム画面アプリ）でも確実に取り出せるよう、まず「共有」を試す。
+      // 共有シートから「ファイルに保存」等を選べる（ダウンロードが効かないiOSアプリ対策）。
+      const file = new File([json], filename, { type: 'application/json' })
+      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean }
+      if (typeof nav.canShare === 'function' && nav.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'ガクモン バックアップ' })
+          setNotice({
+            title: '書き出しました',
+            body: '共有メニューから「ファイルに保存」などを選ぶと、新しい方のアプリの「読み込む」で復元できます。',
+          })
+        } catch (err) {
+          // 共有をキャンセルしたとき(AbortError)は何も出さない
+          if ((err as Error)?.name !== 'AbortError') {
+            setNotice({
+              title: 'エラー',
+              body: '共有に失敗しました: ' + ((err as Error)?.message ?? ''),
+            })
+          }
+        }
+        return
+      }
+
+      // PC・Android：ファイルとしてダウンロード
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setNotice({
+        title: '書き出しました',
+        body: 'バックアップファイルを保存しました。新しい方のアプリで「データを読み込む」を押し、このファイルを選ぶとデータが戻ります。',
+      })
+    } catch (e) {
+      setNotice({
+        title: 'エラー',
+        body: '書き出しに失敗しました: ' + (e instanceof Error ? e.message : String(e)),
+      })
+    }
+  }
+
+  const onPickImportFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 同じファイルを選び直せるようにリセット
+    if (!file) return
+    file
+      .text()
+      .then((text) => {
+        let parsed: unknown
+        try {
+          parsed = JSON.parse(text)
+        } catch {
+          setNotice({ title: '読み込めません', body: 'このファイルはバックアップ形式ではありません。' })
+          return
+        }
+        const obj = parsed as { type?: string; data?: Record<string, string> }
+        if (!obj || obj.type !== 'gakumon-backup' || !obj.data) {
+          setNotice({
+            title: '読み込めません',
+            body: 'ガクモンのバックアップファイルではないようです。',
+          })
+          return
+        }
+        const data = obj.data
+        setConfirm({
+          message:
+            'いまのこの端末のデータ（モンスター・コイン・設定など）を、選んだバックアップで丸ごと上書きします。よろしいですか？',
+          onYes: () => {
+            const r = storage.importAllRaw(data)
+            if (r.ok) window.location.reload() // 確実に反映するため再読み込み
+            else
+              setNotice({
+                title: '保存エラー',
+                body: '読み込みの保存に失敗しました: ' + (r.error ?? ''),
+              })
+          },
+        })
+      })
+      .catch((err) => {
+        setNotice({
+          title: 'エラー',
+          body: 'ファイルの読み取りに失敗しました: ' + (err instanceof Error ? err.message : String(err)),
+        })
+      })
+  }
+
   // ---- 音設定 ----
   const toggleSound = (key: 'se' | 'bgm', value: boolean) => {
     updateSettings((s) => ({ ...s, sound: { ...s.sound, [key]: value } }))
@@ -823,6 +924,32 @@ export default function ParentMenu({ onBack }: ParentMenuProps) {
               className="h-6 w-6"
               checked={settings.sound.bgm}
               onChange={(e) => toggleSound('bgm', e.target.checked)}
+            />
+          </label>
+        </div>
+      </Section>
+
+      {/* ---- データお引っこし（バックアップ／復元） ---- */}
+      <Section title="データお引っこし（バックアップ／復元）">
+        <p className="mb-3 text-sm text-[var(--color-ink-soft)]">
+          機種変更やアプリの入れ直しでデータを引き継ぐときに使います。古い方で「書き出す」→
+          出てきたファイルを新しい方で「読み込む」と、モンスターや進み具合が丸ごと移ります。
+          ふだんのバックアップ（保険）にも使えます。
+        </p>
+        <div className="flex flex-col gap-2">
+          <button
+            className="self-start rounded-xl bg-[var(--color-primary)] px-4 py-2 text-base font-bold text-white"
+            onClick={() => void exportData()}
+          >
+            データを書き出す（バックアップ）
+          </button>
+          <label className="self-start cursor-pointer rounded-xl border-2 border-[var(--color-primary)] px-4 py-2 text-base font-bold text-[var(--color-primary-dark)]">
+            データを読み込む（復元）
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={onPickImportFile}
             />
           </label>
         </div>

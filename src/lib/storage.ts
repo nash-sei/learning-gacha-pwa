@@ -128,4 +128,40 @@ export const storage = {
   rawRemove(key: string): void {
     localStorage.removeItem(key)
   },
+
+  // ---- データお引っこし（バックアップ／復元・全 lg2_* が対象） ----
+  /** 全 lg2_* キーの生データ（文字列）を集めて返す。機種変更・URL変更時の引き継ぎ用 */
+  exportAllRaw(): Record<string, string> {
+    const out: Record<string, string> = {}
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k && k.startsWith('lg2_')) {
+        const v = localStorage.getItem(k)
+        if (v != null) out[k] = v
+      }
+    }
+    return out
+  },
+  /**
+   * バックアップを復元：既存の lg2_* を消してから書き戻す（v1 の lg1_backup_* は触らない）。
+   * lg2_ 以外のキーは安全のため無視する。
+   */
+  importAllRaw(data: Record<string, string>): SaveResult {
+    try {
+      const toRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)
+        if (k && k.startsWith('lg2_')) toRemove.push(k)
+      }
+      toRemove.forEach((k) => localStorage.removeItem(k))
+      for (const [k, v] of Object.entries(data)) {
+        if (k.startsWith('lg2_') && typeof v === 'string') localStorage.setItem(k, v)
+      }
+      return { ok: true }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('[storage] importAllRaw failed', e)
+      return { ok: false, error: msg }
+    }
+  },
 }

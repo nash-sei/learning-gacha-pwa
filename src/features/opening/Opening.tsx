@@ -69,6 +69,9 @@ export default function Opening({ onDone }: OpeningProps) {
   // 'start'=「タップしてはじめる」画面。最初のタップで音を解禁してから本編が始まる
   // （iPhone等は仕様上、画面タップ前は音が鳴らせないため。これでどの端末でも頭から曲が鳴る）
   const [phase, setPhase] = useState<'start' | 'silhouettes' | 'title'>('start')
+  // 最後のモンスターが流れ去ってから true。タイトル＆シルエットはこれが true のときだけ出す
+  //（モンスターと重なって「タイトルが2回・ずれて出る」不具合を防ぐ）
+  const [titleReady, setTitleReady] = useState(false)
   const doneRef = useRef(false)
 
   // モンスターを順番に流し、最後まで来たらタイトルへ
@@ -87,10 +90,17 @@ export default function Opening({ onDone }: OpeningProps) {
     return () => window.clearInterval(timer)
   }, [phase])
 
-  // タイトル登場で派手な音
+  // タイトルへ移ったら、最後のモンスターが流れ去る(exit≈0.45s)のを待ってからタイトルを出す＝重なり防止
   useEffect(() => {
-    if (phase === 'title') audio.playSe('reveal-ur')
+    if (phase !== 'title') return
+    const t = window.setTimeout(() => setTitleReady(true), 520)
+    return () => window.clearTimeout(t)
   }, [phase])
+
+  // タイトルが実際に出る瞬間に派手な音（モンスター退場中は鳴らさない）
+  useEffect(() => {
+    if (titleReady) audio.playSe('reveal-ur')
+  }, [titleReady])
 
   const finish = () => {
     if (doneRef.current) return
@@ -99,16 +109,18 @@ export default function Opening({ onDone }: OpeningProps) {
     onDone()
   }
 
-  // タップ：start なら音を鳴らして本編開始 / 流れている途中ならスキップ / タイトルならホームへ
+  // タップ：start=音を鳴らして本編開始 / 流れ中=スキップ / 退場待ち中=すぐタイトル / タイトル表示中=ホームへ
   const handleTap = () => {
     if (phase === 'start') {
       // この瞬間（ユーザー操作）に音が解禁される＝どの端末でもOP曲が頭から鳴る
       audio.playBgm('opening')
       setPhase('silhouettes')
-    } else if (phase === 'title') {
-      finish()
+    } else if (phase === 'silhouettes') {
+      setPhase('title') // 流れている途中はスキップしてタイトルへ
+    } else if (titleReady) {
+      finish() // タイトル表示中ならホームへ進む
     } else {
-      setPhase('title')
+      setTitleReady(true) // モンスター退場の待ち時間中なら、すぐタイトルを出す
     }
   }
 
@@ -169,7 +181,7 @@ export default function Opening({ onDone }: OpeningProps) {
       )}
 
       {/* モンスターのシルエット（影絵）＝タイトル登場シーンの背景。中央は空けて縁に配置 */}
-      {phase === 'title' && (
+      {titleReady && (
         <motion.div
           className="pointer-events-none absolute inset-0 z-0"
           initial={{ opacity: 0 }}
@@ -223,14 +235,14 @@ export default function Opening({ onDone }: OpeningProps) {
             }}
             initial={{ x: s.fromX, y: s.y, opacity: 0 }}
             animate={{ x: s.toX, y: s.y, opacity: 0.95 }}
-            exit={{ x: s.exitX, y: s.y, opacity: 0 }}
+            exit={{ x: s.exitX, y: s.y, opacity: 0, transition: { duration: 0.45, ease: 'easeIn' } }}
             transition={{ duration: 1.4, ease: 'easeInOut' }}
           />
         )}
       </AnimatePresence>
 
       {/* タイトル（画面全体の中央レイヤー＝モンスターの大きさに影響されない） */}
-      {phase === 'title' && (
+      {titleReady && (
         <motion.div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 px-6"
           initial={{ opacity: 0 }}

@@ -16,7 +16,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GameProvider, useGame } from './contexts/GameContext'
-import type { Difficulty } from './types'
+import type { Difficulty, Rarity } from './types'
 import { audio } from './lib/audio'
 import ProfileSelect from './features/profile/ProfileSelect'
 import ForcePasscodeChange from './features/profile/ForcePasscodeChange'
@@ -29,9 +29,19 @@ import ShardEgg from './features/gacha/ShardEgg'
 import ParentMenu from './features/settings/ParentMenu'
 import Opening from './features/opening/Opening'
 import DangerEvent from './features/danger/DangerEvent'
+import AdultMode from './features/adult/AdultMode'
 import { DANGER_RATE } from './lib/constants'
 
-export type Screen = 'home' | 'quiz' | 'gacha' | 'shard-egg' | 'zukan' | 'tree' | 'parent' | 'danger'
+export type Screen =
+  | 'home'
+  | 'quiz'
+  | 'gacha'
+  | 'shard-egg'
+  | 'zukan'
+  | 'tree'
+  | 'parent'
+  | 'danger'
+  | 'adult'
 
 interface PendingGacha {
   difficulty: Difficulty
@@ -81,48 +91,105 @@ function AppContent() {
 function SessionScreens() {
   const [screen, setScreen] = useState<Screen>('home')
   const [pendingGacha, setPendingGacha] = useState<PendingGacha | null>(null)
+  // テスト用（npm run dev 限定）：演出を「見るだけ」表示するための指定
+  const [debugRarity, setDebugRarity] = useState<Rarity | null>(null)
+  const [debugDanger, setDebugDanger] = useState(false)
 
   // gacha なのに pendingGacha が無い（リロード等）→ ホーム表示にフォールバック
   const effectiveScreen: Screen = screen === 'gacha' && !pendingGacha ? 'home' : screen
 
+  // テスト用ジャンプ（本番ビルドでは下のパネルごと消えるので呼ばれない）
+  const openGachaDemo = (r: Rarity) => {
+    setDebugRarity(r)
+    setPendingGacha({ difficulty: 'normal', retryUsed: false })
+    setScreen('gacha')
+  }
+  const openDangerDemo = () => {
+    setDebugDanger(true)
+    setScreen('danger')
+  }
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={effectiveScreen}
-        className="min-h-dvh"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-      >
-        {effectiveScreen === 'home' && <Home go={(s) => setScreen(s)} />}
-        {effectiveScreen === 'quiz' && (
-          <Quiz
-            onComplete={(r: PendingGacha) => {
-              setPendingGacha(r)
-              setScreen('gacha')
-            }}
-            onQuit={() => setScreen('home')}
-          />
-        )}
-        {effectiveScreen === 'gacha' && pendingGacha && (
-          <Gacha
-            difficulty={pendingGacha.difficulty}
-            retryUsed={pendingGacha.retryUsed}
-            onDone={() => {
-              setPendingGacha(null)
-              // ガチャのあと、低確率で DANGER 討伐イベントが発生（追加機能1-C）
-              setScreen(Math.random() < DANGER_RATE ? 'danger' : 'home')
-            }}
-          />
-        )}
-        {effectiveScreen === 'danger' && <DangerEvent onDone={() => setScreen('home')} />}
-        {effectiveScreen === 'shard-egg' && <ShardEgg onDone={() => setScreen('home')} />}
-        {effectiveScreen === 'zukan' && <Zukan onBack={() => setScreen('home')} />}
-        {effectiveScreen === 'tree' && <CoinTree onBack={() => setScreen('home')} />}
-        {effectiveScreen === 'parent' && <ParentMenu onBack={() => setScreen('home')} />}
-      </motion.div>
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={effectiveScreen}
+          className="min-h-dvh"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {effectiveScreen === 'home' && <Home go={(s) => setScreen(s)} />}
+          {effectiveScreen === 'quiz' && (
+            <Quiz
+              onComplete={(r: PendingGacha) => {
+                setPendingGacha(r)
+                setScreen('gacha')
+              }}
+              onQuit={() => setScreen('home')}
+            />
+          )}
+          {effectiveScreen === 'gacha' && pendingGacha && (
+            <Gacha
+              difficulty={pendingGacha.difficulty}
+              retryUsed={pendingGacha.retryUsed}
+              debugRarity={debugRarity ?? undefined}
+              onDone={() => {
+                const wasDebug = debugRarity != null
+                setPendingGacha(null)
+                setDebugRarity(null)
+                // ガチャのあと、低確率で DANGER 討伐イベントが発生（追加機能1-C）。テスト演出では出さない。
+                setScreen(!wasDebug && Math.random() < DANGER_RATE ? 'danger' : 'home')
+              }}
+            />
+          )}
+          {effectiveScreen === 'danger' && (
+            <DangerEvent
+              debugReveal={debugDanger}
+              onDone={() => {
+                setDebugDanger(false)
+                setScreen('home')
+              }}
+            />
+          )}
+          {effectiveScreen === 'adult' && <AdultMode onDone={() => setScreen('home')} />}
+          {effectiveScreen === 'shard-egg' && <ShardEgg onDone={() => setScreen('home')} />}
+          {effectiveScreen === 'zukan' && <Zukan onBack={() => setScreen('home')} />}
+          {effectiveScreen === 'tree' && <CoinTree onBack={() => setScreen('home')} />}
+          {effectiveScreen === 'parent' && <ParentMenu onBack={() => setScreen('home')} />}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* === テスト用パネル（開発モード、または本番でも URL に ?test を付けた時だけ表示。通常の利用者には出ない） === */}
+      {(import.meta.env.DEV || new URLSearchParams(window.location.search).has('test')) &&
+        effectiveScreen === 'home' && (
+        <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-[var(--color-primary)] bg-white/90 px-3 py-2 shadow-lg backdrop-blur">
+          <span className="text-xs font-extrabold text-[var(--color-ink-soft)]">🧪 えんしゅつテスト</span>
+          {(['N', 'R', 'SR', 'UR'] as Rarity[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => openGachaDemo(r)}
+              className="rounded-lg bg-[var(--color-primary)] px-2.5 py-1 text-sm font-extrabold text-white active:scale-95"
+            >
+              {r}
+            </button>
+          ))}
+          <button
+            onClick={openDangerDemo}
+            className="rounded-lg bg-[var(--color-danger)] px-2.5 py-1 text-sm font-extrabold text-white active:scale-95"
+          >
+            DANGER
+          </button>
+          <button
+            onClick={() => setScreen('adult')}
+            className="rounded-lg bg-[var(--color-ink-soft)] px-2.5 py-1 text-sm font-extrabold text-white active:scale-95"
+          >
+            大人
+          </button>
+        </div>
+      )}
+    </>
   )
 }
 

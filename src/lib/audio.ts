@@ -20,6 +20,7 @@ export type SeName =
   | 'reveal-ur'
   | 'harvest'
   | 'partner-happy'
+  | 'danger-bgm'
 
 export type BgmName = 'opening' | 'home' | 'quiz'
 
@@ -36,6 +37,7 @@ const SE_NAMES: SeName[] = [
   'reveal-ur',
   'harvest',
   'partner-happy',
+  'danger-bgm',
 ]
 
 const BGM_NAMES: BgmName[] = ['opening', 'home', 'quiz']
@@ -118,6 +120,8 @@ const SYNTH_SE: Record<SeName, SynthNote[]> = {
     { f: 784, t: 0, d: 0.09, type: 'triangle', g: 0.2 },
     { f: 987.8, t: 0.1, d: 0.16, type: 'triangle', g: 0.2 },
   ],
+  // DANGER専用曲（public/sounds/danger-bgm.mp3）。ファイルが無い時の保険は接近音を流用。
+  'danger-bgm': dangerNotes(),
 }
 
 // ========== 内部状態 ==========

@@ -12,27 +12,43 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Difficulty, Rarity, SaveData } from '../../types'
 import type { GachaResult } from '../../lib/gacha'
-import { demote, performGacha } from '../../lib/gacha'
+import { demote, performGacha, pickMonster } from '../../lib/gacha'
+import { MONSTERS } from '../../data/monsters'
 import { DIFFICULTY_LABEL, RARITY_COLOR, RARITY_LABEL } from '../../lib/constants'
 import { audio } from '../../lib/audio'
 import type { SeName } from '../../lib/audio'
 import { useGame } from '../../contexts/GameContext'
 import Dialog from '../../components/Dialog'
 import MonsterSprite from '../../components/MonsterSprite'
+import {
+  SparkleStars,
+  RainbowFall,
+  RainbowSweep,
+  EggBurst,
+  GoldRays,
+  RainbowAurora,
+  RevealHalo,
+  ShockRing,
+} from './effects'
+import type { StarPiece, RainbowBand } from './effects'
 
 export interface GachaProps {
   difficulty: Difficulty
   retryUsed: boolean
   onDone: () => void
+  /** テスト用：指定レア度の演出を「見るだけ」表示する（保存もガチャ回数消費もしない・npm run dev 限定） */
+  debugRarity?: Rarity
 }
 
 type Phase =
   | 'ready'
   | 'drumroll'
+  | 'rainbow'
   | 'egg'
   | 'shake'
   | 'crack'
   | 'silhouette'
+  | 'flash'
   | 'reveal'
   | 'result'
 
@@ -117,7 +133,7 @@ function EggCracks() {
   )
 }
 
-export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
+export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: GachaProps) {
   const { save, childSettings, updateSave } = useGame()
 
   const [phase, setPhase] = useState<Phase>('ready')
@@ -140,6 +156,31 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
     []
   )
 
+  // SR の金色の星（タマゴの中心からぐるりと囲むように配置＝卵のまわりでピカピカ）
+  const stars = useMemo<StarPiece[]>(
+    () =>
+      Array.from({ length: 22 }, (_, i) => ({
+        id: i,
+        angle: (i / 22) * Math.PI * 2 + pseudoRandom(i + 3) * 0.35,
+        radius: 110 + pseudoRandom(i + 53) * 65,
+        delay: pseudoRandom(i + 103) * 0.9,
+        size: 18 + pseudoRandom(i + 153) * 20,
+      })),
+    []
+  )
+
+  // UR の虹のすじ（左右交互に降ってくる）
+  const rainbowBands = useMemo<RainbowBand[]>(
+    () =>
+      Array.from({ length: 8 }, (_, i) => ({
+        id: i,
+        side: i % 2 === 0 ? 'left' : 'right',
+        top: 2 + pseudoRandom(i + 11) * 58,
+        delay: i * 0.18,
+      })),
+    []
+  )
+
   // クイズBGMはここで止めて演出の音を立たせる
   useEffect(() => {
     audio.stopBgm()
@@ -147,10 +188,17 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
 
   // 段階演出のタイマー進行（音と同期）
   useEffect(() => {
+    // SR/UR は「だれかな？」を飛ばし、割れた瞬間にピカッ→そのまま登場（とくべつ感）
+    const rarity = outcome?.result.rarity
+    const special = rarity === 'SR' || rarity === 'UR'
     let t: number | undefined
     switch (phase) {
       case 'drumroll':
         t = window.setTimeout(() => setPhase('egg'), 1500)
+        break
+      case 'rainbow':
+        // UR 導入：右→左で虹がふわっと流れたあと卵へ
+        t = window.setTimeout(() => setPhase('egg'), 1900)
         break
       case 'egg':
         t = window.setTimeout(() => setPhase('shake'), 1000)
@@ -160,10 +208,13 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
         break
       case 'crack':
         audio.playSe('crack')
-        t = window.setTimeout(() => setPhase('silhouette'), 800)
+        t = window.setTimeout(() => setPhase(special ? 'flash' : 'silhouette'), special ? 650 : 800)
         break
       case 'silhouette':
         t = window.setTimeout(() => setPhase('reveal'), 1000)
+        break
+      case 'flash':
+        t = window.setTimeout(() => setPhase('reveal'), 600)
         break
       case 'reveal':
         if (outcome) audio.playSe(REVEAL_SE[outcome.result.rarity])
@@ -188,12 +239,39 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
     )
   }
 
-  const canPull = save.dailyGachaCount < childSettings.maxDailyGacha
+  // テスト時は回数制限を無視して何度でも開けるようにする
+  const canPull = debugRarity != null || save.dailyGachaCount < childSettings.maxDailyGacha
+
+  // 演出スタート：UR だけ太鼓をやめ、先に虹がふわっと流れる導入にする
+  const startReveal = (result: GachaResult, reward: number) => {
+    setOutcome({ result, reward })
+    if (result.rarity === 'UR') {
+      audio.playSe('harvest') // やわらかい光の音（太鼓のかわり）
+      setPhase('rainbow')
+    } else {
+      audio.playSe('drumroll')
+      setPhase('drumroll')
+    }
+  }
 
   // ---- commit-then-animate：先に保存、あとから演出（spec §6-1） ----
   const handleOpen = () => {
     if (!canPull || phase !== 'ready') return
     audio.unlock()
+
+    // テスト用：指定レア度の演出を「見るだけ」表示（保存しない・回数を消費しない）
+    if (debugRarity) {
+      const monster = pickMonster(debugRarity, save, MONSTERS, Math.random)
+      const result: GachaResult = {
+        monster,
+        rarity: debugRarity,
+        isNew: true,
+        shardGain: 0,
+        pityTriggered: false,
+      }
+      startReveal(result, childSettings.coinRewards[effDiff])
+      return
+    }
 
     // ① 抽選（nextSave は monster/shards/dailyGachaCount/pity 確定済・コインは含まない）
     const { result, nextSave } = performGacha(save, effDiff)
@@ -215,13 +293,18 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
     if (!r.ok) setSaveWarnOpen(true)
 
     // ④ ここから演出
-    setOutcome({ result, reward })
-    audio.playSe('drumroll')
-    setPhase('drumroll')
+    startReveal(result, reward)
   }
 
   const result = outcome?.result ?? null
   const eggStyle = result ? EGG_STYLE[result.rarity] : EGG_STYLE.N
+  // SR/UR は光のにじみ（bloom）を多段に重ねて豪華に見せる
+  const eggBloom =
+    result?.rarity === 'UR'
+      ? `0 0 50px 14px ${eggStyle.glow}, 0 0 110px 40px rgba(176,107,255,0.5), 0 0 175px 70px rgba(120,200,255,0.3), 0 10px 24px rgba(58,47,42,0.2)`
+      : result?.rarity === 'SR'
+        ? `0 0 50px 14px ${eggStyle.glow}, 0 0 110px 40px rgba(255,200,80,0.55), 0 0 175px 70px rgba(255,170,30,0.3), 0 10px 24px rgba(58,47,42,0.2)`
+        : `0 0 56px 18px ${eggStyle.glow}, 0 10px 24px rgba(58,47,42,0.2)`
   const showEgg = phase === 'egg' || phase === 'shake' || phase === 'crack'
 
   return (
@@ -313,14 +396,37 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
           </div>
         )}
 
+        {/* ---- UR 導入：太鼓のかわりに、右→左で虹がふわっと流れる ---- */}
+        {phase === 'rainbow' && (
+          <div className="flex flex-col items-center gap-4">
+            <RainbowAurora />
+            <RainbowSweep />
+            <motion.p
+              className="z-10 text-2xl font-extrabold text-white"
+              style={{ textShadow: '0 2px 12px rgba(176,107,255,0.9)' }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: [0, 1, 1], scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              にじいろの よかん…！
+            </motion.p>
+          </div>
+        )}
+
         {/* ---- 卵（色・光でレア度予告）→ ゆれる → ヒビ ---- */}
         {showEgg && result && (
           <div className="flex flex-col items-center gap-4">
+            {/* SR：背後で回る金の放射光／UR：虹のオーロラ（面で光らせる土台） */}
+            {result.rarity === 'SR' && <GoldRays />}
+            {result.rarity === 'UR' && <RainbowAurora />}
+            {/* SR：金色の星がピカピカ／UR：虹が左右から交互に降ってくる */}
+            {result.rarity === 'SR' && <SparkleStars stars={stars} />}
+            {result.rarity === 'UR' && <RainbowFall bands={rainbowBands} />}
             <motion.div
               className="relative h-48 w-40 rounded-[50%_50%_50%_50%/60%_60%_42%_42%]"
               style={{
                 background: eggStyle.base,
-                boxShadow: `0 0 56px 18px ${eggStyle.glow}, 0 10px 24px rgba(58,47,42,0.2)`,
+                boxShadow: eggBloom,
               }}
               initial={{ scale: 0, y: 40 }}
               animate={
@@ -348,7 +454,7 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
           </div>
         )}
 
-        {/* ---- シルエット ---- */}
+        {/* ---- シルエット（N/R のみ・SR/UR は飛ばしてフラッシュ） ---- */}
         {phase === 'silhouette' && result && (
           <motion.div
             initial={{ scale: 0.4, opacity: 0 }}
@@ -361,6 +467,13 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
           </motion.div>
         )}
 
+        {/* ---- ピカッ（SR/UR：卵から光のすじが飛び出す） ---- */}
+        {phase === 'flash' && result && (
+          <EggBurst
+            tint={result.rarity === 'UR' ? 'rgba(176,107,255,0.95)' : 'rgba(255,190,60,0.95)'}
+          />
+        )}
+
         {/* ---- ジャーン！（レア度別） ---- */}
         {(phase === 'reveal' || phase === 'result') && result && (
           <div className="flex w-full flex-col items-center gap-3">
@@ -368,10 +481,13 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
             <AnimatePresence>
               {phase === 'reveal' && result.rarity === 'UR' && (
                 <motion.div
-                  className="absolute inset-x-0 top-6 z-10 py-3 text-center text-3xl font-extrabold text-white"
+                  className="absolute inset-x-0 top-6 z-20 py-3 text-center text-4xl font-black text-white"
                   style={{
                     background:
                       'linear-gradient(90deg, #ff5e5e, #ffc043, #4ade80, #4f9dff, #b06bff)',
+                    WebkitTextStroke: '1.5px rgba(255,255,255,0.9)',
+                    textShadow: '0 3px 10px rgba(0,0,0,0.4)',
+                    boxShadow: '0 0 30px rgba(176,107,255,0.7)',
                   }}
                   initial={{ x: '-110%' }}
                   animate={{ x: 0 }}
@@ -398,11 +514,57 @@ export default function Gacha({ difficulty, retryUsed, onDone }: GachaProps) {
               <Confetti pieces={confetti} />
             )}
 
+            {/* SR=金 / UR=虹：モンスター背後の回る後光 */}
+            {(result.rarity === 'SR' || result.rarity === 'UR') && (
+              <RevealHalo kind={result.rarity === 'UR' ? 'rainbow' : 'gold'} />
+            )}
+            {/* 登場の瞬間に広がる光の輪（1発） */}
+            {(result.rarity === 'SR' || result.rarity === 'UR') && phase === 'reveal' && (
+              <ShockRing
+                color={
+                  result.rarity === 'UR' ? 'rgba(200,150,255,0.9)' : 'rgba(255,210,110,0.95)'
+                }
+              />
+            )}
+            {/* UR：登場の瞬間の白い閃光＋集中線（必殺技風） */}
+            {result.rarity === 'UR' && phase === 'reveal' && (
+              <>
+                <motion.div
+                  className="pointer-events-none absolute inset-0 bg-white"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.8, 0] }}
+                  transition={{ duration: 0.5, times: [0, 0.2, 1], ease: 'easeOut' }}
+                />
+                <motion.div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      'repeating-conic-gradient(rgba(255,255,255,0) 0deg, rgba(255,255,255,0.5) 1.6deg, rgba(255,255,255,0) 5deg)',
+                    maskImage: 'radial-gradient(circle, transparent 22%, #000 60%)',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 22%, #000 60%)',
+                  }}
+                  initial={{ opacity: 0, scale: 1.3 }}
+                  animate={{ opacity: [0, 0.7, 0], scale: [1.3, 1, 1] }}
+                  transition={{ duration: 0.7, ease: 'easeOut' }}
+                />
+              </>
+            )}
+
             <motion.div
               initial={{ scale: 0.3, rotate: -8 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 320, damping: 14 }}
               className="relative"
+              style={
+                result.rarity === 'UR'
+                  ? {
+                      filter:
+                        'drop-shadow(0 0 16px rgba(176,107,255,0.9)) drop-shadow(0 0 28px rgba(120,200,255,0.6))',
+                    }
+                  : result.rarity === 'SR'
+                    ? { filter: 'drop-shadow(0 0 16px rgba(255,200,80,0.95))' }
+                    : undefined
+              }
             >
               <MonsterSprite monsterId={result.monster.id} size={160} />
               {result.isNew && (

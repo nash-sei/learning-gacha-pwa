@@ -47,6 +47,7 @@ export interface GameContextValue {
     name: string
     grade: Grade
     iconId: string
+    isAdult?: boolean
     migrateV1?: boolean
   }): Profile
   deleteProfile(id: string): void
@@ -172,12 +173,19 @@ export function GameProvider(props: { children: ReactNode }) {
 
   // ---- プロフィール作成（migrateV1=true なら v1 データを引き継ぐ・spec §9-2） ----
   const createProfile = useCallback(
-    (input: { name: string; grade: Grade; iconId: string; migrateV1?: boolean }): Profile => {
+    (input: {
+      name: string
+      grade: Grade
+      iconId: string
+      isAdult?: boolean
+      migrateV1?: boolean
+    }): Profile => {
       const profile: Profile = {
         id: generateProfileId(),
         name: input.name,
         grade: input.grade,
         iconId: input.iconId,
+        isAdult: input.isAdult ?? false,
       }
       const nextProfiles = [...profilesRef.current, profile]
       const rp = storage.saveProfiles(nextProfiles)

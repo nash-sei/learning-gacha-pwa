@@ -597,7 +597,8 @@ export default function ParentMenu({ onBack }: ParentMenuProps) {
     )
   }
 
-  const selectedChildGrade = profiles.find((p) => p.id === selectedChildId)?.grade ?? null
+  const selectedChildProfile = profiles.find((p) => p.id === selectedChildId) ?? null
+  const selectedChildGrade = selectedChildProfile?.grade ?? null
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-4 p-4 pb-10">
@@ -668,7 +669,7 @@ export default function ParentMenu({ onBack }: ParentMenuProps) {
                 <div className="flex items-center justify-between py-1.5">
                   <span className="text-base text-[var(--color-ink)]">学年</span>
                   <span className="text-base text-[var(--color-ink-soft)]">
-                    小{selectedChildGrade}（変更は将来対応）
+                    {selectedChildProfile?.isAdult ? '🎓 大人モード' : `小${selectedChildGrade}（変更は将来対応）`}
                   </span>
                 </div>
                 <button

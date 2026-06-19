@@ -7,7 +7,7 @@
 // ========== 基本ユニオン ==========
 
 /** 学年（プロフィールに紐づく。将来 4 以上を追加可能） */
-export type Grade = 2 | 3
+export type Grade = 2 | 3 | 4
 
 export type Difficulty = 'easy' | 'normal' | 'hard'
 
@@ -89,6 +89,8 @@ export interface Question {
   explain: string[]
   /** 由来パック（'legacy' / '2026-06' 等） */
   pack?: string
+  /** 大人モード用の一言ヒント（任意・答えそのものは書かない） */
+  hint?: string
 }
 
 // ========== プロフィール ==========
@@ -98,6 +100,8 @@ export interface Profile {
   name: string
   grade: Grade
   iconId: string
+  /** 大人プロフィール（学年ではなく大人モード・任意・未定義は子供扱い） */
+  isAdult?: boolean
 }
 
 // ========== モンスター ==========

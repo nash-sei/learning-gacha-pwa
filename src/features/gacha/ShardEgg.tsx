@@ -18,12 +18,13 @@ import { audio } from '../../lib/audio'
 import { useGame } from '../../contexts/GameContext'
 import Dialog from '../../components/Dialog'
 import MonsterSprite from '../../components/MonsterSprite'
+import { EggBurst } from './effects'
 
 export interface ShardEggProps {
   onDone: () => void
 }
 
-type Phase = 'ready' | 'gather' | 'egg' | 'crack' | 'reveal' | 'result'
+type Phase = 'ready' | 'gather' | 'egg' | 'crack' | 'flash' | 'reveal' | 'result'
 
 /** 虹色（UR 演出と同系・とくべつ感） */
 const RAINBOW = 'linear-gradient(135deg, #ff5e5e, #ffc043, #4ade80, #4f9dff, #b06bff)'
@@ -165,7 +166,10 @@ export default function ShardEgg({ onDone }: ShardEggProps) {
         break
       case 'crack':
         audio.playSe('crack')
-        t = window.setTimeout(() => setPhase('reveal'), 700)
+        t = window.setTimeout(() => setPhase('flash'), 600)
+        break
+      case 'flash':
+        t = window.setTimeout(() => setPhase('reveal'), 600)
         break
       case 'reveal':
         if (outcome) audio.playSe(outcome.rarity === 'UR' ? 'reveal-ur' : 'reveal-sr')
@@ -299,6 +303,9 @@ export default function ShardEgg({ onDone }: ShardEggProps) {
             </p>
           </div>
         )}
+
+        {/* ---- ピカッ（割れた瞬間、卵から光のすじが飛び出す） ---- */}
+        {phase === 'flash' && <EggBurst tint={RAINBOW_GLOW} />}
 
         {/* ---- ジャーン！（SR以上確定・虹バースト＋紙吹雪） ---- */}
         {(phase === 'reveal' || phase === 'result') && result && (

@@ -42,6 +42,7 @@ export default function ProfileSelect() {
   const [view, setView] = useState<'list' | 'create'>(profiles.length === 0 ? 'create' : 'list')
   const [name, setName] = useState('')
   const [grade, setGrade] = useState<Grade>(2)
+  const [isAdult, setIsAdult] = useState(false)
   const [iconId, setIconId] = useState<string>(ICON_PRESETS[0])
   const [migrateChoice, setMigrateChoice] = useState<boolean>(profiles.length === 0)
   const [formError, setFormError] = useState<string | null>(null)
@@ -71,6 +72,7 @@ export default function ProfileSelect() {
       name: trimmed,
       grade,
       iconId,
+      isAdult,
       migrateV1: wantMigrate,
     })
 
@@ -164,7 +166,7 @@ export default function ProfileSelect() {
               <span className="text-6xl">{profileIcon(p.iconId)}</span>
               <span className="text-2xl font-extrabold text-[var(--color-ink)]">{p.name}</span>
               <span className="text-sm font-bold text-[var(--color-ink-soft)]">
-                {p.grade}ねんせい
+                {p.isAdult ? '🎓 大人' : `${p.grade}ねんせい`}
               </span>
             </motion.button>
           ))}
@@ -214,27 +216,44 @@ export default function ProfileSelect() {
           />
         </label>
 
-        {/* がくねん */}
+        {/* がくねん／大人 */}
         <div>
           <span className="mb-2 block text-xl font-extrabold">なんねんせい？</span>
-          <div className="flex gap-3">
-            {([2, 3] as Grade[]).map((g) => (
+          <div className="grid grid-cols-2 gap-3">
+            {([2, 3, 4] as Grade[]).map((g) => (
               <button
                 key={g}
-                className={`btn-kid flex-1 ${
-                  grade === g
+                className={`btn-kid ${
+                  !isAdult && grade === g
                     ? 'bg-[var(--color-primary)]'
                     : 'bg-[var(--color-ink-faint)] opacity-80'
                 }`}
                 onClick={() => {
                   audio.playSe('tap')
                   setGrade(g)
+                  setIsAdult(false)
                 }}
               >
                 {g}ねんせい
               </button>
             ))}
+            <button
+              className={`btn-kid ${
+                isAdult ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-ink-faint)] opacity-80'
+              }`}
+              onClick={() => {
+                audio.playSe('tap')
+                setIsAdult(true)
+              }}
+            >
+              🎓 大人
+            </button>
           </div>
+          {isAdult && (
+            <p className="mt-2 text-sm font-bold text-[var(--color-ink-soft)]">
+              🎓 大人モードでは「おとなのクイズ」（一般教養・雑学・常識）で あそびます
+            </p>
+          )}
         </div>
 
         {/* アイコン */}

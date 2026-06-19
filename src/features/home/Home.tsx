@@ -120,7 +120,7 @@ export default function Home({ go }: HomeProps) {
             <div className="leading-tight">
               <p className="text-lg font-extrabold">{currentProfile.name}</p>
               <p className="text-xs font-bold text-[var(--color-ink-soft)]">
-                {currentProfile.grade}ねんせい
+                {currentProfile.isAdult ? '🎓 大人' : `${currentProfile.grade}ねんせい`}
               </p>
             </div>
           </div>
@@ -218,12 +218,21 @@ export default function Home({ go }: HomeProps) {
 
       {/* ===== 入口ボタン ===== */}
       <nav className="space-y-3 pb-4">
-        <button
-          className="btn-kid w-full bg-[var(--color-primary)] text-3xl"
-          onClick={() => navTap('quiz')}
-        >
-          ✏️ クイズに ちょうせん！
-        </button>
+        {currentProfile.isAdult ? (
+          <button
+            className="btn-kid w-full bg-[var(--color-primary-dark)] text-3xl"
+            onClick={() => navTap('adult')}
+          >
+            🎓 おとなの クイズに ちょうせん！
+          </button>
+        ) : (
+          <button
+            className="btn-kid w-full bg-[var(--color-primary)] text-3xl"
+            onClick={() => navTap('quiz')}
+          >
+            ✏️ クイズに ちょうせん！
+          </button>
+        )}
         {/* かけらタマゴ入口（spec §8）：ひけるときだけ虹色で目立たせる */}
         {shardEggReady ? (
           <motion.button
@@ -262,6 +271,16 @@ export default function Home({ go }: HomeProps) {
             🌳 コインのき
           </button>
         </div>
+        {!currentProfile.isAdult && (
+          <div className="flex justify-center">
+            <button
+              className="rounded-full bg-[var(--color-primary-dark)] px-5 py-2 text-base font-extrabold text-white shadow active:scale-95"
+              onClick={() => navTap('adult')}
+            >
+              🎓 おとなの クイズ
+            </button>
+          </div>
+        )}
         <div className="flex justify-center">
           <button
             className="rounded-full bg-[var(--color-surface)] px-5 py-2 text-base font-bold text-[var(--color-ink-soft)] shadow active:scale-95"

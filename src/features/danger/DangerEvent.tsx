@@ -220,6 +220,12 @@ export default function DangerEvent({ onDone, debugReveal }: DangerEventProps) {
   // DANGER専用曲を動画の再生開始に合わせて一度だけ鳴らすためのフラグ
   const bgmStartedRef = useRef(false)
 
+  // DANGER演出のあいだはホームのBGMを止めて、専用曲と効果音をしっかり聞かせる。
+  // 画面がホームに戻ると Home 側が自動でBGMを鳴らし直す。
+  useEffect(() => {
+    audio.stopBgm()
+  }, [])
+
   // 土煙：3回の足踏み（着地）に合わせてモクモク。後の踏みつけほど大きく多く。茶/灰/黒影の3色。
   const dustPuffs = useMemo<Puff[]>(() => {
     const stompSec = [0.5, 1.5, 2.05]

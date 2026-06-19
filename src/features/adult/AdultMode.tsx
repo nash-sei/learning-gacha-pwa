@@ -62,6 +62,39 @@ function saveSeen(seen: Set<string>): void {
   }
 }
 
+/** 同じジャンル(pack)が連続しないように並べ替える（出題傾向を読まれにくくする）。 */
+function spreadByGenre(items: Question[]): Question[] {
+  const groups = new Map<string, Question[]>()
+  for (const q of items) {
+    const key = q.pack ?? q.subject
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(q)
+  }
+  const result: Question[] = []
+  let prev: string | null = null
+  while (result.length < items.length) {
+    // 直前と違うジャンルのうち、残数が最も多いグループから1問出す
+    let best: [string, Question[]] | null = null
+    for (const entry of groups) {
+      if (entry[1].length === 0 || entry[0] === prev) continue
+      if (!best || entry[1].length > best[1].length) best = entry
+    }
+    // 直前と違うジャンルが残っていなければ、残っているものから出す
+    if (!best) {
+      for (const entry of groups) {
+        if (entry[1].length > 0) {
+          best = entry
+          break
+        }
+      }
+    }
+    if (!best) break
+    result.push(best[1].shift()!)
+    prev = best[0]
+  }
+  return result
+}
+
 function pickQuestions(): Question[] {
   let seen = loadSeen()
   // まだ出していない問題だけを対象にシャッフル
@@ -80,7 +113,7 @@ function pickQuestions(): Question[] {
     picked.forEach((q) => seen.add(q.id))
   }
   saveSeen(seen)
-  return picked
+  return spreadByGenre(picked)
 }
 
 export default function AdultMode({ onDone }: AdultModeProps) {

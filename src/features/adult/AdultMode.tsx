@@ -45,8 +45,42 @@ const ADULT_RESULT_MESSAGES = [
   'よくできました！天才！パーフェクト！', // 10
 ]
 
+/** 既出問題ID（localStorageに保存）。全問題を出し切るまで同じ問題を繰り返さない。 */
+const SEEN_KEY = 'gakumon-adult-seen-v1'
+function loadSeen(): Set<string> {
+  try {
+    return new Set<string>(JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]'))
+  } catch {
+    return new Set<string>()
+  }
+}
+function saveSeen(seen: Set<string>): void {
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify([...seen]))
+  } catch {
+    /* localStorageが使えない環境では記憶しない */
+  }
+}
+
 function pickQuestions(): Question[] {
-  return shuffle(ADULT_POOL).slice(0, Math.min(QUESTION_COUNT, ADULT_POOL.length))
+  let seen = loadSeen()
+  // まだ出していない問題だけを対象にシャッフル
+  const available = shuffle(ADULT_POOL.filter((q) => !seen.has(q.id)))
+  let picked = available.slice(0, QUESTION_COUNT)
+  if (picked.length < QUESTION_COUNT) {
+    // 全問題を出し切った → 周回をリセット。直前に出した分は避けて補充する
+    const usedIds = new Set(picked.map((q) => q.id))
+    const refill = shuffle(ADULT_POOL.filter((q) => !usedIds.has(q.id))).slice(
+      0,
+      QUESTION_COUNT - picked.length
+    )
+    picked = [...picked, ...refill]
+    seen = new Set(picked.map((q) => q.id))
+  } else {
+    picked.forEach((q) => seen.add(q.id))
+  }
+  saveSeen(seen)
+  return picked
 }
 
 export default function AdultMode({ onDone }: AdultModeProps) {

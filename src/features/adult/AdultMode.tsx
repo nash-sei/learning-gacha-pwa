@@ -13,6 +13,10 @@ import type { Question } from '../../types'
 import { shuffle, buildChoiceOptions, checkAnswer } from '../../lib/questionEngine'
 import { audio } from '../../lib/audio'
 import { PACK_ADULT } from '../../data/packs/pack-adult'
+import { PACK_ADULT2 } from '../../data/packs/pack-adult2'
+
+/** 大人モードの出題プール（既存200問＋追加240問＝計440問） */
+const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2]
 
 export interface AdultModeProps {
   onDone: () => void
@@ -27,8 +31,22 @@ const REWARD_YEN = 200
 /** 大人向けの落ち着いた背景（子供用の明るい庭と区別） */
 const ADULT_BG = 'linear-gradient(to bottom, #24344d, #141d2e)'
 
+const ADULT_RESULT_MESSAGES = [
+  'ドンマイ！ここからスタート！つぎはいけるよ！', // 0
+  'ナイスチャレンジ！まずは1もんせいかい！', // 1
+  'いいぞ！すこしずつ前進してる！', // 2
+  'その調子！コツコツいこう！', // 3
+  'あと一歩！どんどん良くなってる！', // 4
+  'いい感じ！はんぶんクリア！ここから巻き返そう！', // 5
+  'すごい！はんぶん以上せいかい！のってきた！', // 6
+  'いいぞいいぞ！あと少しで満点だ！', // 7
+  'お見事！ほぼ完璧！その調子！', // 8
+  'おしい！あと1問で満点！もう天才クラス！', // 9
+  'よくできました！天才！パーフェクト！', // 10
+]
+
 function pickQuestions(): Question[] {
-  return shuffle(PACK_ADULT).slice(0, Math.min(QUESTION_COUNT, PACK_ADULT.length))
+  return shuffle(ADULT_POOL).slice(0, Math.min(QUESTION_COUNT, ADULT_POOL.length))
 }
 
 export default function AdultMode({ onDone }: AdultModeProps) {
@@ -92,15 +110,8 @@ export default function AdultMode({ onDone }: AdultModeProps) {
 
   // ===== けっか =====
   if (phase === 'result') {
-    const ratio = questions.length > 0 ? score / questions.length : 0
     const msg =
-      ratio === 1
-        ? 'まんてん！おみごと！'
-        : ratio >= 0.7
-          ? 'すばらしい！'
-          : ratio >= 0.4
-            ? 'いいせん いってます'
-            : 'もう1回 ちょうせん！'
+      ADULT_RESULT_MESSAGES[score] ?? ADULT_RESULT_MESSAGES[ADULT_RESULT_MESSAGES.length - 1]
     return (
       <div
         className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 p-6"

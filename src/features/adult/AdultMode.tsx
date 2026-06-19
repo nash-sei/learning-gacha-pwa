@@ -17,6 +17,8 @@ import { PACK_ADULT2 } from '../../data/packs/pack-adult2'
 
 /** 大人モードの出題プール（既存200問＋追加240問＝計440問） */
 const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2]
+/** 現在プールに存在する問題ID（既出メモの掃除に使う） */
+const POOL_IDS = new Set(ADULT_POOL.map((q) => q.id))
 
 export interface AdultModeProps {
   onDone: () => void
@@ -49,7 +51,10 @@ const ADULT_RESULT_MESSAGES = [
 const SEEN_KEY = 'gakumon-adult-seen-v1'
 function loadSeen(): Set<string> {
   try {
-    return new Set<string>(JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]'))
+    const raw: unknown = JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]')
+    const ids = Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : []
+    // いまプールにある問題IDだけ残す（削除済みIDや壊れた値を掃除する）
+    return new Set(ids.filter((id) => POOL_IDS.has(id)))
   } catch {
     return new Set<string>()
   }

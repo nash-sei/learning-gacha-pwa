@@ -9,9 +9,13 @@
  */
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import type { Question } from '../../types'
+import type { AdultData, Question, Rarity } from '../../types'
 import { shuffle, buildChoiceOptions, checkAnswer } from '../../lib/questionEngine'
 import { audio } from '../../lib/audio'
+import { storage } from '../../lib/storage'
+import { rollAdultMonster } from '../../lib/adultRoulette'
+import AdultRoulette, { type RouletteSegment } from './AdultRoulette'
+import AdultZukan from './AdultZukan'
 import { PACK_ADULT } from '../../data/packs/pack-adult'
 import { PACK_ADULT2 } from '../../data/packs/pack-adult2'
 
@@ -32,6 +36,37 @@ const MAX_HINTS = 3
 const REWARD_YEN = 200
 /** 大人向けの落ち着いた背景（子供用の明るい庭と区別） */
 const ADULT_BG = 'linear-gradient(to bottom, #24344d, #141d2e)'
+
+/** 初級ルーレットの枠（モンスター4＋はずれ4・各1/8）。当たりの中身は AdultMode が処理する */
+const BEGINNER_SEGMENTS: RouletteSegment[] = [
+  { label: 'モンスター', weight: 1, color: '#34d399', kind: 'monster' },
+  { label: 'はずれ', weight: 1, color: '#64748b', kind: 'miss' },
+  { label: 'モンスター', weight: 1, color: '#60a5fa', kind: 'monster' },
+  { label: 'はずれ', weight: 1, color: '#475569', kind: 'miss' },
+  { label: 'モンスター', weight: 1, color: '#a78bfa', kind: 'monster' },
+  { label: 'はずれ', weight: 1, color: '#64748b', kind: 'miss' },
+  { label: 'モンスター', weight: 1, color: '#f472b6', kind: 'monster' },
+  { label: 'はずれ', weight: 1, color: '#475569', kind: 'miss' },
+]
+
+/** 初級ルーレットの結果（モンスター当選 or はずれ）。全問正解→200円画面のときは null */
+type RouletteOutcome =
+  | { kind: 'monster'; monsterId: string; name: string; rarity: Rarity; isNew: boolean }
+  | { kind: 'miss' }
+  | null
+
+const RARITY_BADGE_COLOR: Record<Rarity, string> = {
+  N: '#64748b',
+  R: '#3b82f6',
+  SR: '#a855f7',
+  UR: 'linear-gradient(90deg,#f59e0b,#ef4444,#a855f7)',
+}
+const RARITY_TEXT: Record<Rarity, string> = {
+  N: 'ノーマル',
+  R: 'レア',
+  SR: 'スーパーレア',
+  UR: 'ウルトラレア',
+}
 
 const ADULT_RESULT_MESSAGES = [
   'ドンマイ！ここからスタート！つぎはいけるよ！', // 0
@@ -126,10 +161,14 @@ export default function AdultMode({ onDone }: AdultModeProps) {
   const [qIndex, setQIndex] = useState(0)
   const [answered, setAnswered] = useState<{ displayIndex: number; correct: boolean } | null>(null)
   const [score, setScore] = useState(0)
-  const [phase, setPhase] = useState<'quiz' | 'result'>('quiz')
+  const [phase, setPhase] = useState<'quiz' | 'roulette' | 'result' | 'zukan'>('quiz')
   // ヒント：使った合計回数（ゲーム単位）と、今の問題で見せたヒントが「何回目」か
   const [hintsUsed, setHintsUsed] = useState(0)
   const [revealedOrdinal, setRevealedOrdinal] = useState<number | null>(null)
+  // 大人専用データ（ずかん等・子供のセーブとは独立・lg2_adult）
+  const [adultData, setAdultData] = useState<AdultData>(() => storage.getAdultData())
+  // 初級ルーレットの結果（result画面で表示）
+  const [outcome, setOutcome] = useState<RouletteOutcome>(null)
 
   const q = questions[qIndex] ?? null
   // 選択肢の並びはこの問題の間だけ固定（再レンダーで並び替わらないよう q をキーに）
@@ -150,7 +189,29 @@ export default function AdultMode({ onDone }: AdultModeProps) {
     setHintsUsed(0)
     setRevealedOrdinal(null)
     setScore(0)
+    setOutcome(null)
     setPhase('quiz')
+  }
+
+  /** 初級ルーレットが止まったとき：モンスター枠なら抽選して大人ずかんに保存、はずれなら記録だけ */
+  const handleRouletteFinish = (seg: RouletteSegment) => {
+    if (seg.kind === 'monster') {
+      const res = rollAdultMonster(adultData.zukan)
+      const nextZukan = res.isNew ? [...adultData.zukan, res.monster.id] : adultData.zukan
+      const nextData = { ...adultData, zukan: nextZukan }
+      setAdultData(nextData)
+      storage.saveAdultData(nextData)
+      setOutcome({
+        kind: 'monster',
+        monsterId: res.monster.id,
+        name: res.monster.name,
+        rarity: res.rarity,
+        isNew: res.isNew,
+      })
+    } else {
+      setOutcome({ kind: 'miss' })
+    }
+    setPhase('result')
   }
 
   const useHint = () => {
@@ -175,9 +236,29 @@ export default function AdultMode({ onDone }: AdultModeProps) {
       setQIndex(qIndex + 1)
       setAnswered(null)
       setRevealedOrdinal(null) // 次の問題ではヒント表示をリセット（使った合計は持ち越し）
+    } else if (score >= 7 && score < questions.length) {
+      // 7〜9問正解 → 初級ルーレット（全問正解＝上級は別途実装・今は200円画面のまま）
+      setPhase('roulette')
     } else {
       setPhase('result')
     }
+  }
+
+  // ===== 初級ルーレット（7〜9問正解。回したら結果へ） =====
+  if (phase === 'roulette') {
+    return (
+      <AdultRoulette
+        title="🎡 初級ルーレット"
+        cond={`${score} / ${questions.length} せいかい！`}
+        segments={BEGINNER_SEGMENTS}
+        onFinish={handleRouletteFinish}
+      />
+    )
+  }
+
+  // ===== 大人ずかん =====
+  if (phase === 'zukan') {
+    return <AdultZukan zukan={adultData.zukan} onBack={() => setPhase('result')} />
   }
 
   // ===== けっか =====
@@ -207,8 +288,53 @@ export default function AdultMode({ onDone }: AdultModeProps) {
           </p>
           <p className="text-center text-lg font-bold text-[var(--color-ink-soft)]">{msg}</p>
 
-          {/* 全問正解のごほうび（DANGERのモンスター無し・200円おこづかい） */}
-          {perfect && (
+          {/* 初級ルーレットの結果（モンスター当選） */}
+          {outcome?.kind === 'monster' && (
+            <motion.div
+              className="w-full rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg-2)] p-4 text-center"
+              initial={{ opacity: 0, y: 14, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.2 }}
+            >
+              <img
+                src={`/monsters/${outcome.monsterId}.webp`}
+                alt={outcome.name}
+                className="mx-auto h-24 w-24 object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.visibility = 'hidden'
+                }}
+              />
+              <p className="mt-1 text-xl font-extrabold text-[var(--color-ink)]">
+                🎁 {outcome.name} を ゲット！
+              </p>
+              <span
+                className="mt-1 inline-block rounded-full px-3 py-0.5 text-xs font-extrabold text-white"
+                style={{ background: RARITY_BADGE_COLOR[outcome.rarity] }}
+              >
+                {RARITY_TEXT[outcome.rarity]}
+              </span>
+              <p className="mt-1 text-sm font-bold text-[var(--color-ink-soft)]">
+                {outcome.isNew
+                  ? '大人ずかんに とうろく！'
+                  : 'すでに もっている モンスター（ずかんはそのまま）'}
+              </p>
+            </motion.div>
+          )}
+
+          {/* 初級ルーレットの結果（はずれ） */}
+          {outcome?.kind === 'miss' && (
+            <motion.div
+              className="w-full rounded-2xl border-2 border-[var(--color-bg-2)] bg-[var(--color-bg-2)] p-4 text-center"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <p className="text-xl font-extrabold text-[var(--color-ink-soft)]">ざんねん… はずれ 😢</p>
+              <p className="text-sm font-bold text-[var(--color-ink-faint)]">つぎは モンスターが でるかも！</p>
+            </motion.div>
+          )}
+
+          {/* 全問正解のごほうび（200円おこづかい・上級ルーレット実装までの暫定） */}
+          {perfect && !outcome && (
             <motion.div
               className="w-full rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg-2)] p-4 text-center"
               initial={{ opacity: 0, y: 14, scale: 0.92 }}
@@ -224,6 +350,15 @@ export default function AdultMode({ onDone }: AdultModeProps) {
             </motion.div>
           )}
 
+          <button
+            className="btn-kid w-full bg-[var(--color-accent)]"
+            onClick={() => {
+              audio.playSe('tap')
+              setPhase('zukan')
+            }}
+          >
+            📖 大人ずかんを みる（{adultData.zukan.length}）
+          </button>
           <div className="flex w-full gap-3">
             <button className="btn-kid flex-1 bg-[var(--color-primary)]" onClick={restart}>
               もう1回
@@ -376,7 +511,11 @@ export default function AdultMode({ onDone }: AdultModeProps) {
               )}
             </div>
             <button className="btn-kid w-full bg-[var(--color-accent)]" onClick={next}>
-              {qIndex + 1 < questions.length ? 'つぎへ →' : 'けっかを みる'}
+              {qIndex + 1 < questions.length
+                ? 'つぎへ →'
+                : score >= 7 && score < questions.length
+                  ? '🎡 ルーレットへ！'
+                  : 'けっかを みる'}
             </button>
           </motion.div>
         )}

@@ -2,6 +2,7 @@
  * 学習ガチャ v2 定数・初期値（spec §6 / §9）
  */
 import type {
+  AdultData,
   ChildSettings,
   Difficulty,
   MetaData,
@@ -18,6 +19,8 @@ export const STORAGE_KEYS = {
   meta: 'lg2_meta',
   /** 子別セーブ */
   user: (profileId: string): string => `lg2_user_${profileId}`,
+  /** 大人モード専用データ（全プロフィール共通・1つだけ・spec ルーレット） */
+  adult: 'lg2_adult',
   /** v1 バックアップ接頭辞（移行後に旧キーをこの名前へ改名） */
   backupPrefix: 'lg1_backup_',
 }
@@ -68,6 +71,11 @@ export function newSaveData(today: string, month: string): SaveData {
     pityCounters: { noRareStreak: 0, totalSinceUR: 0 },
     dangerYenAwarded: [],
   }
+}
+
+/** 大人モード専用データの初期値（lg2_adult・子供のセーブとは独立） */
+export function defaultAdultData(): AdultData {
+  return { perfectStreak: 0, zukan: [], rewardTotal: 0 }
 }
 
 // ========== レア度確率（spec §6-2） ==========

@@ -30,6 +30,8 @@ import ParentMenu from './features/settings/ParentMenu'
 import Opening from './features/opening/Opening'
 import DangerEvent from './features/danger/DangerEvent'
 import AdultMode from './features/adult/AdultMode'
+import AdultZukan from './features/adult/AdultZukan'
+import { storage } from './lib/storage'
 import { DANGER_RATE } from './lib/constants'
 
 export type Screen =
@@ -42,6 +44,7 @@ export type Screen =
   | 'parent'
   | 'danger'
   | 'adult'
+  | 'adult-zukan'
 
 interface PendingGacha {
   difficulty: Difficulty
@@ -154,6 +157,9 @@ function SessionScreens() {
             />
           )}
           {effectiveScreen === 'adult' && <AdultMode onDone={() => setScreen('home')} />}
+          {effectiveScreen === 'adult-zukan' && (
+            <AdultZukan zukan={storage.getAdultData().zukan} onBack={() => setScreen('home')} />
+          )}
           {effectiveScreen === 'shard-egg' && <ShardEgg onDone={() => setScreen('home')} />}
           {effectiveScreen === 'zukan' && <Zukan onBack={() => setScreen('home')} />}
           {effectiveScreen === 'tree' && <CoinTree onBack={() => setScreen('home')} />}

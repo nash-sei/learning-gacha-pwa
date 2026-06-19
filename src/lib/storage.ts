@@ -3,9 +3,10 @@
  * - lg2_* キーで保存。データリセットは lg2_* のみ削除（v1 の localStorage.clear() 全消しは禁止）。
  * - 保存失敗（容量超過等）を握りつぶさず { ok:false } を返す（spec §9-5）。呼び出し側が親へ警告できる。
  */
-import type { MetaData, Profile, Question, SaveData, Settings } from '../types'
+import type { AdultData, MetaData, Profile, Question, SaveData, Settings } from '../types'
 import {
   STORAGE_KEYS,
+  defaultAdultData,
   defaultMeta,
   defaultSettings,
 } from './constants'
@@ -90,6 +91,22 @@ export const storage = {
   },
   saveMeta(m: MetaData): SaveResult {
     return writeJSON(STORAGE_KEYS.meta, m)
+  },
+
+  // ---- 大人モード専用データ（lg2_adult・全プロフィール共通・子供セーブと独立） ----
+  /** 後から増えたフィールドの欠落を初期値で埋めて返す */
+  getAdultData(): AdultData {
+    const loaded = readJSON<Partial<AdultData>>(STORAGE_KEYS.adult)
+    const base = defaultAdultData()
+    if (!loaded) return base
+    return {
+      perfectStreak: loaded.perfectStreak ?? base.perfectStreak,
+      zukan: Array.isArray(loaded.zukan) ? loaded.zukan : base.zukan,
+      rewardTotal: loaded.rewardTotal ?? base.rewardTotal,
+    }
+  },
+  saveAdultData(d: AdultData): SaveResult {
+    return writeJSON(STORAGE_KEYS.adult, d)
   },
 
   // ---- データリセット（lg2_* のみ・spec §9-2） ----

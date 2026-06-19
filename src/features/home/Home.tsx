@@ -12,6 +12,7 @@ import type { MonsterOwned } from '../../types'
 import { useGame } from '../../contexts/GameContext'
 import { MONSTERS } from '../../data/monsters'
 import { COINS_PER_FRUIT, SHARD_EGG_COST, TREE_IMG } from '../../lib/constants'
+import { storage } from '../../lib/storage'
 import { weekStr } from '../../lib/dateUtil'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
@@ -79,26 +80,37 @@ function Wanderer(props: { monsterId: string; stage: number; seed: number; isPar
 
 export default function Home({ go }: HomeProps) {
   const { currentProfile, save, childSettings, clearCurrentProfile } = useGame()
+  const isAdult = currentProfile?.isAdult === true
 
   // にわの BGM（音源が無ければ無音・初回タップで解放）
   useEffect(() => {
     audio.playBgm('home')
   }, [])
 
-  // 庭に出すモンスター（相棒を先頭に最大12体・count>0 のみ）
+  // 大人プロフィールのずかん（lg2_adult・子供セーブとは独立）。ホーム表示用に読む
+  const adultZukan = useMemo(() => (isAdult ? storage.getAdultData().zukan : []), [isAdult])
+
+  // 庭に出すモンスター（最大12体）。大人は大人ずかん、子供は所持モンスター（相棒を先頭）
   const wanderers = useMemo<MonsterOwned[]>(() => {
+    if (isAdult) {
+      return adultZukan
+        .slice(0, 12)
+        .map((id) => ({ monsterId: id, count: 1, xp: 0, level: 1, stage: 1 }))
+    }
     if (!save) return []
     const owned = save.monsters.filter((m) => m.count > 0)
     const partner = owned.filter((m) => m.monsterId === save.partnerId)
     const rest = owned.filter((m) => m.monsterId !== save.partnerId)
     return [...partner, ...rest].slice(0, 12)
-  }, [save])
+  }, [save, isAdult, adultZukan])
 
   if (!save || !currentProfile) return null
 
   // 図鑑進捗は通常モンスターだけで数える（DANGER限定は別枠・図鑑のDANGER欄で表示）
   const regularIds = new Set(MONSTERS.filter((m) => !m.isDanger).map((m) => m.id))
-  const ownedCount = save.monsters.filter((m) => m.count > 0 && regularIds.has(m.monsterId)).length
+  const ownedCount = isAdult
+    ? adultZukan.filter((id) => regularIds.has(id)).length
+    : save.monsters.filter((m) => m.count > 0 && regularIds.has(m.monsterId)).length
   const fruitCount = Math.floor(save.treeCoins / COINS_PER_FRUIT)
 
   // かけらタマゴ（spec §8）：50かけら＋今週未使用のときだけ目立たせる
@@ -260,7 +272,7 @@ export default function Home({ go }: HomeProps) {
         <div className="flex gap-3">
           <button
             className="btn-kid flex-1 bg-[var(--color-secondary)]"
-            onClick={() => navTap('zukan')}
+            onClick={() => navTap(isAdult ? 'adult-zukan' : 'zukan')}
           >
             📖 ずかん
           </button>

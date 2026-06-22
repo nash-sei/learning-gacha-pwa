@@ -32,8 +32,6 @@ export interface AdultModeProps {
 const QUESTION_COUNT = 10
 /** 1ゲームで使えるヒントの上限 */
 const MAX_HINTS = 3
-/** 全問正解のごほうび金額（円） */
-const REWARD_YEN = 200
 /** 大人向けの落ち着いた背景（子供用の明るい庭と区別） */
 const ADULT_BG = 'linear-gradient(to bottom, #24344d, #141d2e)'
 
@@ -49,9 +47,44 @@ const BEGINNER_SEGMENTS: RouletteSegment[] = [
   { label: 'はずれ', weight: 1, color: '#475569', kind: 'miss' },
 ]
 
-/** 初級ルーレットの結果（モンスター当選 or はずれ）。全問正解→200円画面のときは null */
+/**
+ * 上級ルーレットの枠（10問 全問正解＝満点1回ごと）。
+ * 配分：200円77%・500円15%・1000円5%・はずれ3%（roulette-demo.html の決定どおり）。
+ * 1000円・500円は向かい合わせの2か所に分散。
+ */
+const ADVANCED_SEGMENTS: RouletteSegment[] = [
+  { label: '200円', weight: 19.25, color: '#34d399', kind: 'yen', yen: 200 },
+  { label: '1000円', weight: 2.5, color: '#fbbf24', kind: 'yen', yen: 1000 },
+  { label: '500円', weight: 7.5, color: '#60a5fa', kind: 'yen', yen: 500 },
+  { label: '200円', weight: 19.25, color: '#34d399', kind: 'yen', yen: 200 },
+  { label: 'はずれ', weight: 3, color: '#64748b', kind: 'miss' },
+  { label: '200円', weight: 19.25, color: '#34d399', kind: 'yen', yen: 200 },
+  { label: '1000円', weight: 2.5, color: '#fbbf24', kind: 'yen', yen: 1000 },
+  { label: '500円', weight: 7.5, color: '#60a5fa', kind: 'yen', yen: 500 },
+  { label: '200円', weight: 19.25, color: '#34d399', kind: 'yen', yen: 200 },
+]
+
+/**
+ * プレミアムルーレットの枠（満点を3回連続＝その回かぎり・回したら連続カウントは0に戻る）。
+ * 配分：1000円72%・2000円25%・5000円3%・はずれ無し（roulette-demo.html の決定どおり）。
+ * 5000円・2000円は向かい合わせの2か所に分散。
+ */
+const PREMIUM_SEGMENTS: RouletteSegment[] = [
+  { label: '1000円', weight: 36, color: '#fbbf24', kind: 'yen', yen: 1000 },
+  { label: '5000円', weight: 1.5, color: '#ef4444', kind: 'yen', yen: 5000 },
+  { label: '2000円', weight: 12.5, color: '#fb923c', kind: 'yen', yen: 2000 },
+  { label: '1000円', weight: 36, color: '#fbbf24', kind: 'yen', yen: 1000 },
+  { label: '5000円', weight: 1.5, color: '#ef4444', kind: 'yen', yen: 5000 },
+  { label: '2000円', weight: 12.5, color: '#fb923c', kind: 'yen', yen: 2000 },
+]
+
+/** どのルーレットを回すか（7〜9問＝初級／満点1回＝上級／満点3連続＝プレミアム） */
+type RouletteLevel = 'beginner' | 'advanced' | 'premium'
+
+/** ルーレットの結果（モンスター当選／お金当選／はずれ）。result前は null */
 type RouletteOutcome =
   | { kind: 'monster'; monsterId: string; name: string; rarity: Rarity; isNew: boolean }
+  | { kind: 'yen'; yen: number }
   | { kind: 'miss' }
   | null
 
@@ -167,8 +200,10 @@ export default function AdultMode({ onDone }: AdultModeProps) {
   const [revealedOrdinal, setRevealedOrdinal] = useState<number | null>(null)
   // 大人専用データ（ずかん等・子供のセーブとは独立・lg2_adult）
   const [adultData, setAdultData] = useState<AdultData>(() => storage.getAdultData())
-  // 初級ルーレットの結果（result画面で表示）
+  // ルーレットの結果（result画面で表示）
   const [outcome, setOutcome] = useState<RouletteOutcome>(null)
+  // どのルーレットを回すか（初級／上級／プレミアム）
+  const [rouletteLevel, setRouletteLevel] = useState<RouletteLevel>('beginner')
 
   const q = questions[qIndex] ?? null
   // 選択肢の並びはこの問題の間だけ固定（再レンダーで並び替わらないよう q をキーに）
@@ -190,15 +225,23 @@ export default function AdultMode({ onDone }: AdultModeProps) {
     setRevealedOrdinal(null)
     setScore(0)
     setOutcome(null)
+    setRouletteLevel('beginner')
     setPhase('quiz')
   }
 
-  /** 初級ルーレットが止まったとき：モンスター枠なら抽選して大人ずかんに保存、はずれなら記録だけ */
+  /**
+   * ルーレットが止まったとき：当たり枠に応じて保存する。
+   * - モンスター枠 → 大人ずかんに追加（初級）
+   * - お金枠 → ごほうび合計に加算（上級・プレミアム）
+   * - はずれ → 記録だけ
+   * プレミアムを回したら、連続満点カウント(perfectStreak)は0に戻す（その回かぎりの特別ルーレット）。
+   */
   const handleRouletteFinish = (seg: RouletteSegment) => {
+    const nextStreak = rouletteLevel === 'premium' ? 0 : adultData.perfectStreak
     if (seg.kind === 'monster') {
       const res = rollAdultMonster(adultData.zukan)
       const nextZukan = res.isNew ? [...adultData.zukan, res.monster.id] : adultData.zukan
-      const nextData = { ...adultData, zukan: nextZukan }
+      const nextData = { ...adultData, zukan: nextZukan, perfectStreak: nextStreak }
       setAdultData(nextData)
       storage.saveAdultData(nextData)
       setOutcome({
@@ -208,7 +251,22 @@ export default function AdultMode({ onDone }: AdultModeProps) {
         rarity: res.rarity,
         isNew: res.isNew,
       })
+    } else if (seg.kind === 'yen') {
+      const yen = seg.yen ?? 0
+      const nextData = {
+        ...adultData,
+        rewardTotal: adultData.rewardTotal + yen,
+        perfectStreak: nextStreak,
+      }
+      setAdultData(nextData)
+      storage.saveAdultData(nextData)
+      setOutcome({ kind: 'yen', yen })
     } else {
+      if (nextStreak !== adultData.perfectStreak) {
+        const nextData = { ...adultData, perfectStreak: nextStreak }
+        setAdultData(nextData)
+        storage.saveAdultData(nextData)
+      }
       setOutcome({ kind: 'miss' })
     }
     setPhase('result')
@@ -236,21 +294,68 @@ export default function AdultMode({ onDone }: AdultModeProps) {
       setQIndex(qIndex + 1)
       setAnswered(null)
       setRevealedOrdinal(null) // 次の問題ではヒント表示をリセット（使った合計は持ち越し）
-    } else if (score >= 7 && score < questions.length) {
-      // 7〜9問正解 → 初級ルーレット（全問正解＝上級は別途実装・今は200円画面のまま）
+      return
+    }
+    // 最終問題のあと：スコアでルーレットを出し分ける
+    if (score === questions.length) {
+      // 満点。連続満点が3に達したらプレミアム、それ以外は上級。
+      const streakIfPerfect = adultData.perfectStreak + 1
+      if (streakIfPerfect >= 3) {
+        // プレミアム（回したら handleRouletteFinish で perfectStreak を0に戻す）
+        setRouletteLevel('premium')
+      } else {
+        // 上級。連続満点カウントを1つ進めて保存
+        const nextData = { ...adultData, perfectStreak: streakIfPerfect }
+        setAdultData(nextData)
+        storage.saveAdultData(nextData)
+        setRouletteLevel('advanced')
+      }
+      setPhase('roulette')
+    } else if (score >= 7) {
+      // 7〜9問正解 → 初級ルーレット。満点を逃したので連続満点カウントは0に戻す
+      if (adultData.perfectStreak !== 0) {
+        const nextData = { ...adultData, perfectStreak: 0 }
+        setAdultData(nextData)
+        storage.saveAdultData(nextData)
+      }
+      setRouletteLevel('beginner')
       setPhase('roulette')
     } else {
+      // 6問以下 → 結果のみ。満点を逃したので連続満点カウントは0に戻す
+      if (adultData.perfectStreak !== 0) {
+        const nextData = { ...adultData, perfectStreak: 0 }
+        setAdultData(nextData)
+        storage.saveAdultData(nextData)
+      }
       setPhase('result')
     }
   }
 
-  // ===== 初級ルーレット（7〜9問正解。回したら結果へ） =====
+  // ===== ルーレット（初級＝7〜9問／上級＝満点1回／プレミアム＝満点3連続） =====
   if (phase === 'roulette') {
+    const wheel =
+      rouletteLevel === 'premium'
+        ? {
+            title: '👑 プレミアムルーレット',
+            cond: 'ぜんもん せいかい 3回れんぞく！ おめでとう！',
+            segments: PREMIUM_SEGMENTS,
+          }
+        : rouletteLevel === 'advanced'
+          ? {
+              title: '🏆 上級ルーレット',
+              cond: `${score} / ${questions.length} ぜんもん せいかい！`,
+              segments: ADVANCED_SEGMENTS,
+            }
+          : {
+              title: '🎡 初級ルーレット',
+              cond: `${score} / ${questions.length} せいかい！`,
+              segments: BEGINNER_SEGMENTS,
+            }
     return (
       <AdultRoulette
-        title="🎡 初級ルーレット"
-        cond={`${score} / ${questions.length} せいかい！`}
-        segments={BEGINNER_SEGMENTS}
+        title={wheel.title}
+        cond={wheel.cond}
+        segments={wheel.segments}
         onFinish={handleRouletteFinish}
       />
     )
@@ -333,19 +438,22 @@ export default function AdultMode({ onDone }: AdultModeProps) {
             </motion.div>
           )}
 
-          {/* 全問正解のごほうび（200円おこづかい・上級ルーレット実装までの暫定） */}
-          {perfect && !outcome && (
+          {/* ルーレットの結果（お金 当選・上級／プレミアム） */}
+          {outcome?.kind === 'yen' && (
             <motion.div
               className="w-full rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg-2)] p-4 text-center"
               initial={{ opacity: 0, y: 14, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.2 }}
             >
-              <p className="text-2xl font-extrabold text-[var(--color-accent-dark)]">
-                💰 げんきん {REWARD_YEN}円 ゲット！
+              <p className="text-3xl font-extrabold text-[var(--color-accent-dark)]">
+                💰 {outcome.yen}円 ゲット！
               </p>
               <p className="text-sm font-bold text-[var(--color-ink-soft)]">
                 ぜんもん せいかい！ おうちのひとから うけとってね
+              </p>
+              <p className="mt-1 text-xs font-bold text-[var(--color-ink-faint)]">
+                これまでの おこづかい合計：{adultData.rewardTotal}円
               </p>
             </motion.div>
           )}
@@ -513,7 +621,7 @@ export default function AdultMode({ onDone }: AdultModeProps) {
             <button className="btn-kid w-full bg-[var(--color-accent)]" onClick={next}>
               {qIndex + 1 < questions.length
                 ? 'つぎへ →'
-                : score >= 7 && score < questions.length
+                : score >= 7
                   ? '🎡 ルーレットへ！'
                   : 'けっかを みる'}
             </button>

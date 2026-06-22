@@ -8,1386 +8,6 @@ import type { Question } from '../../types'
 
 export const PACK_ADULT2: Question[] = [
   {
-    "id": "math-001",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "2次方程式 x²−5x+6=0 の解の組はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "x=2,3",
-        "x=1,6",
-        "x=−2,−3",
-        "x=3,5"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "x²−5x+6は(x−2)(x−3)と因数分解できる。したがって解はx=2,3。"
-    ],
-    "hint": "積が6、和が5になる2つの数を考える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-002",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "log₂8 の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "2",
-        "3",
-        "4",
-        "8"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "log₂8は『2を何乗すると8になるか』を表す。2³=8なので値は3。"
-    ],
-    "hint": "対数は『底を何乗するか』を表す。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-003",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "sin30° の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "√3/2",
-        "1/3",
-        "1/2",
-        "√2/2"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "30°、60°、90°の直角三角形では、sin30°は斜辺に対する向かい側の比で1/2。"
-    ],
-    "hint": "30°の向かい側の辺は斜辺の半分。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-004",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "初項5、公差3の等差数列で、第10項はいくつですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "29",
-        "30",
-        "31",
-        "32"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "等差数列の第n項は aₙ=a₁+(n−1)d。5+9×3=32。"
-    ],
-    "hint": "第10項までに公差は9回足される。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-005",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "不等式 x²−4x−5≦0 の解はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "−1≦x≦5",
-        "x≦−1 または 5≦x",
-        "−5≦x≦1",
-        "x≦1 または 5≦x"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "x²−4x−5=(x+1)(x−5)。上に開く放物線なので、0以下になるのは2つの解の間で−1≦x≦5。"
-    ],
-    "hint": "上に開く2次式は、根の間で0以下になる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-006",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "複素数 (2+i)(3−2i) を計算するとどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "4−i",
-        "8−i",
-        "8+i",
-        "6−i"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "(2+i)(3−2i)=6−4i+3i−2i²。i²=−1より、6−i+2=8−i。"
-    ],
-    "hint": "i²を−1に置き換えて整理する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-007",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "関数 f(x)=x³−3x²+2 の導関数 f'(x) はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "3x²−3x",
-        "3x²−6",
-        "3x²−6x",
-        "x²−6x"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "x³の微分は3x²、−3x²の微分は−6x、定数2の微分は0。よってf'(x)=3x²−6x。"
-    ],
-    "hint": "各項ごとに次数を1つ下げる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-008",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "∫₀² (3x²+1) dx の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "8",
-        "9",
-        "11",
-        "10"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "3x²+1の原始関数はx³+x。0から2まで代入すると(8+2)−0=10。"
-    ],
-    "hint": "原始関数を作って上端と下端を代入する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-009",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "2個のサイコロを同時に投げるとき、出た目の和が8になる確率はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "5/36",
-        "1/6",
-        "7/36",
-        "1/9"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "和が8になる組は(2,6),(3,5),(4,4),(5,3),(6,2)の5通り。全体36通りなので5/36。"
-    ],
-    "hint": "順序つきで何通りあるか数える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-010",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "5C2 の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "20",
-        "10",
-        "15",
-        "25"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "5C2は5個から2個を選ぶ組合せの数。5×4÷(2×1)=10。"
-    ],
-    "hint": "順番を区別しない選び方。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-011",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "初項2、公比3の等比数列で、第5項はいくつですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "54",
-        "81",
-        "162",
-        "486"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "等比数列の第n項は aₙ=a₁rⁿ⁻¹。2×3⁴=2×81=162。"
-    ],
-    "hint": "第5項では公比を4回かける。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-012",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "方程式 2ˣ=16 の解はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "2",
-        "3",
-        "5",
-        "4"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "16は2⁴なので、2ˣ=2⁴。よってx=4。"
-    ],
-    "hint": "16を2の累乗で表す。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-013",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "円 x²+y²−4x+6y−12=0 の中心と半径の組はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "中心(2,−3)、半径5",
-        "中心(−2,3)、半径5",
-        "中心(2,3)、半径1",
-        "中心(−2,−3)、半径1"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "平方完成すると(x−2)²+(y+3)²=25。したがって中心は(2,−3)、半径は5。"
-    ],
-    "hint": "xとyをそれぞれ平方完成する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-014",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "曲線 y=x² 上の x=2 における接線の方程式はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "y=2x",
-        "y=4x−4",
-        "y=4x+4",
-        "y=2x+2"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "y=x²の導関数は2xなので、x=2での傾きは4。接点は(2,4)だから、接線はy−4=4(x−2)、つまりy=4x−4。"
-    ],
-    "hint": "接線は『傾き』と『接点』から作る。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-015",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "方程式 log₃(x−1)+log₃(x−3)=1 の解はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "x=3",
-        "x=0",
-        "x=4",
-        "x=6"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "対数の和をまとめるとlog₃((x−1)(x−3))=1なので、(x−1)(x−3)=3。整理してx(x−4)=0、定義域x>3よりx=4。"
-    ],
-    "hint": "対数の中身が正になる範囲も確認する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-016",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "∫₀π sin²x dx の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "1",
-        "π",
-        "2π",
-        "π/2"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "sin²x=(1−cos2x)/2を用いると、0からπまでの積分はπ/2。cos2xの積分部分は端点で打ち消し合う。"
-    ],
-    "hint": "半角の公式を使うと積分しやすい。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-017",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "多項式 P(x)=x³−2x+5 を x−2 で割った余りはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "9",
-        "7",
-        "5",
-        "3"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "剰余の定理より、x−2で割った余りはP(2)。P(2)=8−4+5=9。"
-    ],
-    "hint": "x−aで割る余りはP(a)。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-018",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "lim x→∞ (3x²−x)/(x²+2) の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "1",
-        "3",
-        "0",
-        "∞"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "分子と分母をx²で割ると、(3−1/x)/(1+2/x²)。x→∞で1/xと2/x²は0に近づくので値は3。"
-    ],
-    "hint": "最高次数の係数に注目する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-019",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "−3² の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "9",
-        "6",
-        "−9",
-        "−6"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "−3²は−(3²)を意味するので−9。(−3)²と混同すると9を選びやすい。"
-    ],
-    "hint": "2乗されている範囲を確認する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-020",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "(−2)⁴ の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "−16",
-        "8",
-        "−8",
-        "16"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "(−2)⁴は−2全体を4回かけるので16。かっこがあるため、符号も含めて偶数回かける。"
-    ],
-    "hint": "かっこがある場合、符号も一緒に累乗される。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-021",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "0.2² の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "0.04",
-        "0.4",
-        "0.004",
-        "4"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "0.2²=0.2×0.2=0.04。小数点の位置を1けただけ動かして0.4にする誤りが多い。"
-    ],
-    "hint": "小数どうしのかけ算では小数点以下の桁数を合計する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-022",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "実数xについて、√(x²) と常に等しいものはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "x",
-        "−x",
-        "0",
-        "|x|"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "√(x²)は常に0以上の値を表すため|x|。xが負のときにxとすると符号が合わない。"
-    ],
-    "hint": "平方根の記号は0以上の値を表す。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-023",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "x>3 の両辺に −2 をかけたとき、正しい不等式はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "−2x<−6",
-        "−2x>−6",
-        "2x<6",
-        "−x>3"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "不等式の両辺に負の数をかけると、不等号の向きが逆になる。したがって−2x<−6。"
-    ],
-    "hint": "負の数をかけると向きが変わる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-024",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "(a+b)² を展開した式として正しいものはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "a²+b²",
-        "a²−2ab+b²",
-        "a²+2ab+b²",
-        "2a+2b"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "(a+b)²=(a+b)(a+b)=a²+2ab+b²。中央の2abを忘れてa²+b²にする誤りが多い。"
-    ],
-    "hint": "同じ2項式を2回かけてすべての項を掛け合わせる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-025",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "x=1, y=2 のとき、1/(x+y) の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "3/2",
-        "1/3",
-        "1/2",
-        "1"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "x+y=3なので1/(x+y)=1/3。1/x+1/y=3/2と混同しないように注意する。"
-    ],
-    "hint": "分母全体を先に計算する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-026",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "log₂(8+8) の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "3",
-        "4",
-        "6",
-        "8"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "8+8=16なのでlog₂16=4。log₂8+log₂8のように分けて6とするのは誤り。"
-    ],
-    "hint": "対数を取る前に、かっこの中を計算する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-027",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "関数 y=sin(x²) の導関数はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "cos(x²)",
-        "2x sin(x²)",
-        "2x cos(x²)",
-        "cos(2x)"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "合成関数の微分より、外側のsinを微分してcos(x²)、さらに内側x²の微分2xをかける。よって2x cos(x²)。"
-    ],
-    "hint": "合成関数では内側の微分もかける。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-028",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "∫ 1/x dx として正しいものはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "1/x²+C",
-        "x²/2+C",
-        "−1/x+C",
-        "log|x|+C"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "1/xの不定積分はlog|x|+C。x⁻¹の積分を通常のべき乗公式で処理しようとすると間違えやすい。"
-    ],
-    "hint": "指数が−1のときは特別扱い。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-029",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "不等式 |x−2|<3 の解はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "−1<x<5",
-        "x<−1 または 5<x",
-        "−3<x<3",
-        "−5<x<1"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "|x−2|<3は−3<x−2<3と同値。各辺に2を足して−1<x<5。外側を選ぶのは |x−2|>3 の場合。"
-    ],
-    "hint": "絶対値が小さい場合は中心から近い範囲。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-030",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "100円の商品を20%値上げし、その後20%値下げしました。最終価格はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "100円",
-        "104円",
-        "80円",
-        "96円"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "20%値上げで120円、その後20%値下げは120×0.8=96円。増減率は元にする金額が変わるため、元通りにはならない。"
-    ],
-    "hint": "2回目の割合は、値上げ後の金額に対してかかる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-031",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "1辺5cmの正方形の対角線の長さはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "5√2 cm",
-        "10 cm",
-        "25 cm",
-        "2√5 cm"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "正方形の対角線は、1辺をaとするとa√2。したがって5√2cm。"
-    ],
-    "hint": "対角線で直角二等辺三角形ができる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-032",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "半径6cm、中心角60°のおうぎ形の面積はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "3π cm²",
-        "6π cm²",
-        "12π cm²",
-        "36π cm²"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "おうぎ形の面積はπr²×中心角/360°。π×6²×60/360=6πcm²。"
-    ],
-    "hint": "円全体の何分のいくつかを考える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-033",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "直角三角形で、直角をはさむ2辺が6cmと8cmです。斜辺の長さはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "9cm",
-        "12cm",
-        "10cm",
-        "14cm"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "三平方の定理より、斜辺は√(6²+8²)=√100=10cm。"
-    ],
-    "hint": "直角三角形では三平方の定理を使う。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-034",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "3辺の長さが5cm、5cm、6cmの二等辺三角形の面積はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "10 cm²",
-        "15 cm²",
-        "18 cm²",
-        "12 cm²"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "底辺6cmを半分にすると3cmずつ。高さは√(5²−3²)=4cmなので、面積は6×4÷2=12cm²。"
-    ],
-    "hint": "底辺を半分に分けて直角三角形を作る。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-035",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "点(1,2)と点(3,6)を通る直線の方程式はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "y=2x",
-        "y=x+1",
-        "y=2x+1",
-        "y=3x−1"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "傾きは(6−2)/(3−1)=2。点(1,2)を通るので y−2=2(x−1)、つまりy=2x。"
-    ],
-    "hint": "まず2点から傾きを求める。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-036",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "点A(−1,2)と点B(3,5)の距離はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "4",
-        "5",
-        "6",
-        "7"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "距離は√((3−(−1))²+(5−2)²)=√(4²+3²)=5。"
-    ],
-    "hint": "座標の差で直角三角形を作る。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-037",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "円 x²+y²=25 に対して、点(3,4)はどこにありますか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "円の内側",
-        "円の外側",
-        "円周上",
-        "判断できない"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "点(3,4)を代入すると3²+4²=25。円の式と等しいので円周上にある。"
-    ],
-    "hint": "座標を円の式に代入して比べる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-038",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "ベクトル a=(2,−1), b=(1,3) のとき、a+2b はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "(3,2)",
-        "(4,5)",
-        "(5,4)",
-        "(0,−7)"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "2b=(2,6)なので、a+2b=(2,−1)+(2,6)=(4,5)。"
-    ],
-    "hint": "まずbを2倍してから成分ごとに足す。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-039",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "3辺の長さが7cm、8cm、9cmの三角形の面積はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "10√5 cm²",
-        "12√3 cm²",
-        "12√5 cm²",
-        "24 cm²"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "ヘロンの公式でs=(7+8+9)/2=12。面積は√(12×5×4×3)=√720=12√5cm²。"
-    ],
-    "hint": "3辺が分かる三角形はヘロンの公式が使える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-040",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "ベクトル u=(1,0), v=(1,√3) のなす角はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "30°",
-        "45°",
-        "90°",
-        "60°"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "内積は1、|u|=1、|v|=2なのでcosθ=1/2。したがってθ=60°。"
-    ],
-    "hint": "内積と長さからcosθを求める。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-041",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "点(2,3)から直線 x+2y−4=0 までの距離はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "4√5/5",
-        "2√5/5",
-        "4",
-        "√5"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "点と直線の距離は |ax₀+by₀+c|/√(a²+b²)。|2+6−4|/√5=4/√5=4√5/5。"
-    ],
-    "hint": "点と直線の距離公式に代入する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-042",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "円 x²+y²=25 と直線 x=3 の交点2つの距離はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "6",
-        "8",
-        "10",
-        "4"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "x=3を代入すると9+y²=25よりy=±4。交点は(3,4)と(3,−4)で、距離は8。"
-    ],
-    "hint": "直線の条件を円の式に代入する。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-043",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "ベクトル (2,1) と (−1,3) を隣り合う2辺とする平行四辺形の面積はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "5",
-        "6",
-        "7",
-        "8"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "平行四辺形の面積は|2×3−1×(−1)|=|6+1|=7。2次元では成分の行列式の絶対値で求められる。"
-    ],
-    "hint": "2つのベクトルの行列式の絶対値を使う。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-044",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "空間内の2点 A(1,2,3), B(4,6,15) の距離はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "11",
-        "12",
-        "14",
-        "13"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "距離は√((4−1)²+(6−2)²+(15−3)²)=√(9+16+144)=√169=13。"
-    ],
-    "hint": "3次元でも座標の差の2乗を足す。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-045",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "2辺の長さが4cmと5cmで、その間の角が60°の三角形の面積はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "5√3 cm²",
-        "10√3 cm²",
-        "20 cm²",
-        "10 cm²"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "面積は1/2ab sinC。1/2×4×5×sin60°=10×√3/2=5√3cm²。"
-    ],
-    "hint": "2辺とその間の角から面積を求める公式を使う。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-046",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "円 (x−1)²+(y+2)²=9 に、点(5,1)から引いた接線の長さはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "中心は(1,−2)、半径は3。中心から点(5,1)までの距離は5なので、接線の長さは√(5²−3²)=4。"
-    ],
-    "hint": "中心・外部の点・接点で直角三角形ができる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-047",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "ベクトル a=(3,4) の、単位ベクトル e=(1,0) 方向への正射影の長さはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "4",
-        "5",
-        "3",
-        "7"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "単位ベクトル方向への正射影の長さは内積a・e。3×1+4×0=3。"
-    ],
-    "hint": "単位ベクトルとの内積を考える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-048",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "点Pが線分ABを AP:PB=2:1 に内分します。A(1,2), B(7,5) のとき、Pの座標はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "(3,3)",
-        "(4,3)",
-        "(4,4)",
-        "(5,4)"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "AP:PB=2:1なので、PはAから全体の2/3進んだ（Bに近い側の）点。座標は((1×1+2×7)/3,(1×2+2×5)/3)=(5,4)。"
-    ],
-    "hint": "内分点の公式では、反対側の比を重みとして使う。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-049",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "5! の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "120",
-        "25",
-        "60",
-        "100"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "!は階乗を表し、5!=5×4×3×2×1=120。"
-    ],
-    "hint": "階乗は1まで順にかける記号。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-050",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "easy",
-    "text": "7P2 の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "21",
-        "42",
-        "14",
-        "49"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "7P2は7個から順番を区別して2個並べる数。7×6=42。"
-    ],
-    "hint": "Pは順番を区別する並べ方。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-051",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "7C2 の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "42",
-        "14",
-        "21",
-        "35"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "7C2は順番を区別しない選び方。7×6÷2=21。"
-    ],
-    "hint": "Cは順番を区別しない選び方。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-052",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "Σ の記号を使った和 1+2+3+4+5 の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "10",
-        "12",
-        "20",
-        "15"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "1から5までを足すと、1+2+3+4+5=15。Σは指定された範囲の和を表す記号。"
-    ],
-    "hint": "小さい順にすべて足し合わせる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-053",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "数列 2, 6, 12, 20, 30, … の次の項はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "42",
-        "40",
-        "44",
-        "46"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "各項はn(n+1)の形で、1×2, 2×3, 3×4, 4×5, 5×6。次は6×7=42。"
-    ],
-    "hint": "となり合う2つの整数の積として見る。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-054",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "normal",
-    "text": "命題 p⇒q が偽になるのはどの場合ですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "pが真、qが真",
-        "pが真、qが偽",
-        "pが偽、qが真",
-        "pが偽、qが偽"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "p⇒qは『pならばq』なので、pが真なのにqが偽の場合だけ成り立たず偽になる。"
-    ],
-    "hint": "前提が成り立つのに結論が成り立たない場合を考える。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-055",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "Σで表される 1+3+5+…+(2n−1) の値はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "n(n+1)",
-        "2n²",
-        "n²",
-        "n²+n"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "最初からn個の奇数の和はn²。例えば1+3+5+7=16=4²となる。"
-    ],
-    "hint": "奇数を順に足すと平方数が現れる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-056",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "数列 1, 1, 2, 3, 5, 8, … の次の項はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "11",
-        "12",
-        "14",
-        "13"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "各項は直前2項の和。5+8=13なので次の項は13。"
-    ],
-    "hint": "直前の2つを足す規則。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-057",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "nC0 の値として常に正しいものはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "1",
-        "0",
-        "n",
-        "n−1"
-      ],
-      "correct": 0
-    },
-    "explain": [
-      "n個から0個を選ぶ方法は『何も選ばない』1通り。したがってnC0=1。"
-    ],
-    "hint": "空集合を選ぶ場合も数え上げに含める。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-058",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "論理式 ¬(p∧q) と同値なものはどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "¬p∧¬q",
-        "¬p∨¬q",
-        "p∨q",
-        "p∧¬q"
-      ],
-      "correct": 1
-    },
-    "explain": [
-      "ド・モルガンの法則より、¬(p∧q) は ¬p∨¬q と同値。『かつ』の否定は『または』に変わる。"
-    ],
-    "hint": "否定を内側へ入れると接続語が入れ替わる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-059",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "数列 2, 3, 7, 16, 32, … の次の項はどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "54",
-        "55",
-        "57",
-        "64"
-      ],
-      "correct": 2
-    },
-    "explain": [
-      "差をとると1,4,9,16で、平方数が並ぶ。次の差は25なので、32+25=57。"
-    ],
-    "hint": "まず隣どうしの差を並べてみる。",
-    "pack": "数学"
-  },
-  {
-    "id": "math-060",
-    "subject": "japanese",
-    "type": "vocab",
-    "grade": 3,
-    "difficulty": "hard",
-    "text": "2進法の 1011₂ を10進法で表すとどれですか。",
-    "answer": {
-      "kind": "choice",
-      "options": [
-        "9",
-        "10",
-        "12",
-        "11"
-      ],
-      "correct": 3
-    },
-    "explain": [
-      "1011₂=1×2³+0×2²+1×2¹+1×2⁰=8+2+1=11。"
-    ],
-    "hint": "右から2⁰、2¹、2²、2³の位で考える。",
-    "pack": "数学"
-  },
-  {
     "id": "hg-001",
     "subject": "japanese",
     "type": "vocab",
@@ -5526,5 +4146,1205 @@ export const PACK_ADULT2: Question[] = [
     ],
     "hint": "『笑いを失う』ではなく『思わず笑いが出る』。",
     "pack": "ことわざ"
+  },
+  {
+    "id": "jhist-001",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "縄文時代の人々が食べた貝やけものの骨などのごみが積み重なってできた遺跡を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["貝塚", "古墳", "環濠集落", "竪穴式住居"], "correct": 0 },
+    "explain": ["縄文時代の集落跡に見られるごみ捨て場が貝塚です。東京の大森貝塚はエドワード・モースが1877年に発見し、日本の考古学の出発点となりました。"],
+    "hint": "貝がらや骨が積み重なってできた遺跡です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-002",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "縄文時代に作られた、目が大きく土で作られた人形を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["埴輪", "土偶", "銅鐸", "勾玉"], "correct": 1 },
+    "explain": ["縄文時代に作られた土製の人形が土偶です。埴輪は古墳時代のもの、銅鐸は弥生時代の青銅製祭器です。"],
+    "hint": "土（つち）で作った人形という意味の言葉です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-003",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "弥生時代に中国・朝鮮半島から伝わり、日本の食文化の基盤となった農業は何ですか。",
+    "answer": { "kind": "choice", "options": ["麦作", "稲作（水田稲作）", "畑作", "牧畜"], "correct": 1 },
+    "explain": ["弥生時代（紀元前3世紀頃）に朝鮮半島経由で水田稲作が伝わり、食料の安定確保とともに貧富の差や争いも生まれました。"],
+    "hint": "日本人の主食の原点となった農業です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-004",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "古墳時代、古墳の周囲や頂上に並べられた素焼きの焼き物を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["土偶", "銅鐸", "埴輪", "土器"], "correct": 2 },
+    "explain": ["埴輪は古墳の周りに立て並べられた素焼きの焼き物です。人物・動物・家などの形があり、被葬者の生前の様子を表すと考えられています。"],
+    "hint": "古墳の周りに並べられた素焼きの造形物です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-005",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "飛鳥時代、聖徳太子が定めた、役人の心得を示したとされる十七条の何ですか。",
+    "answer": { "kind": "choice", "options": ["十七条の律", "十七条の憲法", "十七条の令", "十七条の格"], "correct": 1 },
+    "explain": ["604年に聖徳太子が制定したとされる「十七条の憲法」は、仏教や儒教の精神にもとづいて役人の心得を示したものです。"],
+    "hint": "「和をもって貴しとなす」の第一条が有名です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-006",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "奈良時代に建立され、世界最大級の木造建築として知られる建物はどれですか。",
+    "answer": { "kind": "choice", "options": ["法隆寺金堂", "東大寺大仏殿", "薬師寺西塔", "興福寺中金堂"], "correct": 1 },
+    "explain": ["東大寺大仏殿は現存する世界最大級の木造建築物です。中には聖武天皇が建立させた奈良の大仏（盧舎那仏）が安置されています。"],
+    "hint": "奈良の大仏が安置されている建物です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-007",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "遣唐使として唐に渡り、玄宗皇帝に仕えて日本に帰ることができなかった奈良時代の人物は誰ですか。",
+    "answer": { "kind": "choice", "options": ["阿倍仲麻呂", "空海", "最澄", "吉備真備"], "correct": 0 },
+    "explain": ["阿倍仲麻呂は717年に遣唐使として渡唐し、玄宗皇帝に重用されました。帰国を試みましたが遭難し、中国で没しました。「天の原ふりさけ見れば…」の和歌でも有名です。"],
+    "hint": "「天の原ふりさけ見れば…」の和歌を詠んだ人物です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-008",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "平安時代に書かれた、紫式部による世界最古級の長編小説といわれる作品は何ですか。",
+    "answer": { "kind": "choice", "options": ["枕草子", "源氏物語", "竹取物語", "伊勢物語"], "correct": 1 },
+    "explain": ["紫式部が書いた「源氏物語」は光源氏を主人公とした長編物語で、世界最古の長編小説の一つとされています。「枕草子」は清少納言の随筆です。"],
+    "hint": "光源氏が主人公の物語です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-009",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "遣唐使の廃止を建議し、その後の「国風文化」の発展につながったとされる平安時代の貴族は誰ですか。",
+    "answer": { "kind": "choice", "options": ["藤原道長", "菅原道真", "紀貫之", "在原業平"], "correct": 1 },
+    "explain": ["菅原道真は894年に遣唐使の廃止を建議し、受け入れられました。その後、左遷されて太宰府で没し、学問の神様として天満宮に祀られています。"],
+    "hint": "学問の神様として天満宮に祀られた人物です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-010",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "鎌倉時代、武士が守るべき規範をまとめた最初の武家法「御成敗式目」を制定した人物は誰ですか。",
+    "answer": { "kind": "choice", "options": ["源頼朝", "北条泰時", "足利尊氏", "北条時頼"], "correct": 1 },
+    "explain": ["1232年に鎌倉幕府の執権・北条泰時が御成敗式目（貞永式目）を定めました。武士社会の慣習をまとめた最初の武家法です。"],
+    "hint": "この時代の幕府の執権が制定しました。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-011",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "室町時代に起きた「応仁の乱」は、何年間続きましたか。",
+    "answer": { "kind": "choice", "options": ["3年", "5年", "11年", "20年"], "correct": 2 },
+    "explain": ["応仁の乱は1467年から1477年まで約11年間続きました。主に京都を舞台とし、この乱をきっかけに戦国時代へと突入していきます。"],
+    "hint": "1467年から始まり、戦国時代の幕開けとなりました。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-012",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "織田信長が「楽市楽座」を実施した主な目的は何ですか。",
+    "answer": { "kind": "choice", "options": ["キリスト教を広めるため", "座（商人の組合）の独占を廃止して自由な商業を促進するため", "農民から税を取りやすくするため", "武士の特権を強化するため"], "correct": 1 },
+    "explain": ["楽市楽座は商工業者の同業組合「座」の独占権を廃止し、誰でも自由に商売できるようにした政策です。信長は経済の活性化で強大な財力を得ました。"],
+    "hint": "商人の既得権（座）を壊し、自由な取引を認めた政策です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-013",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "織田信長が1575年の長篠の戦いで武田軍に対して有効に活用した武器は何ですか。",
+    "answer": { "kind": "choice", "options": ["大砲", "鉄砲（火縄銃）", "弓矢", "槍"], "correct": 1 },
+    "explain": ["長篠の戦いで信長は鉄砲を大量に使い、馬防柵とともに活用することで武田軍を破りました。鉄砲の三段撃ちは有名ですが、詳細には諸説あります。"],
+    "hint": "種子島に伝来した新兵器です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-014",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "豊臣秀吉が農民や寺社から武器を取り上げ、農民の武装解除を進めた政策を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["検地", "刀狩", "楽市楽座", "一国一城令"], "correct": 1 },
+    "explain": ["1588年に豊臣秀吉が行った刀狩により、農民は武器を持てなくなりました。これにより武士と農民の身分がはっきりと区別されました（兵農分離）。"],
+    "hint": "農民から「刀」を「狩り」取る政策です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-015",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "江戸幕府を開いた徳川家康が、征夷大将軍に任じられた年はいつですか。",
+    "answer": { "kind": "choice", "options": ["1600年", "1603年", "1615年", "1598年"], "correct": 1 },
+    "explain": ["徳川家康は1600年の関ヶ原の戦いで勝利し、1603年に征夷大将軍に任じられて江戸幕府を開きました。「1603年、家康将軍」と覚えられます。"],
+    "hint": "関ヶ原の戦いの3年後です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-016",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "江戸時代、松尾芭蕉が東北・北陸を旅して書いた紀行文の俳諧作品は何ですか。",
+    "answer": { "kind": "choice", "options": ["東海道中膝栗毛", "奥の細道", "土佐日記", "枕草子"], "correct": 1 },
+    "explain": ["松尾芭蕉が1689年に弟子の曾良と東北・北陸を旅した記録が「奥の細道」です。「夏草や兵どもが夢の跡」など多くの名句が含まれています。"],
+    "hint": "松尾芭蕉が東北・北陸を旅した記録です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-017",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "幕末に結ばれた「日米修好通商条約」に含まれた不平等な内容として正しいのはどれですか。",
+    "answer": { "kind": "choice", "options": ["日本が関税を自由に決めることができた", "アメリカ人が日本で罪を犯しても日本の法律で裁けなかった（領事裁判権）", "日本はアメリカに軍事支援を義務付けられた", "アメリカへの移住が禁止された"], "correct": 1 },
+    "explain": ["日米修好通商条約には「領事裁判権（治外法権）を認める」「関税自主権がない」という不平等な条項が含まれていました。この撤廃は明治政府の外交課題でした。"],
+    "hint": "外国人が日本で犯罪を起こしても日本の裁判所で裁けない条項です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-018",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "明治維新で行われた「廃藩置県」とはどのような改革ですか。",
+    "answer": { "kind": "choice", "options": ["藩の武士を全員廃止した", "藩を廃止して全国を府・県に統一し、中央集権国家を作った", "藩の代わりに村を設置した", "藩の領地を農民に分け与えた"], "correct": 1 },
+    "explain": ["1871年に行われた廃藩置県により、江戸時代の藩が廃止され、全国に府・県が置かれました。中央から知事が派遣されることで、天皇を中心とした中央集権体制が確立されました。"],
+    "hint": "藩を廃止（廃藩）して県を置く（置県）改革です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-019",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "明治時代に「殖産興業」のもと、政府主導で建設された官営工場として代表的なものはどれですか。",
+    "answer": { "kind": "choice", "options": ["八幡製鉄所", "富岡製糸場", "横須賀造船所", "大阪紡績会社"], "correct": 1 },
+    "explain": ["1872年に群馬県に開業した富岡製糸場は、フランスの技術を取り入れた官営の近代的な製糸工場です。2014年に「富岡製糸場と絹産業遺産群」として世界遺産に登録されました。"],
+    "hint": "群馬県に建てられた官営の製糸工場で、世界遺産にも登録されています。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-020",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "明治時代初期の1872年に発布された「学制」の目的は何ですか。",
+    "answer": { "kind": "choice", "options": ["武士の子どもだけに教育を受けさせるため", "国民全体に教育を広めて近代国家を担う人材を育てるため", "外国語教育を禁止するため", "宗教教育を広めるため"], "correct": 1 },
+    "explain": ["1872年に発布された学制により、日本で初めて全国的な近代学校制度が整いました。身分・男女を問わず教育を受けることが目指されました。"],
+    "hint": "国民みんなに学校教育を広げる制度です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-021",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "大正デモクラシーを思想面で支えた、吉野作造が唱えた考え方は何ですか。",
+    "answer": { "kind": "choice", "options": ["天賦人権論", "民本主義", "社会主義", "自由民権論"], "correct": 1 },
+    "explain": ["吉野作造は「民本主義」を唱え、民衆の意向を政治に反映することを主張しました。大正デモクラシーの理論的な支柱となりました。"],
+    "hint": "「民」を「本」とする主義という名前です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-022",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "1923年9月1日に発生し、東京・神奈川を中心に甚大な被害をもたらした大地震を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["濃尾地震", "関東大震災", "阪神・淡路大震災", "昭和三陸地震"], "correct": 1 },
+    "explain": ["関東大震災はマグニチュード7.9前後の大地震で、死者・行方不明者は約10万5000人にのぼりました。地震後の火災による被害が特に大きかったことで知られています。"],
+    "hint": "9月1日は現在「防災の日」とされています。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-023",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "昭和時代、1931年に関東軍が南満州鉄道を自ら爆破して軍事行動の口実とした事件を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["二・二六事件", "満州事変（柳条湖事件）", "五・一五事件", "盧溝橋事件"], "correct": 1 },
+    "explain": ["1931年9月、関東軍が柳条湖で南満州鉄道を自ら爆破し、これを口実に軍事行動を起こしました。これが満州事変の発端となり、満州国建設につながりました。"],
+    "hint": "「柳条湖事件」とも呼ばれます。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-024",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "1964年に日本で開催された、アジア初のオリンピックが開かれた都市はどこですか。",
+    "answer": { "kind": "choice", "options": ["大阪", "東京", "京都", "神戸"], "correct": 1 },
+    "explain": ["1964年に東京オリンピックが開催されました。これはアジアで初めてのオリンピックであり、東海道新幹線の開業など、高度経済成長期のシンボルとなりました。"],
+    "hint": "東海道新幹線もこの年に開業しました。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-025",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "縄文時代の特徴として正しいものはどれですか。",
+    "answer": { "kind": "choice", "options": ["稲作農業が盛んで集落が形成された", "狩猟・採集・漁労を中心とし、縄目の文様をつけた土器を使った", "青銅器と鉄器が同時に伝わった", "ピラミッドのような巨大な墳墓を建設した"], "correct": 1 },
+    "explain": ["縄文時代（約1万数千年前〜紀元前3世紀頃）は狩猟・採集・漁労が生業で、表面に縄目の文様をつけた縄文土器を使いました。稲作が本格的に始まるのは弥生時代です。"],
+    "hint": "この時代の土器の特徴が時代の名前になっています。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-026",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "遣唐使は何時代に廃止されましたか。",
+    "answer": { "kind": "choice", "options": ["奈良時代", "平安時代", "鎌倉時代", "室町時代"], "correct": 1 },
+    "explain": ["遣唐使は630年に始まり、894年に菅原道真の建議によって廃止されました。廃止後、日本独自の国風文化が花開きました。"],
+    "hint": "「白紙（894）に戻す遣唐使」と語呂合わせで覚えられます。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-027",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "織田信長・豊臣秀吉の時代を「安土桃山時代」と呼びますが、「桃山」の名はどこに由来しますか。",
+    "answer": { "kind": "choice", "options": ["豊臣秀吉の出身地の地名", "豊臣秀吉が建てた伏見城の跡地（伏見桃山）", "徳川家康の居城のある場所", "信長が好んだ桃の花から"], "correct": 1 },
+    "explain": ["豊臣秀吉が築いた伏見城は、廃城後その跡地に桃が植えられ「桃山」と呼ばれたことから、この時代を安土桃山時代と呼ぶようになりました。"],
+    "hint": "伏見城の跡地に植えられた果物が由来です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-028",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "hard",
+    "text": "1872年に新橋〜横浜間で開業した日本初の鉄道。この鉄道建設を指揮したお雇い外国人技師は誰ですか。",
+    "answer": { "kind": "choice", "options": ["クラーク", "モース", "エドモンド・モレル", "コンドル"], "correct": 2 },
+    "explain": ["イギリス人技師エドモンド・モレルは新橋〜横浜間の鉄道建設を指揮しました。クラーク博士は札幌農学校、モースは大森貝塚、コンドルは鹿鳴館などで知られます。"],
+    "hint": "日本初の鉄道建設を指揮したイギリス人技師です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-029",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "hard",
+    "text": "1336年から1392年まで、二つの朝廷が並び立って対立した時代を何と呼びますか。",
+    "answer": { "kind": "choice", "options": ["応仁の乱", "南北朝時代", "戦国時代", "保元の乱"], "correct": 1 },
+    "explain": ["南北朝時代は、足利尊氏が擁立した北朝と、後醍醐天皇が吉野に開いた南朝が並立した時代です。3代将軍・足利義満により南北朝が統一されました。"],
+    "hint": "天皇家が二つに分かれて対立した時代です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "jhist-030",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "hard",
+    "text": "1956年、日ソ共同宣言で国交を回復した日本が、同年加盟を果たした国際機関はどれですか。",
+    "answer": { "kind": "choice", "options": ["NATO", "国際連合（国連）", "ASEAN", "OPEC"], "correct": 1 },
+    "explain": ["1956年に日ソ共同宣言でソ連との国交を回復し、同年12月に日本は国際連合への加盟が認められました。これにより日本は国際社会への復帰を果たしました。"],
+    "hint": "第二次世界大戦後に設立された、世界平和を目的とする最大の国際機関です。",
+    "pack": "歴史"
+  },
+  {
+    "id": "money-001",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "株式会社が資金を集めるために発行する「所有権を表す証券」のことを何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["債券", "株式", "投資信託", "手形"], "correct": 1 },
+    "explain": ["株式とは、会社の所有権を細かく分割したものです。株式を持つ人（株主）は会社の一部オーナーとなり、配当金や議決権などの権利を得ます。"],
+    "hint": "会社の「株」と書く、所有権の単位です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-002",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "会社が利益の一部を株主に分配するお金を何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["配当金", "利息", "補助金", "報酬"], "correct": 0 },
+    "explain": ["配当金とは、会社が稼いだ利益の一部を株主に還元するお金です。すべての会社が配当を出すわけではなく、業績や経営方針によって異なります。"],
+    "hint": "株を持っていると受け取れる、利益の「分配」です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-003",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "日本を代表する株価指数で、代表的な225銘柄の株価をもとに算出されるものはどれか？",
+    "answer": { "kind": "choice", "options": ["TOPIX", "NYダウ", "日経平均株価", "S&P500"], "correct": 2 },
+    "explain": ["日経平均株価（日経225）は、日本の株式市場の動向を示す代表的な指標です。ニュースで「今日の日経平均は〇〇円」と報じられるのがこれです。"],
+    "hint": "日本の新聞社の名前が付いた、225銘柄の指数です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-004",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "NISA（少額投資非課税制度）の「非課税」とはどういう意味か？",
+    "answer": { "kind": "choice", "options": ["投資した元本が保証される制度", "投資で得た利益に税金がかからない制度", "国から補助金がもらえる制度", "損をした場合に補填される制度"], "correct": 1 },
+    "explain": ["通常、投資で得た利益には約20%の税金がかかります。NISAの非課税枠を使うと、その税金がゼロになります。元本の保証はなく、損失が出る可能性はあります。"],
+    "hint": "利益にかかる「税」が「非（ない）」という意味です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-005",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "iDeCo（個人型確定拠出年金）の特徴として正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["いつでも自由に引き出せる", "掛金が全額所得控除になり節税できる", "元本が必ず増える", "会社員は加入できない"], "correct": 1 },
+    "explain": ["iDeCoの大きなメリットは、毎月の掛金が全額所得控除となり、所得税・住民税が軽減される点です。ただし原則60歳まで引き出せないため、老後資金として積み立てる制度です。"],
+    "hint": "「節税しながら老後に備える」のが特徴です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-006",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "多くの投資家から集めたお金をまとめて、専門家が複数の株や債券に投資する商品を何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["定期預金", "投資信託", "国債", "外貨預金"], "correct": 1 },
+    "explain": ["投資信託は「ファンド」とも呼ばれ、少額からでも多くの銘柄に分散投資できる商品です。専門家が運用するため、投資の知識が少なくても始めやすいのが特徴です。"],
+    "hint": "お金を「信託」して、プロに「投資」してもらう商品です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-007",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "複利と単利の違いとして正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["単利は利息にも利息がつき、複利は元本にだけ利息がつく", "複利は利息にも利息がつき、単利は元本にだけ利息がつく", "単利の方が長期で見ると必ず得になる", "複利と単利は長期間でも結果が変わらない"], "correct": 1 },
+    "explain": ["複利は「利息が利息を生む」仕組みです。元本に利息を加えた金額に次の利息がつくため、長期になるほど単利との差が大きくなります。"],
+    "hint": "「利息の利息」がつくのはどちらか考えましょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-008",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「卵はひとつのカゴに盛るな」という格言が示す投資の考え方はどれか？",
+    "answer": { "kind": "choice", "options": ["高リスクな投資に集中すること", "投資せずに現金を保有すること", "複数の異なる資産に分けて投資すること", "プロに運用を任せること"], "correct": 2 },
+    "explain": ["「分散投資」の重要性を示す格言です。1つの銘柄や資産に集中すると、それが値下がりしたとき大きな損失になります。複数に分散することでリスクを抑えられます。"],
+    "hint": "カゴを落としたとき、卵が全部割れないようにする工夫です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-009",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "一般的に言われる「リスクとリターンの関係」として正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["リスクが高いほどリターンも高くなる傾向がある", "リスクが低いほどリターンが高くなる傾向がある", "リスクとリターンは無関係である", "リスクが高いほどリターンは必ず低くなる"], "correct": 0 },
+    "explain": ["投資の世界では「ハイリスク・ハイリターン」が基本原則です。大きな利益を狙うほど損失のリスクも大きくなります。「高リターンで低リスク」のうまい話には注意が必要です。"],
+    "hint": "「大きなリターン」を得るには、相応の「リスク」が伴います。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-010",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "物価が全体的に上がり続け、お金の価値が下がっていく現象を何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["デフレーション", "スタグフレーション", "インフレーション", "リセッション"], "correct": 2 },
+    "explain": ["インフレーション（インフレ）とは物価が上昇し続ける現象です。100円で買えたものが120円になると、同じお金で買えるものが減り、現金の価値が実質的に下がります。"],
+    "hint": "「インフレ」と略され、物価が「膨らむ」イメージです。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-011",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "円高が進んだとき、海外旅行をする日本人にとってどのような影響があるか？",
+    "answer": { "kind": "choice", "options": ["旅行費用が実質的に高くなる", "旅行費用が実質的に安くなる", "円高は海外旅行に影響しない", "帰国後の外貨換金で必ず損をする"], "correct": 1 },
+    "explain": ["円高とは「円の価値が外貨に対して高い」状態です。1ドル=100円の円高では、1ドル=150円のときより少ない円でドルを買えるため、海外旅行が割安になります。"],
+    "hint": "円の価値が「高い」と、外国のものを買うとき有利か不利か考えましょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-012",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "国や企業がお金を借りるために発行する「借用証書」のような金融商品を何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["株式", "債券", "投資信託", "先物"], "correct": 1 },
+    "explain": ["債券は、発行した国や企業がお金を借りる代わりに、定期的に利息を支払い、満期に元本を返す金融商品です。国が発行するものを「国債」と呼びます。"],
+    "hint": "「借りた」しるしの「券」で、利息を受け取れます。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-013",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "変動金利型の住宅ローンで、世の中の金利が上がると返済額は一般的にどうなるか？",
+    "answer": { "kind": "choice", "options": ["変わらない", "下がる", "上がる", "金利と返済額は無関係"], "correct": 2 },
+    "explain": ["金利はお金を借りる際のコストです。変動金利型の住宅ローンでは、金利が上がると毎月の返済額も増加します。固定金利型は契約時の金利が維持されます。"],
+    "hint": "「借りるコスト」が上がれば、返す額はどうなるでしょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-014",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "ETF（上場投資信託）の特徴として正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["1日1回の価格でしか売買できない", "株式と同様に取引所でリアルタイムに売買できる", "元本が保証されている", "個人は購入できない"], "correct": 1 },
+    "explain": ["ETF（上場投資信託）は証券取引所に上場された投資信託で、株式と同じようにリアルタイムで売買できます。通常の投資信託は1日1回の基準価額での取引です。"],
+    "hint": "「上場」しているので株のように売買できます。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-015",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "毎月一定の金額で同じ投資信託を買い続ける投資手法を何と呼ぶか？",
+    "answer": { "kind": "choice", "options": ["一括投資法", "ドルコスト平均法", "逆張り投資法", "信用取引法"], "correct": 1 },
+    "explain": ["ドルコスト平均法は、価格が高いときには少なく、安いときには多く購入できるため、平均購入単価をならすことができます。相場を読む必要がなく、長期積立に向いた手法です。"],
+    "hint": "定額で買い続けて「平均コスト」を安定させる方法です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-016",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「元本保証」とはどういう意味か？",
+    "answer": { "kind": "choice", "options": ["投資した金額以上の利益が保証される", "投資した元のお金が減らずに戻ってくることが保証される", "損した場合に国が補填してくれる", "利息が必ず受け取れることが保証される"], "correct": 1 },
+    "explain": ["元本保証とは、投資した元のお金（元本）が減らないことを意味します。銀行預金は預金保険で一定額まで保護されますが、株式や投資信託には原則ありません。"],
+    "hint": "「元（もと）」のお金が「保証」される、という意味です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-017",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "「72の法則」を使うと何の目安がわかるか？",
+    "answer": { "kind": "choice", "options": ["株価が2倍になる銘柄を探す方法", "元本が2倍になるまでのおよその年数", "72%の確率で利益が出る投資法", "年間72万円の節税ができる制度"], "correct": 1 },
+    "explain": ["72の法則は「72 ÷ 金利（%）= 元本が2倍になるおよその年数」で計算します。年利3%なら約24年、年利6%なら約12年が目安です。複利の威力を直感的に理解できます。"],
+    "hint": "「72」を金利で割ると、2倍になる「年数」が出ます。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-018",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "長期投資のメリットとして最も適切なのはどれか？",
+    "answer": { "kind": "choice", "options": ["短期間で必ず大きな利益が出る", "複利の効果を活かして資産を増やしやすい", "損失が出た場合に国が補填してくれる", "税金が一切かからない"], "correct": 1 },
+    "explain": ["長期投資の大きなメリットは複利効果です。利益を再投資し続けることで、時間が経つほど「利益が利益を生む」雪だるま式の効果が大きくなります。"],
+    "hint": "長い時間をかけて「複利」の雪だるまを大きくします。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-019",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "為替レートが1ドル=100円から1ドル=150円になった場合、円はどうなったか？",
+    "answer": { "kind": "choice", "options": ["円高になった", "円安になった", "為替レートは変わっていない", "ドルが安くなった"], "correct": 1 },
+    "explain": ["1ドルを買うのに必要な円が100円から150円に増えたということは、円の価値が下がった（ドルの価値が上がった）状態です。これを「円安」と呼びます。輸入品の価格上昇などにつながります。"],
+    "hint": "同じ1ドルを買うのに、より多くの円が必要になりました。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-020",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "貯金（預金）と投資の違いとして最も正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["貯金は元本が大きく増え、投資は元本が保証されている", "投資は元本保証があり、貯金はリスクが高い", "貯金は元本保証がある一方、投資は元本が減る可能性もあるがリターンを期待できる", "貯金と投資に本質的な違いはない"], "correct": 2 },
+    "explain": ["銀行預金（貯金）は元本が保護されますが、現在の低金利では利息はほとんどつきません。投資は元本割れのリスクがある分、長期的により高いリターンを期待できます。目的に応じた使い分けが大切です。"],
+    "hint": "安全性とリターンはトレードオフ（あちらを立てればこちらが…）の関係です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-021",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "元本100万円を年利10%の単利で2年間運用した場合、2年後の合計金額はいくらか？",
+    "answer": { "kind": "choice", "options": ["110万円", "120万円", "121万円", "112万円"], "correct": 1 },
+    "explain": ["単利では毎年「元本×利率」が利息としてつきます。100万円×10%=10万円が毎年つくので、2年間で20万円の利息となり、合計120万円です。複利なら121万円になります。"],
+    "hint": "単利は毎年同じ金額の利息がつきます。1年ごとに計算してみましょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-022",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "株価が上がったり下がったりする直接の理由として最も適切なのはどれか？",
+    "answer": { "kind": "choice", "options": ["政府が毎日決定する", "買いたい人と売りたい人の需要と供給のバランスで決まる", "会社の利益に比例して自動的に決まる", "日本銀行が毎日設定する"], "correct": 1 },
+    "explain": ["株価は市場での売買により、買いたい人（需要）と売りたい人（供給）のバランスで決まります。企業業績・経済指標・ニュース・投資家心理など様々な要因がこのバランスに影響します。"],
+    "hint": "市場での「買いたい量」と「売りたい量」のバランスを考えましょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-023",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "投資信託を選ぶとき「信託報酬（運用管理費用）」に注意すべき理由として正しいのはどれか？",
+    "answer": { "kind": "choice", "options": ["信託報酬が高いほど運用成績が必ず良くなるから", "信託報酬は毎年運用資産から差し引かれ、長期では結果に大きく影響するから", "信託報酬は解約時にのみ一度だけかかるから", "信託報酬は国が補助してくれるから"], "correct": 1 },
+    "explain": ["信託報酬は年率で表示され、保有している間ずっと運用資産から差し引かれます。年率1%と0.1%では、長期間では最終的な資産額に大きな差が生じます。長期投資では低コストの商品を選ぶことが重要です。"],
+    "hint": "毎年かかるコストが長期間積み重なると、最終結果に大きく影響します。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-024",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "株式を売買するために、まず必要となるものはどれか？",
+    "answer": { "kind": "choice", "options": ["銀行の定期預金口座", "証券会社の口座", "郵便局の口座", "クレジットカードだけあればよい"], "correct": 1 },
+    "explain": ["株式を売買するには、証券会社に「証券口座」を開設する必要があります。近年はネット証券でスマートフォンから手軽に口座開設・取引できるようになっています。"],
+    "hint": "株を売買する「窓口」となる会社の口座が必要です。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "money-025",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "インフレ（物価上昇）が続く環境で、現金だけで資産を持ち続けると、その実質的な価値はどうなりやすいか？",
+    "answer": { "kind": "choice", "options": ["実質的な価値が増える", "実質的な価値は変わらない", "実質的な価値が下がる", "インフレは現金保有に影響しない"], "correct": 2 },
+    "explain": ["インフレで物価が上がると、同じ金額で買えるものが減ります。物価が年2%上がると、現金の実質的な購買力は年々目減りします。インフレ対策として投資が注目される理由のひとつです。"],
+    "hint": "物価が上がると、同じ金額で買えるものの「量」はどうなるでしょう。",
+    "pack": "お金・投資"
+  },
+  {
+    "id": "boki-001",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "簿記とは、主にどのような目的で行われる記録作業ですか？",
+    "answer": { "kind": "choice", "options": ["お店や会社のお金の出入りを記録し、財産や損益を明らかにする", "商品の在庫数を管理するための記録作業", "従業員の勤務時間を記録するための作業", "税務署への申告書類を作成するためだけの計算作業"], "correct": 0 },
+    "explain": ["簿記は、お金や財産の動きを帳簿に記録し、会社の財産状況ともうけを正確に把握するための技術です。決算書の作成にもつながります。"],
+    "hint": "帳簿に記録して、財産と損益を明らかにする作業です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-002",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「複式簿記」の特徴として正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["収入と支出だけを記録する方式", "1つの取引を原因と結果の2つの面から記録する方式", "複数の会社の帳簿をまとめて管理する方式", "現金だけに絞って記録する方式"], "correct": 1 },
+    "explain": ["複式簿記は、1つの取引を「原因（借方）」と「結果（貸方）」の2つの面から必ず記録します。これにより記録の誤りを発見しやすく、財産と損益を同時に把握できます。"],
+    "hint": "「複式」は「2つの側面」を意味します。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-003",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "簿記で「資産」にあたるものはどれですか？",
+    "answer": { "kind": "choice", "options": ["借入金", "買掛金", "資本金", "売掛金"], "correct": 3 },
+    "explain": ["売掛金は「商品を売ったがまだ代金をもらっていない権利」で、将来お金が入ってくるため資産です。借入金・買掛金は負債、資本金は純資産に分類されます。"],
+    "hint": "将来お金が入ってくる「権利」は会社にとってプラスの財産です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-004",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "貸借対照表（B/S）が成り立つ等式として正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["資産 ＝ 負債 − 純資産", "資産 ＋ 負債 ＝ 純資産", "資産 ＝ 負債 ＋ 純資産", "純資産 ＝ 資産 ＋ 負債"], "correct": 2 },
+    "explain": ["「資産 ＝ 負債 ＋ 純資産」は簿記の大原則です。会社が持つ財産（資産）は、他から借りたもの（負債）と自分で積み上げたもの（純資産）の合計と必ず一致します。"],
+    "hint": "会社の財産の出どころは「借りたもの」と「自分のもの」の2つです。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-005",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "損益計算書（P/L）で「利益」を求める式として正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["利益 ＝ 収益 ＋ 費用", "利益 ＝ 収益 − 費用", "利益 ＝ 費用 − 収益", "利益 ＝ 資産 − 負債"], "correct": 1 },
+    "explain": ["利益は「収益（売上などのかせぎ）から費用（経費など）を引いた残り」です。この式が損益計算書の基本で、利益がプラスなら黒字、マイナスなら赤字です。"],
+    "hint": "かせぎからコストを引いた残りが利益です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-006",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "簿記で「借方（かりかた）」とはどちらの側を指しますか？",
+    "answer": { "kind": "choice", "options": ["帳簿の右側", "帳簿の左側", "帳簿の上側", "帳簿の下側"], "correct": 1 },
+    "explain": ["借方は帳簿の左側、貸方は右側です。名前の由来には諸説ありますが、簿記では「左＝借方・右＝貸方」と機械的に覚えるのが基本です。"],
+    "hint": "「かり」は左、「かし」は右と覚えます。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-007",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "「仕訳（しわけ）」とは何をすることですか？",
+    "answer": { "kind": "choice", "options": ["商品を種類ごとに倉庫に分類して保管すること", "取引を借方と貸方に分けて勘定科目と金額を記録すること", "年末に帳簿の合計を計算して締め切ること", "売上と費用を比較して利益を計算すること"], "correct": 1 },
+    "explain": ["仕訳は、取引が起きたときに「何が増えた・減ったか」を借方と貸方に分けて記録する作業です。すべての帳簿記入はこの仕訳から始まります。"],
+    "hint": "取引を左（借方）と右（貸方）に「仕分け」するイメージです。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-008",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「買掛金」とはどのようなものですか？",
+    "answer": { "kind": "choice", "options": ["商品を売ったが、まだ代金を受け取っていないお金", "銀行から借りているお金", "商品を仕入れたが、まだ代金を支払っていない義務", "将来受け取る予定の利息"], "correct": 2 },
+    "explain": ["買掛金は「商品を仕入れたがまだ代金を払っていない」という支払い義務で、負債に分類されます。反対に「売ったがまだもらっていない」は売掛金（資産）です。"],
+    "hint": "「買った代金をまだ払っていない」のは将来の支払い義務です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-009",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "貸借対照表（B/S）が表すものとして正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["一定期間の売上と費用の内訳", "ある時点での会社の財産と借金の状況", "一定期間の現金の増減の記録", "従業員への給料の支払い状況"], "correct": 1 },
+    "explain": ["B/Sは「Balance Sheet（バランスシート）」の略で、決算日などある一時点の財産（資産）・借金（負債）・自己資本（純資産）をまとめた表です。会社の体力を一目で確認できます。"],
+    "hint": "「ある時点でのスナップショット」のような財産の一覧表です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-010",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "損益計算書（P/L）が表すものとして正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["ある時点での会社の財産の状況", "一定期間における会社の収益・費用・利益の結果", "株主への配当金の支払い計画", "銀行からの借入金の残高"], "correct": 1 },
+    "explain": ["P/Lは「Profit and Loss Statement」の略で、1年間などの期間中にどれだけかせいで（収益）、どれだけ使って（費用）、いくらもうかったか（利益）を示す成績表です。"],
+    "hint": "「一定期間の経営の成績を示す」書類を思い浮かべましょう。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-011",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "「減価償却（げんかしょうきゃく）」の説明として正しいものはどれですか？",
+    "answer": { "kind": "choice", "options": ["借入金の利息を毎年少しずつ返済していくこと", "建物や機械などの固定資産の取得費用を、使用年数にわたって少しずつ費用に配分すること", "商品の売れ残りを値引きして販売すること", "売掛金が回収できなかった場合に損失として計上すること"], "correct": 1 },
+    "explain": ["建物や車は何年も使うので、購入費用を一度に経費にせず毎年少しずつ費用にします。これが減価償却です。10年使う機材なら、おおよそ10年に分けて費用にするイメージです。"],
+    "hint": "長く使う資産のコストを「使う年数に分けて」費用にする仕組みです。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-012",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「純資産（自己資本）」とは何を意味しますか？",
+    "answer": { "kind": "choice", "options": ["銀行から借りているお金の合計", "資産から負債を差し引いた、会社が本当に自分のものとして持つ財産", "1年間で稼いだ売上の合計", "現金と預金の合計"], "correct": 1 },
+    "explain": ["純資産は「資産 − 負債」で求められ、借金を返した後に残る本当の自己財産です。資本金や過去の利益の積み上げが含まれます。純資産が大きいほど財務的に安定しています。"],
+    "hint": "全財産から借金を引いた「本当の自分のもの」が純資産です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-013",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「勘定科目（かんじょうかもく）」とは何ですか？",
+    "answer": { "kind": "choice", "options": ["会社の商品に付けられた品番や型番のこと", "帳簿で取引の内容を分類して記録するための名前（ラベル）", "税務署に提出する書類の種類名", "銀行口座の種類を表す名称"], "correct": 1 },
+    "explain": ["勘定科目は、お金の動きを「現金」「売掛金」「仕入」「売上」などのカテゴリーに分けるためのラベルです。取引を正しく分類することで、後から集計や分析がしやすくなります。"],
+    "hint": "帳簿に記録するときに使う「取引の分類名」です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-014",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「売掛金（うりかけきん）」は簿記上どのように分類されますか？",
+    "answer": { "kind": "choice", "options": ["負債", "費用", "資産", "純資産"], "correct": 2 },
+    "explain": ["売掛金は「商品を販売したがまだ代金を受け取っていない権利」です。将来お金が入ってくるためプラスの財産として資産に分類されます。"],
+    "hint": "まだもらっていないお金の「受け取る権利」は会社の財産です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-015",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "「決算（けっさん）」とはどのような作業ですか？",
+    "answer": { "kind": "choice", "options": ["毎月の給料を計算して従業員に支払う作業", "一定期間の帳簿を締め切り、財務諸表を作成する作業", "銀行口座の残高を確認して記帳する作業", "仕入れた商品の数量を棚卸しして記録する作業"], "correct": 1 },
+    "explain": ["決算は1年間（または四半期）の帳簿を締めて、貸借対照表・損益計算書などの財務諸表を作成する大切な作業です。会社の成績と財産状況をまとめます。"],
+    "hint": "一定期間の帳簿を「締めくくる」大仕事です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-016",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "会社が商品を仕入れたときに使う勘定科目はどれですか？",
+    "answer": { "kind": "choice", "options": ["売上", "受取手数料", "給料", "仕入"], "correct": 3 },
+    "explain": ["商品を購入（仕入れ）したときは「仕入」という勘定科目を使います。仕入は費用に分類されます。商品を売った際の「売上」とセットで利益計算に使います。"],
+    "hint": "「商品を買い入れる」ときに使う科目名をそのまま思い浮かべましょう。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-017",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "「資本金」とは何ですか？",
+    "answer": { "kind": "choice", "options": ["銀行からの借入金の合計", "会社が1年間で稼いだ利益の合計", "会社を設立したときや増資した際に株主が払い込んだお金", "商品の仕入れにかかった費用の合計"], "correct": 2 },
+    "explain": ["資本金は会社設立時や増資時に株主から出資されたお金で、純資産の中心的な項目です。返済義務のない「会社の元手」として、負債（借金）とは区別されます。"],
+    "hint": "会社の「元手」として株主が出資したお金のことです。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-018",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "会社の収益が費用を下回り、利益がマイナスになった状態を何といいますか？",
+    "answer": { "kind": "choice", "options": ["黒字", "均衡", "赤字", "余剰"], "correct": 2 },
+    "explain": ["収益より費用が多く、利益がマイナスになった状態を「赤字」といいます。逆に利益がプラスの状態は「黒字」です。かつて帳簿で損失を赤いインクで書いたことが語源といわれています。"],
+    "hint": "損失が出た状態を色で表現した言葉です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-019",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "日商簿記3級で主に学ぶ対象として最も適切なものはどれですか？",
+    "answer": { "kind": "choice", "options": ["株式会社の連結財務諸表の作成", "小規模な株式会社などの基本的な商業簿記", "国際会計基準（IFRS）に基づく財務報告", "製造業における製品原価の計算"], "correct": 1 },
+    "explain": ["日商簿記3級は、小規模な株式会社などを対象にした基本的な「商業簿記」が範囲です。日常的な売買取引の記帳・決算書の作成が中心で、社会人の基礎知識として人気の資格です。"],
+    "hint": "3級は「入門レベル」で、身近な会社のお金の流れを扱います。",
+    "pack": "簿記"
+  },
+  {
+    "id": "boki-020",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "次のうち「負債」に分類されるものはどれですか？",
+    "answer": { "kind": "choice", "options": ["現金", "建物", "借入金", "売掛金"], "correct": 2 },
+    "explain": ["借入金は銀行などからの借金で、将来返済する義務があるため負債です。現金・建物・売掛金はいずれも資産です。「将来お金を払う義務」があるものが負債と覚えましょう。"],
+    "hint": "「将来返さなければならない」義務があるものが負債です。",
+    "pack": "簿記"
+  },
+  {
+    "id": "keisan-001",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "1000円の商品が2割引になっています。いくらで買えますか？",
+    "answer": { "kind": "choice", "options": ["700円", "800円", "850円", "900円"], "correct": 1 },
+    "explain": ["2割引は20%引きなので、1000円×0.8＝800円。1000円×0.2＝200円を引いても同じです。"],
+    "hint": "2割引は、元の値段の8割を払うということ。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-002",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "税抜き価格が1000円の商品の、消費税10%込みの税込価格はいくらですか？",
+    "answer": { "kind": "choice", "options": ["1010円", "1050円", "1100円", "1200円"], "correct": 2 },
+    "explain": ["消費税10%なので、1000円×1.1＝1100円。1000円×0.1＝100円を足しても同じです。"],
+    "hint": "税抜き価格に1割を足します。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-003",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "680円の買い物をして、1000円を出しました。おつりはいくらですか？",
+    "answer": { "kind": "choice", "options": ["220円", "280円", "320円", "380円"], "correct": 2 },
+    "explain": ["おつり＝1000円−680円＝320円です。"],
+    "hint": "出した金額から買い物の金額を引きます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-004",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "4人で5200円の食事代を割り勘にします。1人あたりいくらになりますか？",
+    "answer": { "kind": "choice", "options": ["1100円", "1200円", "1300円", "1400円"], "correct": 2 },
+    "explain": ["5200円÷4人＝1300円です。"],
+    "hint": "合計金額を人数で割ります。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-005",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "りんご3個で360円のAと、5個で500円のBがあります。1個あたりが安いのはどちらですか？",
+    "answer": { "kind": "choice", "options": ["Aの方が安い", "Bの方が安い", "同じ値段", "計算できない"], "correct": 1 },
+    "explain": ["A：360÷3＝120円、B：500÷5＝100円。BはAより1個20円安いです。"],
+    "hint": "それぞれ1個あたりの値段を計算して比べます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-006",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "3000円の買い物で、5%のポイントが還元されます。何円分のポイントがたまりますか？",
+    "answer": { "kind": "choice", "options": ["100円分", "150円分", "200円分", "300円分"], "correct": 1 },
+    "explain": ["3000円×0.05＝150円分。3000円の5%は150円です。"],
+    "hint": "5%は100円あたり5円分です。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-007",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "去年の電気代は月8000円でした。今年は10%値上がりしました。今年の月の電気代はいくらですか？",
+    "answer": { "kind": "choice", "options": ["8100円", "8400円", "8800円", "9000円"], "correct": 2 },
+    "explain": ["8000円×1.1＝8800円。8000円×0.1＝800円を足しても同じです。"],
+    "hint": "10%増は、元の金額の1割を足します。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-008",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "クラス40人のうち15人が電車通学をしています。電車通学の割合は何%ですか？",
+    "answer": { "kind": "choice", "options": ["25%", "30%", "37.5%", "40%"], "correct": 2 },
+    "explain": ["15÷40＝0.375、つまり37.5%です。15÷40×100で求められます。"],
+    "hint": "割合＝部分÷全体×100。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-009",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "時速60kmで走る車が30分間走ると、何km進みますか？",
+    "answer": { "kind": "choice", "options": ["20km", "30km", "40km", "60km"], "correct": 1 },
+    "explain": ["30分＝0.5時間なので、60km×0.5＝30km。時速60kmは1時間で60km進みます。"],
+    "hint": "30分は1時間の半分です。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-010",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "午前10時45分から1時間30分後は何時何分ですか？",
+    "answer": { "kind": "choice", "options": ["午後0時15分", "午後0時30分", "午前11時45分", "午後1時15分"], "correct": 0 },
+    "explain": ["10時45分＋1時間＝11時45分、さらに30分足すと12時15分（午後0時15分）です。"],
+    "hint": "1時間後を先に計算してから、残りの分を足します。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-011",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "国語80点、数学70点、英語90点のテスト3科目の平均点は何点ですか？",
+    "answer": { "kind": "choice", "options": ["75点", "78点", "80点", "85点"], "correct": 2 },
+    "explain": ["（80＋70＋90）÷3＝240÷3＝80点です。"],
+    "hint": "平均＝合計点÷科目数。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-012",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "縦4m、横5mの部屋の面積は何平方メートル（㎡）ですか？",
+    "answer": { "kind": "choice", "options": ["16㎡", "18㎡", "20㎡", "25㎡"], "correct": 2 },
+    "explain": ["長方形の面積＝縦×横＝4×5＝20㎡です。"],
+    "hint": "長方形の面積は縦と横をかけます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-013",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "通常1本120円のジュースを、10本まとめ買いすると1割引になります。10本買うといくらですか？",
+    "answer": { "kind": "choice", "options": ["1000円", "1080円", "1100円", "1200円"], "correct": 1 },
+    "explain": ["通常の合計は120×10＝1200円。1割引なので1200×0.9＝1080円です。"],
+    "hint": "まず10本の定価合計を出してから、1割引を計算します。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-014",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "先月の電気代が5000円で、今月は先月より20%減りました。今月の電気代はいくらですか？",
+    "answer": { "kind": "choice", "options": ["3500円", "4000円", "4200円", "4500円"], "correct": 1 },
+    "explain": ["20%減なので5000円×0.8＝4000円。5000円×0.2＝1000円を引いても同じです。"],
+    "hint": "20%減は、元の金額の8割になります。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-015",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "野球選手が100回打席に立ち、30本ヒットを打ちました。打率はいくつですか？",
+    "answer": { "kind": "choice", "options": ["0.250", "0.300", "0.330", "0.350"], "correct": 1 },
+    "explain": ["打率＝ヒット数÷打席数＝30÷100＝0.300です。"],
+    "hint": "打率＝ヒット数÷打席数。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-016",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "額面の給料が25万円で、手取りが額面の約8割だとすると、手取りはおよそいくらですか？",
+    "answer": { "kind": "choice", "options": ["18万円", "19万円", "20万円", "22万円"], "correct": 2 },
+    "explain": ["25万円×0.8＝20万円。額面の約8割が手取りの目安とされることが多いです。"],
+    "hint": "8割は0.8をかけると求められます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-017",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "1kWhあたり30円の電気料金で、100kWh使用した場合の電気代はいくらですか？",
+    "answer": { "kind": "choice", "options": ["2500円", "3000円", "3500円", "4000円"], "correct": 1 },
+    "explain": ["30円×100kWh＝3000円。単価×使用量で計算できます。"],
+    "hint": "1kWhの単価に使った量をかけます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-018",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "定価2500円の服が3割引のセールになっています。セール価格はいくらですか？",
+    "answer": { "kind": "choice", "options": ["1500円", "1600円", "1750円", "2000円"], "correct": 2 },
+    "explain": ["3割引は30%引きなので、2500円×0.7＝1750円。2500円×0.3＝750円を引いても同じです。"],
+    "hint": "3割引は元の値段の7割を払います。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-019",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "税込み価格が2200円の商品の、税抜き価格（消費税10%）はいくらですか？",
+    "answer": { "kind": "choice", "options": ["1800円", "1900円", "2000円", "2100円"], "correct": 2 },
+    "explain": ["税込価格÷1.1＝税抜価格。2200÷1.1＝2000円です。"],
+    "hint": "税込価格は税抜価格の1.1倍なので、1.1で割ります。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-020",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "自宅から駅まで時速4kmで歩くと20分かかります。自宅から駅までは約何kmですか？",
+    "answer": { "kind": "choice", "options": ["約1.0km", "約1.3km", "約1.5km", "約2.0km"], "correct": 1 },
+    "explain": ["20分＝20÷60時間＝約0.33時間。4km×0.33≒1.3kmです。"],
+    "hint": "道のり＝速さ×時間。時間は「時間」の単位に直します。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-021",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "5人で食事をして合計7500円になりました。1人あたりいくら払えばよいですか？",
+    "answer": { "kind": "choice", "options": ["1200円", "1400円", "1500円", "1600円"], "correct": 2 },
+    "explain": ["7500円÷5人＝1500円です。"],
+    "hint": "合計を人数で割ります。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-022",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "600円の弁当と150円のお茶と80円のあめを買いました。消費税10%込みの合計はいくらですか？",
+    "answer": { "kind": "choice", "options": ["830円", "858円", "880円", "913円"], "correct": 3 },
+    "explain": ["税抜合計は600＋150＋80＝830円。830円×1.1＝913円です。"],
+    "hint": "先に税抜の合計を出してから、1.1をかけます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-023",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "easy",
+    "text": "1袋100gで298円のひき肉と、1袋200gで498円のひき肉があります。100gあたりが安いのはどちらですか？",
+    "answer": { "kind": "choice", "options": ["100g入りの方が安い", "200g入りの方が安い", "同じ値段", "どちらとも言えない"], "correct": 1 },
+    "explain": ["100g入りは100gあたり298円。200g入りは498÷2＝100gあたり249円。200g入りの方が安いです。"],
+    "hint": "両方とも100gあたりの値段に直して比べます。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-024",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "normal",
+    "text": "先月の売上が80万円で、今月は先月より25%増えました。今月の売上はいくらですか？",
+    "answer": { "kind": "choice", "options": ["90万円", "95万円", "100万円", "105万円"], "correct": 2 },
+    "explain": ["25%増なので80万円×1.25＝100万円。80万円×0.25＝20万円を足しても同じです。"],
+    "hint": "25%増は元の金額の1.25倍です。",
+    "pack": "暮らしの計算"
+  },
+  {
+    "id": "keisan-025",
+    "subject": "japanese",
+    "type": "vocab",
+    "grade": 3,
+    "difficulty": "hard",
+    "text": "毎月3万円ずつ貯金すると、50万円貯まるのは何ヶ月後ですか？",
+    "answer": { "kind": "choice", "options": ["約14ヶ月後", "約17ヶ月後", "約20ヶ月後", "約24ヶ月後"], "correct": 1 },
+    "explain": ["50万円÷3万円＝16.6…ヶ月。割り切れないので切り上げて17ヶ月後に達成できます。"],
+    "hint": "目標金額÷毎月の貯金額で、何ヶ月かかるか計算できます。",
+    "pack": "暮らしの計算"
   }
 ]

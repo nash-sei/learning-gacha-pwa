@@ -112,6 +112,15 @@ export const SHARD_EGG_UR_RATE = 0.2
  * 本番運用は 0.2（5回に1回くらい）。テストで毎回出したいときだけ一時的に 1.0 にする。
  */
 export const DANGER_RATE = 0.2
+/**
+ * デンジャー祭り（毎週 金・土・日）の出現率。
+ * ふだんは DANGER_RATE（0.2）、祭りの日だけこの値になる。currentDangerRate() で切り替え。
+ */
+export const DANGER_RATE_FESTIVAL = 0.4
+/**
+ * デンジャー祭りを開催する曜日（JS の Date.getDay：0=日 … 5=金 6=土）＝金・土・日。
+ */
+export const FESTIVAL_DAYS: readonly number[] = [0, 5, 6]
 /** 討伐成功でもらえる現金（円・コインとは別枠の特別ごほうび） */
 export const DANGER_YEN = 200
 /** 討伐で出題する難問の数（全問正解で成功・1問でも間違えたら即終了） */

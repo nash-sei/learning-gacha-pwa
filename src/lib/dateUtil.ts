@@ -2,6 +2,12 @@
  * 日付・月・週の文字列ヘルパー。
  * 端末ローカル日付で計算する（v1 は toISOString で UTC 基準だったため JST 夜に日付がずれる懸念があった）。
  */
+import { FESTIVAL_DAYS } from './constants'
+
+/** きょうがデンジャー祭り（毎週 金・土・日）か。端末ローカルの曜日で判定する。 */
+export function isFestivalDay(d: Date = new Date()): boolean {
+  return FESTIVAL_DAYS.includes(d.getDay())
+}
 
 /** YYYY-MM-DD（端末ローカル） */
 export function todayStr(d: Date = new Date()): string {

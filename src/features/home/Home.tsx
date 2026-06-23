@@ -13,7 +13,7 @@ import { useGame } from '../../contexts/GameContext'
 import { MONSTERS } from '../../data/monsters'
 import { COINS_PER_FRUIT, SHARD_EGG_COST, TREE_IMG } from '../../lib/constants'
 import { storage } from '../../lib/storage'
-import { weekStr } from '../../lib/dateUtil'
+import { weekStr, isFestivalDay } from '../../lib/dateUtil'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
 import SoundToggle from '../../components/SoundToggle'
@@ -148,6 +148,20 @@ export default function Home({ go }: HomeProps) {
         </div>
         <SoundToggle />
       </header>
+
+      {/* ===== デンジャー祭り（金・土・日）の開催中バナー：子供のときだけ ===== */}
+      {!isAdult && isFestivalDay() && (
+        <motion.div
+          className="mb-3 rounded-2xl bg-[var(--color-danger)] px-4 py-2 text-center text-base font-extrabold text-white shadow-md"
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ repeat: Infinity, duration: 1.6 }}
+        >
+          🔥 デンジャーまつり かいさいちゅう！
+          <span className="block text-sm font-bold sm:inline sm:text-base">
+            {' '}きんようび・どようび・にちようび は デンジャーが でやすいよ！
+          </span>
+        </motion.div>
+      )}
 
       {/* ===== ステータス（チャレンジ回数・おこづかい・かけら・ずかん） ===== */}
       <div className="mb-3 flex flex-wrap justify-center gap-2">

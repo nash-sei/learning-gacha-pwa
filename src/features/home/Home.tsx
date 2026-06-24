@@ -168,32 +168,39 @@ export default function Home({ go }: HomeProps) {
             draggable={false}
             className="absolute inset-0 h-full w-full select-none object-cover"
           />
-          {/* 左：かわいい子の顔（右半分をドカーン） */}
+          {/* 左：かわいい子の顔（右半分をドカーン・中央を広く空けるため外側へ） */}
           <img
             src={FESTIVAL_FACE_CUTE_IMG}
             alt=""
             aria-hidden
             draggable={false}
             className="pointer-events-none absolute left-0 top-1/2 w-auto select-none object-contain drop-shadow-lg"
-            style={{ height: '140%', transform: 'translate(-34%, -50%)' }}
+            style={{ height: '124%', transform: 'translate(-48%, -50%)' }}
           />
-          {/* 右：かっこいい子の顔（左半分をドカーン） */}
+          {/* 右：かっこいい子の顔（左半分をドカーン・中央を広く空けるため外側へ） */}
           <img
             src={FESTIVAL_FACE_COOL_IMG}
             alt=""
             aria-hidden
             draggable={false}
             className="pointer-events-none absolute right-0 top-1/2 w-auto select-none object-contain drop-shadow-lg"
-            style={{ height: '140%', transform: 'translate(34%, -50%)' }}
+            style={{ height: '124%', transform: 'translate(48%, -50%)' }}
           />
-          {/* まんなか：くっきり文字 */}
+          {/* まんなか：くっきり文字（顔と重ならないよう中央に確保・改行は語の切れ目だけ） */}
           <div
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center px-24 text-center"
-            style={{ textShadow: '0 2px 5px rgba(0,0,0,0.6)' }}
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-0.5 text-center"
+            style={{
+              textShadow: '0 2px 5px rgba(0,0,0,0.65)',
+              wordBreak: 'keep-all',
+              paddingLeft: '26%',
+              paddingRight: '26%',
+            }}
           >
-            <p className="text-xs font-extrabold text-white sm:text-sm">ぜんもんクリアを めざせ！</p>
-            <p className="text-lg font-black leading-tight text-white sm:text-2xl">
-              🔥 デンジャーまつり かいさい！ 🔥
+            <p className="text-[10px] font-extrabold leading-tight text-white sm:text-sm">
+              ぜんもんクリアを めざせ！
+            </p>
+            <p className="text-[13px] font-black leading-tight text-white sm:text-2xl">
+              デンジャーまつり かいさい！
             </p>
           </div>
         </div>

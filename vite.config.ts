@@ -14,8 +14,10 @@ export default defineConfig({
         // v1 は既定値のままで 7 ファイルのみキャッシュ → モンスター画像が機内モード圏外だった。
         // mp4/webm を追加（DANGER接近動画 public/danger/danger-intro.mp4 をオフラインでも再生するため）。
         globPatterns: ['**/*.{js,css,html,svg,png,webp,jpg,jpeg,ico,mp3,ogg,wav,mp4,webm,json,woff,woff2}'],
-        // モンスター画像・音をまとめてキャッシュできるよう上限を引き上げる（既定 2MB）。
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        // モンスター画像・音・動画をまとめてキャッシュできるよう上限を引き上げる（既定 2MB）。
+        // 6MB → 14MB：ガチャ導入の女神動画 public/gacha/megami_kling_v2.mp4（約12.9MB）も
+        // オフライン保存できるようにする（DANGER動画と同じ扱い）。
+        maximumFileSizeToCacheInBytes: 14 * 1024 * 1024,
         cleanupOutdatedCaches: true,
       },
       manifest: {

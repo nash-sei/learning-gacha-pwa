@@ -139,6 +139,8 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
   const [phase, setPhase] = useState<Phase>('ready')
   const [outcome, setOutcome] = useState<{ result: GachaResult; reward: number } | null>(null)
   const [saveWarnOpen, setSaveWarnOpen] = useState(false)
+  // 女神降臨の動画（ガチャ導入）が再生できないとき用：true で従来のドラムロール演出へ自動フォールバック
+  const [videoFailed, setVideoFailed] = useState(false)
 
   // 実効難易度：リトライを使った回は1段階降格（spec §5-1）
   const effDiff = retryUsed ? demote(difficulty) : difficulty
@@ -194,7 +196,9 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
     let t: number | undefined
     switch (phase) {
       case 'drumroll':
-        t = window.setTimeout(() => setPhase('egg'), 1500)
+        // 女神動画あり：通常は動画の onEnded で egg へ進む。
+        // 動画が壊れた(videoFailed)ときは従来どおり1.5秒。動画が固まったとき用の保険として長めの上限を置く。
+        t = window.setTimeout(() => setPhase('egg'), videoFailed ? 1500 : 11000)
         break
       case 'rainbow':
         // UR 導入：右→左で虹がふわっと流れたあと卵へ
@@ -227,7 +231,7 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
     return () => {
       if (t !== undefined) window.clearTimeout(t)
     }
-  }, [phase, outcome])
+  }, [phase, outcome, videoFailed])
 
   if (!save) {
     return (
@@ -374,8 +378,31 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
           </div>
         )}
 
-        {/* ---- ドラムロール ---- */}
-        {phase === 'drumroll' && (
+        {/* ---- ドラムロール：女神降臨の動画（megami_kling_v2・8秒）---- */}
+        {phase === 'drumroll' && !videoFailed && (
+          <>
+            <video
+              src={`${import.meta.env.BASE_URL}gacha/megami_kling_v2.mp4`}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-cover"
+              onEnded={() => setPhase('egg')}
+              onError={() => setVideoFailed(true)}
+            />
+            {/* せっかちな時用：タップで卵（つぎ）へ飛ばす */}
+            <button
+              className="absolute bottom-3 right-3 z-10 rounded-full bg-black/45 px-4 py-1.5 text-sm font-bold text-white backdrop-blur-sm"
+              onClick={() => setPhase('egg')}
+            >
+              スキップ ▶
+            </button>
+          </>
+        )}
+
+        {/* ---- ドラムロール（動画が出ないときの従来演出・フォールバック）---- */}
+        {phase === 'drumroll' && videoFailed && (
           <div className="flex flex-col items-center gap-6">
             <motion.div
               className="text-6xl"

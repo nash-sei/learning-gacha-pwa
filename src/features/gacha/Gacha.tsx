@@ -8,7 +8,7 @@
  * - レア度別演出：N=ふつう / R=青い光 / SR=金の光+紙吹雪 / UR=虹+特別カットイン
  * - 月間コインは childSettings.maxMonthlyCoins で頭打ち（spec §6-3）
  */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Difficulty, Rarity, SaveData } from '../../types'
 import type { GachaResult } from '../../lib/gacha'
@@ -43,6 +43,7 @@ export interface GachaProps {
 type Phase =
   | 'ready'
   | 'drumroll'
+  | 'goddess'
   | 'rainbow'
   | 'egg'
   | 'shake'
@@ -141,6 +142,8 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
   const [saveWarnOpen, setSaveWarnOpen] = useState(false)
   // 女神降臨の動画（ガチャ導入）が再生できないとき用：true で従来のドラムロール演出へ自動フォールバック
   const [videoFailed, setVideoFailed] = useState(false)
+  // 女神専用曲を動画の再生開始で1回だけ鳴らすための目印（二重再生防止）
+  const goddessBgmStartedRef = useRef(false)
 
   // 実効難易度：リトライを使った回は1段階降格（spec §5-1）
   const effDiff = retryUsed ? demote(difficulty) : difficulty
@@ -196,9 +199,13 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
     let t: number | undefined
     switch (phase) {
       case 'drumroll':
-        // 女神動画あり：通常は動画の onEnded で egg へ進む。
-        // 動画が壊れた(videoFailed)ときは従来どおり1.5秒。動画が固まったとき用の保険として長めの上限を置く。
-        t = window.setTimeout(() => setPhase('egg'), videoFailed ? 1500 : 11000)
+        // N/R：従来の太鼓ロール（1.5秒）
+        t = window.setTimeout(() => setPhase('egg'), 1500)
+        break
+      case 'goddess':
+        // SR/UR：女神降臨の動画。通常は動画の onEnded で egg へ進む。
+        // 動画が壊れた(videoFailed)ら短く切り上げ、固まったとき用の保険として長めの上限を置く。
+        t = window.setTimeout(() => setPhase('egg'), videoFailed ? 1200 : 11000)
         break
       case 'rainbow':
         // UR 導入：右→左で虹がふわっと流れたあと卵へ
@@ -246,12 +253,15 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
   // テスト時は回数制限を無視して何度でも開けるようにする
   const canPull = debugRarity != null || save.dailyGachaCount < childSettings.maxDailyGacha
 
-  // 演出スタート：UR だけ太鼓をやめ、先に虹がふわっと流れる導入にする
+  // 演出スタート：SR/UR だけ「女神降臨」の動画（特別感）。N/R は従来の太鼓ロール。
+  // ※旧 UR 専用の rainbow 導入は廃止（goddess に統一）。rainbow フェーズのコードは未使用で残置。
   const startReveal = (result: GachaResult, reward: number) => {
     setOutcome({ result, reward })
-    if (result.rarity === 'UR') {
-      audio.playSe('harvest') // やわらかい光の音（太鼓のかわり）
-      setPhase('rainbow')
+    goddessBgmStartedRef.current = false
+    const special = result.rarity === 'SR' || result.rarity === 'UR'
+    if (special) {
+      // 女神動画の専用曲（goddess-bgm）は動画の onPlay で1回だけ鳴らす（下の <video> 参照）。
+      setPhase('goddess')
     } else {
       audio.playSe('drumroll')
       setPhase('drumroll')
@@ -378,31 +388,8 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
           </div>
         )}
 
-        {/* ---- ドラムロール：女神降臨の動画（megami_kling_v2・8秒）---- */}
-        {phase === 'drumroll' && !videoFailed && (
-          <>
-            <video
-              src={`${import.meta.env.BASE_URL}gacha/megami_kling_v2.mp4`}
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              className="absolute inset-0 h-full w-full object-cover"
-              onEnded={() => setPhase('egg')}
-              onError={() => setVideoFailed(true)}
-            />
-            {/* せっかちな時用：タップで卵（つぎ）へ飛ばす */}
-            <button
-              className="absolute bottom-3 right-3 z-10 rounded-full bg-black/45 px-4 py-1.5 text-sm font-bold text-white backdrop-blur-sm"
-              onClick={() => setPhase('egg')}
-            >
-              スキップ ▶
-            </button>
-          </>
-        )}
-
-        {/* ---- ドラムロール（動画が出ないときの従来演出・フォールバック）---- */}
-        {phase === 'drumroll' && videoFailed && (
+        {/* ---- ドラムロール（N/R：従来の太鼓ロール）---- */}
+        {phase === 'drumroll' && (
           <div className="flex flex-col items-center gap-6">
             <motion.div
               className="text-6xl"
@@ -419,6 +406,52 @@ export default function Gacha({ difficulty, retryUsed, onDone, debugRarity }: Ga
               >
                 …
               </motion.span>
+            </p>
+          </div>
+        )}
+
+        {/* ---- 女神降臨の動画（SR/UR だけ・megami_kling_v2・8秒）---- */}
+        {phase === 'goddess' && !videoFailed && (
+          <>
+            <video
+              src={`${import.meta.env.BASE_URL}gacha/megami_kling_v2.mp4`}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-cover"
+              onPlay={() => {
+                // 動画はミュート。再生開始に合わせて女神専用曲を1回だけ鳴らす
+                if (!goddessBgmStartedRef.current) {
+                  goddessBgmStartedRef.current = true
+                  audio.playSe('goddess-bgm')
+                }
+              }}
+              onEnded={() => setPhase('egg')}
+              onError={() => setVideoFailed(true)}
+            />
+            {/* せっかちな時用：タップで卵（つぎ）へ飛ばす */}
+            <button
+              className="absolute bottom-3 right-3 z-10 rounded-full bg-black/45 px-4 py-1.5 text-sm font-bold text-white backdrop-blur-sm"
+              onClick={() => setPhase('egg')}
+            >
+              スキップ ▶
+            </button>
+          </>
+        )}
+
+        {/* ---- 女神動画が出ないときのフォールバック（SR/UR・キラッと待つ）---- */}
+        {phase === 'goddess' && videoFailed && (
+          <div className="flex flex-col items-center gap-5">
+            <motion.div
+              className="text-6xl"
+              animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 0.9 }}
+            >
+              ✨
+            </motion.div>
+            <p className="text-2xl font-extrabold text-[var(--color-ink)]">
+              なにか とくべつな よかん…！
             </p>
           </div>
         )}

@@ -21,6 +21,7 @@ export type SeName =
   | 'harvest'
   | 'partner-happy'
   | 'danger-bgm'
+  | 'goddess-bgm'
 
 export type BgmName = 'opening' | 'home' | 'quiz'
 
@@ -38,6 +39,7 @@ const SE_NAMES: SeName[] = [
   'harvest',
   'partner-happy',
   'danger-bgm',
+  'goddess-bgm',
 ]
 
 const BGM_NAMES: BgmName[] = ['opening', 'home', 'quiz']
@@ -122,6 +124,8 @@ const SYNTH_SE: Record<SeName, SynthNote[]> = {
   ],
   // DANGER専用曲（public/sounds/danger-bgm.mp3）。ファイルが無い時の保険は接近音を流用。
   'danger-bgm': dangerNotes(),
+  // ガチャSR/UR専用曲（public/sounds/goddess-bgm.mp3）。ファイルが無い時の保険は明るいファンファーレ。
+  'goddess-bgm': arpeggio([523.3, 659.3, 784, 1046.5, 1318.5], 0.11, 0.26),
 }
 
 // ========== 内部状態 ==========

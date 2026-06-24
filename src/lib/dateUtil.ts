@@ -2,6 +2,28 @@
  * 日付・月・週の文字列ヘルパー。
  * 端末ローカル日付で計算する（v1 は toISOString で UTC 基準だったため JST 夜に日付がずれる懸念があった）。
  */
+import { FESTIVAL_DAYS } from './constants'
+
+/** 本番（公開）のドメイン。ここでだけ ?festival テストスイッチを無効にする。 */
+const PROD_HOST = 'learning-gacha-pwa.vercel.app'
+
+/**
+ * テスト用スイッチ：URLに ?festival が付いていたら曜日に関係なく祭り扱い。
+ * 有効なのは「開発(dev)」または「本番ドメイン以外（Vercelプレビュー等）」だけ。
+ * 本番ドメイン（PROD_HOST）では常に無効＝公開後に子どもが悪用できない。
+ */
+function isFestivalForced(): boolean {
+  if (typeof window === 'undefined') return false
+  if (!new URLSearchParams(window.location.search).has('festival')) return false
+  if (import.meta.env.DEV) return true
+  return window.location.hostname !== PROD_HOST
+}
+
+/** きょうがデンジャー祭り（毎週 金・土・日）か。端末ローカルの曜日で判定する。 */
+export function isFestivalDay(d: Date = new Date()): boolean {
+  if (isFestivalForced()) return true
+  return FESTIVAL_DAYS.includes(d.getDay())
+}
 
 /** YYYY-MM-DD（端末ローカル） */
 export function todayStr(d: Date = new Date()): string {

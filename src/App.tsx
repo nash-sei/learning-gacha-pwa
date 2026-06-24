@@ -32,7 +32,7 @@ import DangerEvent from './features/danger/DangerEvent'
 import AdultMode from './features/adult/AdultMode'
 import AdultZukan from './features/adult/AdultZukan'
 import { storage } from './lib/storage'
-import { DANGER_RATE } from './lib/constants'
+import { currentDangerRate } from './lib/danger'
 
 export type Screen =
   | 'home'
@@ -143,7 +143,8 @@ function SessionScreens() {
                 setPendingGacha(null)
                 setDebugRarity(null)
                 // ガチャのあと、低確率で DANGER 討伐イベントが発生（追加機能1-C）。テスト演出では出さない。
-                setScreen(!wasDebug && Math.random() < DANGER_RATE ? 'danger' : 'home')
+                // 出現率は曜日で変わる：祭りの日（金・土・日）は currentDangerRate() が 0.4 を返す。
+                setScreen(!wasDebug && Math.random() < currentDangerRate() ? 'danger' : 'home')
               }}
             />
           )}

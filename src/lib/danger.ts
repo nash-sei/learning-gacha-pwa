@@ -7,7 +7,17 @@
  */
 import type { DangerAward, MonsterDef, SaveData } from '../types'
 import { MONSTERS } from '../data/monsters'
-import { SHARD_BY_RARITY } from './constants'
+import { DANGER_RATE, DANGER_RATE_FESTIVAL, SHARD_BY_RARITY } from './constants'
+import { isFestivalDay } from './dateUtil'
+
+/**
+ * きょうの DANGER 出現率。
+ * 祭りの日（金・土・日）は DANGER_RATE_FESTIVAL（0.4）、ふだんは DANGER_RATE（0.2）。
+ * App がガチャ後の抽選 `Math.random() < currentDangerRate()` に使う。
+ */
+export function currentDangerRate(d: Date = new Date()): number {
+  return isFestivalDay(d) ? DANGER_RATE_FESTIVAL : DANGER_RATE
+}
 
 /** DANGER限定モンスターの母集団（isDanger のみ） */
 export function dangerMonsters(monsters: MonsterDef[] = MONSTERS): MonsterDef[] {

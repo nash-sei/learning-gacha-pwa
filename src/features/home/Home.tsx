@@ -11,9 +11,16 @@ import type { Screen } from '../../App'
 import type { MonsterOwned } from '../../types'
 import { useGame } from '../../contexts/GameContext'
 import { MONSTERS } from '../../data/monsters'
-import { COINS_PER_FRUIT, SHARD_EGG_COST, TREE_IMG } from '../../lib/constants'
+import {
+  COINS_PER_FRUIT,
+  FESTIVAL_BANNER_IMG,
+  FESTIVAL_FACE_COOL_IMG,
+  FESTIVAL_FACE_CUTE_IMG,
+  SHARD_EGG_COST,
+  TREE_IMG,
+} from '../../lib/constants'
 import { storage } from '../../lib/storage'
-import { weekStr } from '../../lib/dateUtil'
+import { weekStr, isFestivalDay } from '../../lib/dateUtil'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
 import SoundToggle from '../../components/SoundToggle'
@@ -148,6 +155,56 @@ export default function Home({ go }: HomeProps) {
         </div>
         <SoundToggle />
       </header>
+
+      {/* ===== デンジャー祭り（金・土・日）の開催中バナー：子供のときだけ ===== */}
+      {/* 背景=お祭り画像／左右=専用モンスターの顔を大きく半分／まんなか=くっきり文字 */}
+      {!isAdult && isFestivalDay() && (
+        <div className="relative mb-3 h-28 overflow-hidden rounded-2xl shadow-md sm:h-32">
+          {/* 背景：お祭りイラスト */}
+          <img
+            src={FESTIVAL_BANNER_IMG}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="absolute inset-0 h-full w-full select-none object-cover"
+          />
+          {/* 左：かわいい子の顔（右半分をドカーン・中央を広く空けるため外側へ） */}
+          <img
+            src={FESTIVAL_FACE_CUTE_IMG}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="pointer-events-none absolute left-0 top-1/2 w-auto select-none object-contain drop-shadow-lg"
+            style={{ height: '124%', transform: 'translate(-48%, -50%)' }}
+          />
+          {/* 右：かっこいい子の顔（左半分をドカーン・中央を広く空けるため外側へ） */}
+          <img
+            src={FESTIVAL_FACE_COOL_IMG}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="pointer-events-none absolute right-0 top-1/2 w-auto select-none object-contain drop-shadow-lg"
+            style={{ height: '124%', transform: 'translate(48%, -50%)' }}
+          />
+          {/* まんなか：くっきり文字（顔と重ならないよう中央に確保・改行は語の切れ目だけ） */}
+          <div
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-0.5 text-center"
+            style={{
+              textShadow: '0 2px 5px rgba(0,0,0,0.65)',
+              wordBreak: 'keep-all',
+              paddingLeft: '26%',
+              paddingRight: '26%',
+            }}
+          >
+            <p className="text-[10px] font-extrabold leading-tight text-white sm:text-sm">
+              ぜんもんクリアを めざせ！
+            </p>
+            <p className="text-[13px] font-black leading-tight text-white sm:text-2xl">
+              デンジャーまつり かいさい！
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ===== ステータス（チャレンジ回数・おこづかい・かけら・ずかん） ===== */}
       <div className="mb-3 flex flex-wrap justify-center gap-2">

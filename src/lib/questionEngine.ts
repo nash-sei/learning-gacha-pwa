@@ -114,6 +114,8 @@ export function checkUnderstanding(
  * - choice … given.index === correct（元データの index。表示シャッフルは buildChoiceOptions 参照）
  * - order  … given.order は「子供が並べた順に元 tokens の index を並べた配列」。
  *            [0,1,2,…] と一致（=元の正しい順に戻せた）なら正解。
+ *            ダミー札（おとり）対応：correctTokenCount 指定時は「正解札 correctTokenCount 個を
+ *            正しい順に選べたか」だけを見る（並べた札数も correctTokenCount に一致が必要）。
  */
 export function checkAnswer(
   answer: Answer,
@@ -126,8 +128,11 @@ export function checkAnswer(
       return given.index != null && given.index === answer.correct
     case 'order': {
       const order = given.order
-      if (!order || order.length !== answer.tokens.length) return false
-      return order.every((originalIndex, position) => originalIndex === position)
+      // 期待する並べる札数。correctTokenCount 未指定（既存問題）は全 tokens を使う＝従来どおり。
+      const expectedLen = answer.correctTokenCount ?? answer.tokens.length
+      if (!order || order.length !== expectedLen) return false
+      // 先頭 expectedLen 個（＝元 index 0..expectedLen-1）が、その順で選ばれているか。
+      return order.slice(0, expectedLen).every((originalIndex, position) => originalIndex === position)
     }
   }
 }
@@ -175,6 +180,8 @@ export interface ShuffledToken {
 /**
  * order 解答のトークンを表示用にシャッフルする補助。
  * 偶然正解順のままにならないよう混ぜ直す（読まずに正解できてしまうのを防ぐ）。
+ * ダミー札（おとり）対応：answer.tokens には正解札＋ダミー札の「すべて」が入っている前提で、
+ * 全札を originalIndex 付きでシャッフルして返す（correctTokenCount の有無に関わらず同じ扱い）。
  * order 以外は null。
  */
 export function buildOrderTokens(

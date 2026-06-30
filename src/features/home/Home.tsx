@@ -150,8 +150,14 @@ export default function Home({ go }: HomeProps) {
         backgroundPosition: 'center',
       }}
     >
-      {/* 読みやすさ用の薄い暗がり（上下を少しだけ暗く） */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-black/30 via-black/0 to-black/45" />
+      {/* 読みやすさ用の暗がり：夜だけ濃いめ。昼は明るい背景を活かすため、ほぼ無し（モヤつき防止） */}
+      <div
+        className={`pointer-events-none absolute inset-0 z-0 bg-gradient-to-b ${
+          stageMode === 'night'
+            ? 'from-black/30 via-black/0 to-black/45'
+            : 'from-black/0 via-black/0 to-black/15'
+        }`}
+      />
 
       {/* ===== コンテンツ（神殿の上にのせる） ===== */}
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-3xl flex-col p-3">

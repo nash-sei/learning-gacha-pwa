@@ -348,14 +348,14 @@ export default function Home({ go }: HomeProps) {
         <nav className="space-y-2.5 pt-1">
           {isAdult ? (
             <button
-              className="btn-kid w-full bg-[var(--color-primary-dark)] text-3xl"
+              className="btn-kid w-full break-keep bg-[var(--color-primary-dark)] text-2xl"
               onClick={() => navTap('adult')}
             >
               🎓 おとなの クイズに ちょうせん！
             </button>
           ) : (
             <button
-              className="btn-kid w-full bg-[var(--color-primary)] text-3xl"
+              className="btn-kid w-full break-keep bg-[var(--color-primary)] text-2xl"
               onClick={() => navTap('quiz')}
             >
               ✏️ クイズに ちょうせん！
@@ -365,7 +365,7 @@ export default function Home({ go }: HomeProps) {
           {/* かけらタマゴ：ひけるときだけ虹色で目立たせる（子供のみ・ふだんはメニューに状態を出す） */}
           {!isAdult && shardEggReady && (
             <motion.button
-              className="btn-kid w-full text-2xl"
+              className="btn-kid w-full break-keep text-xl"
               style={{
                 background: 'linear-gradient(90deg, #ff5e5e, #ffc043, #4ade80, #4f9dff, #b06bff)',
               }}
@@ -377,32 +377,36 @@ export default function Home({ go }: HomeProps) {
             </motion.button>
           )}
 
+          {/* 下段3つ：アイコンを上・文字を小さく下に（幅が狭いので文字が崩れない） */}
           <div className="flex gap-2.5">
             <button
-              className="btn-kid flex-1 bg-[var(--color-secondary)]"
+              className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-btn)] bg-[var(--color-secondary)] px-1 py-2.5 font-extrabold text-white shadow-lg transition-transform active:translate-y-0.5 active:scale-[0.98]"
               onClick={() => navTap(isAdult ? 'adult-zukan' : 'zukan')}
             >
-              📖 ずかん
+              <span className="text-2xl leading-none">📖</span>
+              <span className="text-sm leading-tight">ずかん</span>
             </button>
             <button
-              className="btn-kid relative flex-1 bg-[var(--color-success)]"
+              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-btn)] bg-[var(--color-success)] px-1 py-2.5 font-extrabold text-white shadow-lg transition-transform active:translate-y-0.5 active:scale-[0.98]"
               onClick={() => navTap('tree')}
             >
-              🌳 コインのき
+              <span className="text-2xl leading-none">🌳</span>
+              <span className="text-sm leading-tight">コインのき</span>
               {fruitCount > 0 && (
-                <span className="absolute -top-2 -right-1 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-sm font-extrabold text-white shadow">
+                <span className="absolute -top-2 -right-1 rounded-full bg-[var(--color-accent)] px-2 py-0.5 text-xs font-extrabold text-white shadow">
                   🪙×{fruitCount}
                 </span>
               )}
             </button>
             <button
-              className="btn-kid flex-1 bg-[var(--color-bg-2)] text-[var(--color-ink-soft)]"
+              className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-btn)] bg-[var(--color-bg-2)] px-1 py-2.5 font-extrabold text-[var(--color-ink-soft)] shadow-lg transition-transform active:translate-y-0.5 active:scale-[0.98]"
               onClick={() => {
                 audio.playSe('tap')
                 setMenuOpen(true)
               }}
             >
-              ≡ メニュー
+              <span className="text-2xl leading-none">≡</span>
+              <span className="text-sm leading-tight">メニュー</span>
             </button>
           </div>
         </nav>
@@ -427,7 +431,7 @@ export default function Home({ go }: HomeProps) {
       >
         <div className="flex flex-col gap-3">
           <button
-            className="btn-kid w-full bg-[var(--color-surface)] text-xl text-[var(--color-ink)]"
+            className="btn-kid w-full break-keep bg-[var(--color-surface)] text-lg text-[var(--color-ink)]"
             onClick={() => {
               audio.playSe('tap')
               setMenuOpen(false)
@@ -437,7 +441,7 @@ export default function Home({ go }: HomeProps) {
             👥 こうたい（プロフィール）
           </button>
           <button
-            className="btn-kid w-full bg-[var(--color-primary-dark)] text-xl"
+            className="btn-kid w-full break-keep bg-[var(--color-primary-dark)] text-lg"
             onClick={() => {
               setMenuOpen(false)
               navTap('parent')
@@ -446,7 +450,7 @@ export default function Home({ go }: HomeProps) {
             🔒 おやメニュー
           </button>
           {!isAdult && !shardEggReady && (
-            <div className="btn-kid w-full bg-[var(--color-bg-2)] text-lg text-[var(--color-ink-soft)]">
+            <div className="btn-kid w-full break-keep bg-[var(--color-bg-2)] text-base text-[var(--color-ink-soft)]">
               ✨ かけらタマゴ：
               {shardEggUsedThisWeek ? 'また らいしゅう！' : `あと ${SHARD_EGG_COST - save.shards} こ`}
             </div>

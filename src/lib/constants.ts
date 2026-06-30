@@ -145,6 +145,23 @@ export const TREE_BG = '/tree/sanctuary-bg.webp'
 /** きの ようせい キララ（コインの木の画面だけの案内役・図鑑/ガチャ対象外） */
 export const FAIRY_IMG = '/tree/fairy.webp'
 
+// ========== ホーム神殿ステージ（ホーム画面リニューアル 2026-07） ==========
+/** 神殿ステージの背景・昼（古代遺跡・public/ui/ 同梱・外部URL禁止＝spec §1-3） */
+export const TEMPLE_DAY_IMG = '/ui/temple-day.webp'
+/** 神殿ステージの背景・夜（同上・暗い背景でモンスターが映える） */
+export const TEMPLE_NIGHT_IMG = '/ui/temple-night.webp'
+/** 昼／夜の選択を覚える localStorage キー（表示専用・セーブとは独立） */
+export const HOME_STAGE_MODE_KEY = 'lg2_home_stage_mode'
+/** ホームの神殿に飾れるモンスターの最大数（相棒＋お気に入りの合計） */
+export const HOME_FAVORITES_MAX = 3
+/** レア度ごとのホーム表示サイズ（px・レアなほど大きい・社長承認 2026-07・バランス版で大きめに） */
+export const HOME_MONSTER_SIZE: Record<Rarity, number> = {
+  N: 180,
+  R: 220,
+  SR: 255,
+  UR: 295,
+}
+
 // ========== タイトル・オープニング（追加機能1） ==========
 /** タイトルロゴ「ガクモン」（public/title/ 同梱・外部URL禁止＝spec §1-3） */
 export const TITLE_LOGO_IMG = '/title/logo.webp'

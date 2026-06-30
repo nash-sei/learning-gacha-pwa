@@ -12,7 +12,7 @@ import { motion } from 'framer-motion'
 import type { MonsterDef } from '../../types'
 import { useGame } from '../../contexts/GameContext'
 import { MONSTERS } from '../../data/monsters'
-import { RARITY_COLOR, RARITY_LABEL } from '../../lib/constants'
+import { HOME_FAVORITES_MAX, RARITY_COLOR, RARITY_LABEL } from '../../lib/constants'
 import { audio } from '../../lib/audio'
 import MonsterSprite from '../../components/MonsterSprite'
 import Dialog from '../../components/Dialog'
@@ -69,6 +69,29 @@ export default function Zukan({ onBack }: ZukanProps) {
     if (!res.ok) setSaveWarn(true)
   }
 
+  // ホームの神殿に飾るお気に入り。相棒は自動で1枠を使うので、自由に飾れる残り枠は最大 HOME_FAVORITES_MAX-（相棒の有無）
+  const favoriteIds = save?.favoriteMonsterIds ?? []
+  const isFavorite = (id: string) => favoriteIds.includes(id)
+  const freeFavoriteCount = favoriteIds.filter((id) => id !== save?.partnerId).length
+  const maxFreeFavorites = HOME_FAVORITES_MAX - (save?.partnerId ? 1 : 0)
+  const favoritesFull = freeFavoriteCount >= maxFreeFavorites
+
+  const toggleFavorite = (id: string) => {
+    const res = updateSave((s) => {
+      const cur = s.favoriteMonsterIds ?? []
+      if (cur.includes(id)) {
+        return { ...s, favoriteMonsterIds: cur.filter((x) => x !== id) }
+      }
+      // 上限（相棒ぶんを除いた自由枠）に達していたら追加しない
+      const free = cur.filter((x) => x !== s.partnerId).length
+      const max = HOME_FAVORITES_MAX - (s.partnerId ? 1 : 0)
+      if (free >= max) return s
+      return { ...s, favoriteMonsterIds: [...cur, id] }
+    })
+    audio.playSe('tap')
+    if (!res.ok) setSaveWarn(true)
+  }
+
   const selected: MonsterDef | undefined = selectedId
     ? MONSTERS.find((m) => m.id === selectedId)
     : undefined
@@ -94,6 +117,11 @@ export default function Zukan({ onBack }: ZukanProps) {
         {owned && isPartner(def.id) && (
           <span className="absolute top-1 left-1 rounded-full bg-[var(--color-secondary)] px-1.5 py-0.5 text-xs font-extrabold text-white">
             ❤ あいぼう
+          </span>
+        )}
+        {owned && isFavorite(def.id) && !isPartner(def.id) && (
+          <span className="absolute top-1 left-1 rounded-full bg-[var(--color-success)] px-1.5 py-0.5 text-xs font-extrabold text-white">
+            🏛 かざってる
           </span>
         )}
         {owned && owned.count > 1 && (
@@ -155,6 +183,11 @@ export default function Zukan({ onBack }: ZukanProps) {
         )}
       </p>
 
+      {/* お気に入りモンスターをホームの神殿に飾る案内（ホーム画面リニューアル2026-07） */}
+      <p className="mb-4 -mt-2 text-center text-sm font-bold text-[var(--color-ink-soft)]">
+        モンスターを タップ →「🏛 ホームに かざる」で しんでんに だせるよ（{HOME_FAVORITES_MAX}びきまで）
+      </p>
+
       {/* ===== グリッド（通常モンスター・レア度順） ===== */}
       <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4">
         {regular.map((def, i) => renderCard(def, i))}
@@ -191,6 +224,32 @@ export default function Zukan({ onBack }: ZukanProps) {
                   ❤ この子を あいぼうにする
                 </button>
               )}
+              {selectedOwned &&
+                (isPartner(selected.id) ? (
+                  <p className="text-center text-sm font-bold text-[var(--color-secondary-dark)]">
+                    ❤ あいぼうは ホームの しんでんに いつも いるよ
+                  </p>
+                ) : isFavorite(selected.id) ? (
+                  <button
+                    className="btn-kid bg-[var(--color-ink-faint)] text-xl"
+                    onClick={() => toggleFavorite(selected.id)}
+                  >
+                    🏛 ホームから はずす
+                  </button>
+                ) : favoritesFull ? (
+                  <p className="text-center text-sm font-bold text-[var(--color-ink-soft)]">
+                    🏛 ホームに かざれるのは {HOME_FAVORITES_MAX}びきまで
+                    <br />
+                    （どれか はずしてね）
+                  </p>
+                ) : (
+                  <button
+                    className="btn-kid bg-[var(--color-success)] text-xl"
+                    onClick={() => toggleFavorite(selected.id)}
+                  >
+                    🏛 ホームに かざる
+                  </button>
+                ))}
               <button
                 className="btn-kid bg-[var(--color-ink-faint)] text-xl"
                 onClick={() => {

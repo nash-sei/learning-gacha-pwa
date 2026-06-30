@@ -187,6 +187,12 @@ export interface SaveData {
   pityCounters: PityCounters
   /** DANGER討伐の現金200円ごほうび履歴（コインとは別枠・親メニューで受け渡し管理・追加機能1-C） */
   dangerYenAwarded: DangerAward[]
+  /**
+   * ホームの神殿に飾るモンスター ID（最大3体・表示専用・ホーム画面リニューアル2026-07）。
+   * 相棒（partnerId）は自動で先頭に出るため、この配列は相棒以外の「飾る」選択を持つ。
+   * 旧セーブには無いので optional（未定義は空配列扱い）。
+   */
+  favoriteMonsterIds?: string[]
 }
 
 // ========== 大人モード専用データ（子供のセーブとは別保存・lg2_adult） ==========

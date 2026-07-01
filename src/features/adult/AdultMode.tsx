@@ -19,9 +19,10 @@ import AdultRoulette, { type RouletteSegment } from './AdultRoulette'
 import AdultZukan from './AdultZukan'
 import { PACK_ADULT } from '../../data/packs/pack-adult'
 import { PACK_ADULT2 } from '../../data/packs/pack-adult2'
+import { PACK_ADULT3 } from '../../data/packs/pack-adult3'
 
 /** 大人モードの出題プール（既存200問＋追加240問＝計440問） */
-const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2]
+const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2, ...PACK_ADULT3]
 /** 現在プールに存在する問題ID（既出メモの掃除に使う） */
 const POOL_IDS = new Set(ADULT_POOL.map((q) => q.id))
 

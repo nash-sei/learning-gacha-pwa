@@ -15,6 +15,7 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
+import { genAdd, genKuku, genDivExact } from '../generators'
 
 export const PACK_2026_06B: Question[] = [
   // ============================================================
@@ -22,6 +23,7 @@ export const PACK_2026_06B: Question[] = [
   // ============================================================
   {
     id: 'm26b-0001',
+    gen: genAdd({ aMin: 45, aMax: 89, bMin: 45, bMax: 89, requireCarry: true, minSum: 100, maxSum: 180 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -143,6 +145,7 @@ export const PACK_2026_06B: Question[] = [
   // ============================================================
   {
     id: 'm26b-0007',
+    gen: genKuku({ min: 2, max: 9 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -157,6 +160,7 @@ export const PACK_2026_06B: Question[] = [
   },
   {
     id: 'm26b-0008',
+    gen: genDivExact({ qMin: 2, qMax: 9, dMin: 2, dMax: 5 }),
     subject: 'math',
     type: 'calc',
     grade: 3,

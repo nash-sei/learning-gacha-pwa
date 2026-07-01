@@ -15,6 +15,7 @@ import {
   buildChoiceOptions,
   buildOrderTokens,
   checkAnswer,
+  materializeQuestion,
   selectQuestions,
 } from '../../lib/questionEngine'
 import type { ShuffledToken } from '../../lib/questionEngine'
@@ -326,7 +327,7 @@ export default function DangerEvent({ onDone, debugReveal }: DangerEventProps) {
       pool: PACK_DANGER,
       clearCounts: save?.questionClearCounts ?? {},
       count: DANGER_QUESTION_COUNT,
-    })
+    }).map((question) => materializeQuestion(question))
     if (qs.length === 0) {
       // 問題が無ければ討伐は発生させない（念のため）
       onDone()

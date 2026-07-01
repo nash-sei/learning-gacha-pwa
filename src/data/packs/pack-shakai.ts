@@ -77,7 +77,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'normal',
     text: 'ほっかいどうは どこ？ ちずを タップ！',
     answer: { kind: 'map', value: 'hokkaido' },
-    explain: ['いちばん きたの おおきな しまが ほっかいどう。ゆきが たくさん ふるよ。'],
+    explain: ['ヒント：日本の 上（きた）の ほうを 見て みよう。', 'いちばん きたの おおきな しまが ほっかいどう。ゆきが たくさん ふるよ。'],
     pack: PACK,
   },
   {
@@ -88,7 +88,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'normal',
     text: 'きゅうしゅうは どこ？ ちずを タップ！',
     answer: { kind: 'map', value: 'kyushu' },
-    explain: ['にほんの みなみにしの しまが きゅうしゅう。あたたかいよ。'],
+    explain: ['ヒント：日本の 下（みなみ）の 左（にし）を 見て みよう。', 'みなみにしの しまが きゅうしゅう。あたたかいよ。'],
     pack: PACK,
   },
   {
@@ -99,7 +99,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'normal',
     text: 'おおさかは どの ちほう？',
     answer: { kind: 'choice', options: ['かんとう', 'きんき', 'とうほく', 'きゅうしゅう'], correct: 1 },
-    explain: ['おおさか・きょうと・ならは「きんき ちほう」だよ。'],
+    explain: ['ヒント：おおさか・きょうと・なら は となりどうしの なかまだよ。', 'この 3つは「きんき ちほう」。'],
     pack: PACK,
   },
   {
@@ -110,7 +110,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'normal',
     text: 'とうきょうが ある「かんとう」は どこ？ ちずを タップ！',
     answer: { kind: 'map', value: 'kanto' },
-    explain: ['とうきょうの まわりが かんとう ちほう。ひとが いちばん おおい。'],
+    explain: ['ヒント：とうきょうは 日本の まん中あたり、右がわだよ。', 'とうきょうの まわりが かんとう ちほう。人が いちばん おおい。'],
     pack: PACK,
   },
   {
@@ -121,7 +121,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'normal',
     text: 'にほんで いちばん ひとが おおい まちは？',
     answer: { kind: 'choice', options: ['おおさか', 'とうきょう', 'ふくおか', 'さっぽろ'], correct: 1 },
-    explain: ['とうきょうは にほんの ちゅうしん。かいしゃや おみせが たくさん。'],
+    explain: ['ヒント：テレビで よく 見る、日本の 中心の 大きな まちだよ。', 'いちばん 人が おおいのは とうきょう。かいしゃも おみせも たくさん。'],
     pack: PACK,
   },
 
@@ -134,7 +134,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'hard',
     text: '「りんご」が いちばん たくさん とれる けんは？',
     answer: { kind: 'choice', options: ['あおもりけん', 'おきなわけん', 'かがわけん', 'ふくいけん'], correct: 0 },
-    explain: ['りんごの にほんいちは あおもりけん。すずしい ところが りんごに ぴったり。'],
+    explain: ['ヒント：日本の 北の ほう、すずしい けんだよ。', 'りんごの 日本一は あおもりけん。すずしい ところが ぴったり。'],
     pack: PACK,
   },
   {
@@ -145,7 +145,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'hard',
     text: 'おいしい お{米|こめ}で ゆうめいな けんは？',
     answer: { kind: 'choice', options: ['にいがたけん', 'おきなわけん', 'とうきょうと', 'かがわけん'], correct: 0 },
-    explain: ['にいがたけんは お米の めいさんち。ゆきどけみずで おいしく そだつ。'],
+    explain: ['ヒント：ゆきが たくさん ふる けんだよ。', 'お{米|こめ}の めいさんは にいがたけん。ゆきどけみずで おいしく そだつ。'],
     pack: PACK,
   },
   {
@@ -156,7 +156,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'hard',
     text: 'むかしの {手紙|てがみ}は、とどくまで かなりの じかんが かかった。いまは すぐに れんらくが できるように なった。れんらくが できるように なった ものは どれ？',
     answer: { kind: 'choice', options: ['スマホ・メール', 'そろばん', 'ふで', 'ちょうちん'], correct: 0 },
-    explain: ['むかしは 手紙が とどくまで じかんが かかった。', 'いまは スマホや メールで すぐ れんらく できる。'],
+    explain: ['むかしは {手紙|てがみ}が とどくまで じかんが かかった。', 'いまは スマホや メールで すぐ れんらく できる。'],
     pack: PACK,
   },
   {
@@ -166,8 +166,8 @@ export const PACK_SHAKAI: Question[] = [
     grade: 3,
     difficulty: 'hard',
     text: 'むかしの ひとが がっこうを つくって ひろめて くれた。だから いま わたしたちは なにが できるように なった？',
-    answer: { kind: 'choice', options: ['{字|じ}が よめる', 'そらを とべる', 'みずの なかで いきる', 'はやく はしれる'], correct: 0 },
-    explain: ['むかしの ひとの おかげで、いま みんな 字を よんだり かいたり できる。', 'これが「れきしの おかげ」だよ。'],
+    answer: { kind: 'choice', options: ['じが よめる', 'そらを とべる', 'みずの なかで いきる', 'はやく はしれる'], correct: 0 },
+    explain: ['ヒント：がっこうで まなぶ、いちばん 大事な ことだよ。', 'むかしの 人の おかげで、いま みんな じが よめる。これが「れきしの おかげ」。'],
     pack: PACK,
   },
   {
@@ -178,7 +178,7 @@ export const PACK_SHAKAI: Question[] = [
     difficulty: 'hard',
     text: 'でんわを ふるい じゅんに ならべよう',
     answer: { kind: 'order', tokens: ['くろい でんわ', 'けいたい でんわ', 'スマホ'] },
-    explain: ['くろい でんわ → けいたい → スマホ の じゅんに あたらしく なった。'],
+    explain: ['ヒント：だんだん 小さく、もち歩ける ように なって いったよ。', 'ふるい順は くろい でんわ → けいたい → スマホ。'],
     pack: PACK,
   },
 ]

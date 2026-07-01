@@ -26,6 +26,19 @@ const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2, ...PACK_ADULT3]
 /** 現在プールに存在する問題ID（既出メモの掃除に使う） */
 const POOL_IDS = new Set(ADULT_POOL.map((q) => q.id))
 
+/** 本番（公開）ドメイン。ここでは新問題テストスイッチを無効化する。 */
+const ADULT_PROD_HOST = 'learning-gacha-pwa.vercel.app'
+/**
+ * テスト用スイッチ：URLに ?newonly が付いていたら、追加パック(pack-adult3)の新問題だけを出す。
+ * 有効なのは localhost / Vercelプレビュー等だけ。本番ドメインでは常に無効。
+ */
+function adultTestPool(): Question[] {
+  if (typeof window === 'undefined') return ADULT_POOL
+  if (!new URLSearchParams(window.location.search).has('newonly')) return ADULT_POOL
+  if (window.location.hostname === ADULT_PROD_HOST) return ADULT_POOL
+  return PACK_ADULT3
+}
+
 export interface AdultModeProps {
   onDone: () => void
 }
@@ -173,12 +186,12 @@ function spreadByGenre(items: Question[]): Question[] {
 function pickQuestions(): Question[] {
   let seen = loadSeen()
   // まだ出していない問題だけを対象にシャッフル
-  const available = shuffle(ADULT_POOL.filter((q) => !seen.has(q.id)))
+  const available = shuffle(adultTestPool().filter((q) => !seen.has(q.id)))
   let picked = available.slice(0, QUESTION_COUNT)
   if (picked.length < QUESTION_COUNT) {
     // 全問題を出し切った → 周回をリセット。直前に出した分は避けて補充する
     const usedIds = new Set(picked.map((q) => q.id))
-    const refill = shuffle(ADULT_POOL.filter((q) => !usedIds.has(q.id))).slice(
+    const refill = shuffle(adultTestPool().filter((q) => !usedIds.has(q.id))).slice(
       0,
       QUESTION_COUNT - picked.length
     )

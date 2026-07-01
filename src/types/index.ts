@@ -78,6 +78,26 @@ export type Answer =
   | { kind: 'choice'; options: string[]; correct: number }
   | { kind: 'order'; tokens: string[]; correctTokenCount?: number }
 
+// ========== 出題ジェネレータ（数字ランダム生成・覚えゲー化対策） ==========
+
+/**
+ * 出題1回分の「その回だけの中身」。gen が返し、materializeQuestion が問題に差し替える。
+ * text / answer / explain は必須。figure / check は指定したときだけ差し替える（未指定は元のまま）。
+ */
+export interface QuestionVariant {
+  text: string
+  answer: Answer
+  explain: string[]
+  figure?: Figure
+  check?: QuestionCheck
+}
+
+/**
+ * 数字を毎回変える出題ジェネレータ（任意）。出題時に一度だけ rng を渡して呼ばれる。
+ * id は変えないので questionClearCounts（苦手記録）はそのまま引き継がれる。
+ */
+export type QuestionGen = (rng: () => number) => QuestionVariant
+
 // ========== 問題 ==========
 
 export interface Question {
@@ -86,7 +106,7 @@ export interface Question {
   type: QuestionType
   grade: Grade
   difficulty: Difficulty
-  /** 問題文（ルビ記法 {漢字|かんじ}） */
+  /** 問題文（ルビ記法 {漢字|かんじ}）。gen があるときは出題時に上書きされる予備値。 */
   text: string
   figure?: Figure
   /** 理解チェック（文章題・読解のみ） */
@@ -98,6 +118,11 @@ export interface Question {
   pack?: string
   /** 大人モード用の一言ヒント（任意・答えそのものは書かない） */
   hint?: string
+  /**
+   * 数字ランダム生成（任意）。あれば出題時に materializeQuestion が呼び、
+   * text / answer / explain（必要なら figure / check）を差し替える。id は不変。
+   */
+  gen?: QuestionGen
 }
 
 // ========== プロフィール ==========

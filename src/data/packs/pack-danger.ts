@@ -12,6 +12,7 @@
  * - 漢字の読み／どの漢字を問う設問は、答えになる漢字にルビを付けない（読ませるため）。type は 'vocab'。
  */
 import type { Question } from '../../types'
+import { genAdd, genAdd3 } from '../generators'
 
 export const PACK_DANGER: Question[] = [
   // ============================================================
@@ -19,6 +20,7 @@ export const PACK_DANGER: Question[] = [
   // ============================================================
   {
     id: 'dg-0001',
+    gen: genAdd({ aMin: 45, aMax: 89, bMin: 45, bMax: 89, requireCarry: true, minSum: 100, maxSum: 180 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -171,6 +173,7 @@ export const PACK_DANGER: Question[] = [
   // ============================================================
   {
     id: 'dg-0011',
+    gen: genAdd3({ aMin: 120, aMax: 480, bMin: 120, bMax: 480 }),
     subject: 'math',
     type: 'calc',
     grade: 3,

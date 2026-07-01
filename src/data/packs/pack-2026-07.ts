@@ -14,6 +14,15 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない（おとり・なぜ・きもち）／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
+import {
+  genAdd,
+  genSub,
+  genAdd3,
+  genKuku,
+  genMul2x1,
+  genDivExact,
+  genDivRemainderChoice,
+} from '../generators'
 
 export const PACK_2026_07: Question[] = [
   // ============================================================
@@ -21,6 +30,7 @@ export const PACK_2026_07: Question[] = [
   // ============================================================
   {
     id: 'm27-0001',
+    gen: genAdd({ aMin: 23, aMax: 58, bMin: 15, bMax: 39, requireCarry: true, maxSum: 99 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -37,6 +47,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0002',
+    gen: genSub({ aMin: 41, aMax: 85, bMin: 14, bMax: 39, requireBorrow: true }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -52,6 +63,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0003',
+    gen: genKuku({ min: 2, max: 9 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -67,6 +79,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0004',
+    gen: genAdd({ aMin: 45, aMax: 89, bMin: 45, bMax: 89, requireCarry: true, minSum: 100, maxSum: 180 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -83,6 +96,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0005',
+    gen: genDivExact({ qMin: 2, qMax: 9, dMin: 2, dMax: 6 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -98,6 +112,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0006',
+    gen: genAdd3({ aMin: 120, aMax: 480, bMin: 120, bMax: 480 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -114,6 +129,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0007',
+    gen: genMul2x1({ aMin: 12, aMax: 39, bMin: 3, bMax: 6 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -129,6 +145,7 @@ export const PACK_2026_07: Question[] = [
   },
   {
     id: 'm27-0008',
+    gen: genDivRemainderChoice({ qMin: 5, qMax: 8, dMin: 4, dMax: 7 }),
     subject: 'math',
     type: 'calc',
     grade: 3,

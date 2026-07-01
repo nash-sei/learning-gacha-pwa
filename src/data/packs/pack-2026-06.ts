@@ -13,6 +13,17 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない（おとり・なぜ・きもち）／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
+import {
+  genAdd,
+  genAdd3,
+  genSub,
+  genSub3,
+  genKuku,
+  genMul2x1,
+  genMul3x1,
+  genDivExact,
+  genDivRemainderChoice,
+} from '../generators'
 
 export const PACK_2026_06: Question[] = [
   // ============================================================
@@ -20,6 +31,7 @@ export const PACK_2026_06: Question[] = [
   // ============================================================
   {
     id: 'm26-0001',
+    gen: genAdd({ aMin: 23, aMax: 58, bMin: 15, bMax: 39, requireCarry: true, maxSum: 99 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -36,6 +48,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0002',
+    gen: genSub({ aMin: 41, aMax: 79, bMin: 14, bMax: 38, requireBorrow: true }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -51,6 +64,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0003',
+    gen: genAdd({ aMin: 25, aMax: 69, bMin: 24, bMax: 49, requireCarry: true, maxSum: 99 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -67,6 +81,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0004',
+    gen: genSub({ aMin: 52, aMax: 95, bMin: 26, bMax: 59, requireBorrow: true }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -82,6 +97,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0005',
+    gen: genKuku({ min: 2, max: 9 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -97,6 +113,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0006',
+    gen: genAdd({ aMin: 45, aMax: 89, bMin: 45, bMax: 89, requireCarry: true, minSum: 100, maxSum: 180 }),
     subject: 'math',
     type: 'calc',
     grade: 2,
@@ -113,6 +130,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0007',
+    gen: genDivExact({ qMin: 2, qMax: 9, dMin: 2, dMax: 5 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -128,6 +146,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0008',
+    gen: genAdd3({ aMin: 120, aMax: 480, bMin: 120, bMax: 480 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -144,6 +163,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0009',
+    gen: genSub3({ aMin: 300, aMax: 900, bMin: 150, bMax: 480 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -160,6 +180,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0010',
+    gen: genMul2x1({ aMin: 12, aMax: 39, bMin: 3, bMax: 5 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -175,6 +196,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0011',
+    gen: genDivRemainderChoice({ qMin: 5, qMax: 8, dMin: 3, dMax: 6 }),
     subject: 'math',
     type: 'calc',
     grade: 3,
@@ -194,6 +216,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0012',
+    gen: genMul3x1({ aMin: 113, aMax: 329, bMin: 3, bMax: 4, maxProduct: 999 }),
     subject: 'math',
     type: 'calc',
     grade: 3,

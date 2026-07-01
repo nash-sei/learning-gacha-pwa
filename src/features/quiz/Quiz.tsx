@@ -22,6 +22,7 @@ import {
   buildOrderTokens,
   checkAnswer,
   checkUnderstanding,
+  materializeQuestion,
   selectQuestions,
 } from '../../lib/questionEngine'
 import type { ShuffledToken } from '../../lib/questionEngine'
@@ -280,7 +281,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
       pool,
       clearCounts: save?.questionClearCounts ?? {},
       count,
-    })
+    }).map((question) => materializeQuestion(question))
     if (qs.length === 0) {
       setNoQuestionsOpen(true)
       return

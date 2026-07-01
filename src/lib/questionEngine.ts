@@ -7,6 +7,27 @@
  */
 import type { Answer, Difficulty, Grade, Question, QuestionCheck } from '../types'
 
+/**
+ * gen（数字ランダム生成）があれば、出題1回分の具体問題に展開する（無ければそのまま返す）。
+ * - text / answer / explain を差し替え、figure / check は gen が返したときだけ差し替える。
+ * - id は変えない＝questionClearCounts（苦手記録）を保つ。
+ * - 展開後は gen を外す（同じ問題を二度展開して数字が途中で変わるのを防ぐ保険）。
+ * 出題セットを作るとき（selectQuestions の直後）に一度だけ呼ぶこと。
+ */
+export function materializeQuestion(q: Question, rng: () => number = Math.random): Question {
+  if (!q.gen) return q
+  const v = q.gen(rng)
+  return {
+    ...q,
+    text: v.text,
+    answer: v.answer,
+    explain: v.explain,
+    figure: v.figure !== undefined ? v.figure : q.figure,
+    check: v.check !== undefined ? v.check : q.check,
+    gen: undefined,
+  }
+}
+
 /** 非破壊 Fisher-Yates シャッフル（rng は 0..1） */
 export function shuffle<T>(arr: T[], rng: () => number = Math.random): T[] {
   const out = arr.slice()

@@ -15,9 +15,10 @@ export const LEGACY_QUESTIONS: Question[] = [
     type: 'money',
     grade: 2,
     difficulty: 'easy',
-    text: '50{円玉|えんだま}はどれ？',
+    text: 'ぎんいろで、まんなかに あなが あいている おかねは どれ？',
     answer: { kind: 'choice', options: ['10円', '50円', '100円'], correct: 1 },
     explain: [
+      'おさいふの なかの おかねを おもいだそう。あなが あいた おかねは めずらしいよ',
       '50えんだまは ぎんいろで、まんなかに あなが あいているよ',
       '10えんだまは ちゃいろ、100えんだまには あなが ないんだ',
     ],

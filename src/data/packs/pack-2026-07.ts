@@ -10,6 +10,8 @@
  * - figure は 1.0 対象の tape / money / clock / shape / scene のみ使用。
  * - ふりがなはルビ記法 {漢字|かんじ}。小2問題は小2配当漢字まで。
  * - 既存 pack-2026-06 / legacy との題材・数字の重複なし（全問照合済み）。
+ * - 🚨作問・修正は「子供向けクイズ作問の9ルール」に従う（Vault: 20_Areas/_shared/learnings/tech/2026-07-02_kids-quiz-authoring-rules.md）。
+ *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない（おとり・なぜ・きもち）／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
 
@@ -836,7 +838,7 @@ export const PACK_2026_07: Question[] = [
     type: 'story',
     grade: 3,
     difficulty: 'easy',
-    text: 'あめが やんで、くもの あいだから おひさまが でました。すると {空|そら}に にじが かかりました。さきちゃんは おかあさんを よんで、ふたりで みました。\nさきちゃんと おかあさんが ふたりで みたのは なに？',
+    text: 'あめが やんで、くもの あいだから おひさまが でました。すると {空|そら}に にじが かかりました。さきちゃんは おかあさんを よんで、ふたりで それを みました。\nさきちゃんと おかあさんが ふたりで みたのは なに？',
     check: {
       kind: 'scene-pick',
       prompt: 'どんな おはなしかな？ただしい えを えらぼう',

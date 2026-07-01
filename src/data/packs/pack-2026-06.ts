@@ -9,6 +9,8 @@
  *   - scene-pick：options は共通場面ライブラリの sceneId（10 種から 3 択を構成）
  * - figure は 1.0 対象の tape / money / clock / shape / scene のみ使用。
  * - ふりがなはルビ記法 {漢字|かんじ}。小2問題は小2配当漢字まで。
+ * - 🚨作問・修正は「子供向けクイズ作問の9ルール」に従う（Vault: 20_Areas/_shared/learnings/tech/2026-07-02_kids-quiz-authoring-rules.md）。
+ *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない（おとり・なぜ・きもち）／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
 
@@ -1122,7 +1124,7 @@ export const PACK_2026_06: Question[] = [
     },
     answer: {
       kind: 'choice',
-      options: ['げんきな あいさつを して もらえたから', 'おもしろい ゆめを みたから', 'バスが あたらしく なったから'],
+      options: ['ゆうとくんが げんきに あいさつを したから', 'おもしろい ゆめを みたから', 'バスが あたらしく なったから'],
       correct: 0,
     },
     explain: [

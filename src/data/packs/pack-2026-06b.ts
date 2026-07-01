@@ -10,7 +10,9 @@
  * - 難易度ラベルは既存パックの較正に合わせる（小2 hard=百を超える計算/2段階/慣用句、小3 easy=九九・簡単なわり算・直結読解）。
  * - word/story/money には理解チェック（check）を付ける。scene 依存を避け asked-what 中心。
  * - 既存 legacy / 2026-06 / 2026-07 と題材・数字の重複なしを目指す（独立検証で照合）。
- * - ※未登録の下書き。社長の中身確認後に packs/index.ts へ登録する。
+ * - packs/index.ts に登録済み（本番稼働中）。
+ * - 🚨作問・修正は「子供向けクイズ作問の9ルール」に従う（Vault: 20_Areas/_shared/learnings/tech/2026-07-02_kids-quiz-authoring-rules.md）。
+ *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
 
@@ -482,8 +484,8 @@ export const PACK_2026_06B: Question[] = [
     text: '「木」が 3つ あつまって できる かんじは どれかな？',
     answer: { kind: 'choice', options: ['森', '林', '花'], correct: 0 },
     explain: [
-      '木が 2つだと「林（はやし）」、3つに ふえると…',
-      '「森（もり）」！ 木が たくさんで もり だよ',
+      'それぞれの かんじの かたちを よく みて、「木」が いくつ あるか かぞえて みよう',
+      '木が 2つだと「林（はやし）」。3つ あつまると「森（もり）」！ 木が たくさんで もりだよ',
     ],
     pack: '2026-06b',
   },

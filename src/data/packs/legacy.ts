@@ -4,6 +4,8 @@
  * - v1 は全問 choice 形式 → v2 では { kind:'choice', options, correct } へ変換。
  * - explain は v1 に存在しなかったため、子供向けの短い解説を新規に補った。
  * - spec §9-2「v1の内蔵問題は pack-legacy として同一IDで収録」準拠。
+ * - 🚨作問・修正は「子供向けクイズ作問の9ルール」に従う（Vault: 20_Areas/_shared/learnings/tech/2026-07-02_kids-quiz-authoring-rules.md）。
+ *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／答えを問題文で先に言わない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
 

@@ -4,6 +4,8 @@
  * - v1 は全問 choice 形式 → v2 では { kind:'choice', options, correct } へ変換。
  * - explain は v1 に存在しなかったため、子供向けの短い解説を新規に補った。
  * - spec §9-2「v1の内蔵問題は pack-legacy として同一IDで収録」準拠。
+ * - 🚨作問・修正は「子供向けクイズ作問の9ルール」に従う（Vault: 20_Areas/_shared/learnings/tech/2026-07-02_kids-quiz-authoring-rules.md）。
+ *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／答えを問題文で先に言わない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
 
@@ -15,9 +17,10 @@ export const LEGACY_QUESTIONS: Question[] = [
     type: 'money',
     grade: 2,
     difficulty: 'easy',
-    text: '50{円玉|えんだま}はどれ？',
+    text: 'ぎんいろで、まんなかに あなが あいている おかねは どれ？',
     answer: { kind: 'choice', options: ['10円', '50円', '100円'], correct: 1 },
     explain: [
+      'おさいふの なかの おかねを おもいだそう。あなが あいた おかねは めずらしいよ',
       '50えんだまは ぎんいろで、まんなかに あなが あいているよ',
       '10えんだまは ちゃいろ、100えんだまには あなが ないんだ',
     ],
@@ -31,7 +34,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'easy',
     text: '10{円|えん}が10{枚|まい}でいくら？',
     answer: { kind: 'choice', options: ['50円', '100円', '200円'], correct: 1 },
-    explain: ['10えんが 10まいで 100えん', '10、20、30…と じゅんばんに かぞえてみよう！'],
+    explain: ['10、20、30…と 10ずつ じゅんばんに かぞえて みよう！', '10えんが 10まいで 100えん！'],
     pack: 'legacy',
   },
   {
@@ -64,7 +67,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'easy',
     text: '100{円玉|えんだま}は どんな{色|いろ}？',
     answer: { kind: 'choice', options: ['茶色', '銀色', '黄色'], correct: 1 },
-    explain: ['100えんだまは ぎんいろだよ', 'ちゃいろは 10えんだまだね'],
+    explain: ['おさいふの こうかを おもいだそう。10えんだまとは いろが ちがうよ', '100えんだまは ぎんいろだよ', 'ちゃいろは 10えんだまだね'],
     pack: 'legacy',
   },
   {
@@ -75,7 +78,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'easy',
     text: '10{円玉|えんだま} 5{枚|まい}で いくら？',
     answer: { kind: 'choice', options: ['15円', '50円', '100円'], correct: 1 },
-    explain: ['10えんが 5まいだよ', '10、20、30、40、50。50えんだ！'],
+    explain: ['ゆびを おりながら 10ずつ かぞえて みよう', '10、20、30、40、50。50えんだ！'],
     pack: 'legacy',
   },
 
@@ -88,7 +91,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'normal',
     text: '130{円|えん}のお{茶|ちゃ}を{買|か}います。100{円玉|えんだま}と{何|なに}を{出|だ}す？',
     answer: { kind: 'choice', options: ['10円×2', '10円×3', '50円'], correct: 1 },
-    explain: ['130えんは 100えんと 30えんに わけられるね', '30えんは 10えんだま 3まいだよ'],
+    explain: ['100えんだまで 100えん はらうと、のこりは いくらかな？', '130えんは 100えんと 30えんに わけられるね', '30えんは 10えんだま 3まいだよ'],
     pack: 'legacy',
   },
   {
@@ -99,7 +102,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'normal',
     text: '100{円玉|えんだま}4{枚|まい}と、10{円玉|えんだま}3{枚|まい}でいくら？',
     answer: { kind: 'choice', options: ['430円', '403円', '340円'], correct: 0 },
-    explain: ['100えんだま 4まいで 400えん', '10えんだま 3まいで 30えん', 'あわせて 430えん！'],
+    explain: ['100えんだまの ぶんと 10えんだまの ぶんを わけて かぞえよう', '100えんだま 4まいで 400えん。10えんだま 3まいで 30えん', 'あわせて 430えん！'],
     pack: 'legacy',
   },
   {
@@ -110,7 +113,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'normal',
     text: '25 + 34 は？',
     answer: { kind: 'choice', options: ['59', '69', '49'], correct: 0 },
-    explain: ['一のくらい：5 + 4 = 9', '十のくらい：20 + 30 = 50', 'あわせて 59だよ！'],
+    explain: ['一のくらいどうし、十のくらいどうしを わけて たして みよう', '一のくらい：5 + 4 = 9。十のくらい：20 + 30 = 50', 'あわせて 59だよ！'],
     pack: 'legacy',
   },
   {
@@ -122,8 +125,8 @@ export const LEGACY_QUESTIONS: Question[] = [
     text: '50{円玉|えんだま}2{枚|まい}と10{円玉|えんだま}5{枚|まい}。どっちがおおい？',
     answer: { kind: 'choice', options: ['おなじ', '50円玉2枚', '10円玉5枚'], correct: 1 },
     explain: [
-      '50えんだま 2まいは 100えん',
-      '10えんだま 5まいは 50えん',
+      'どちらも いくらに なるか、べつべつに けいさんして くらべよう',
+      '50えんだま 2まいは 100えん。10えんだま 5まいは 50えん',
       '100えんの ほうが おおきいね！',
     ],
     pack: 'legacy',
@@ -136,7 +139,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'normal',
     text: '1{時間|じかん}は {何分|なんぷん}？',
     answer: { kind: 'choice', options: ['30分', '60分', '100分'], correct: 1 },
-    explain: ['1じかんは 60ぷんだよ', 'ながい はりが ぐるっと 1しゅう まわると 60ぷん！'],
+    explain: ['とけいの ながい はりが ぐるっと 1しゅう まわる じかんだよ。ちいさい めもりは いくつ あるかな？', 'ながい はりが ぐるっと 1しゅう まわると 60ぷん。1じかんは 60ぷんだよ！'],
     pack: 'legacy',
   },
   {
@@ -204,7 +207,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'hard',
     text: '1000{円|えん} - 460{円|えん} = ?',
     answer: { kind: 'choice', options: ['640円', '540円', '440円'], correct: 1 },
-    explain: ['1000 - 400 = 600、600 - 60 = 540', 'こたえは 540えん！'],
+    explain: ['460えんを 400えんと 60えんに わけて、じゅんばんに ひいて みよう', '1000 - 400 = 600。600 - 60 = 540', 'こたえは 540えん！'],
     pack: 'legacy',
   },
   {
@@ -216,9 +219,9 @@ export const LEGACY_QUESTIONS: Question[] = [
     text: '120{円|えん}のパンを3つかいます。500{円|えん}だしたらおつりは？',
     answer: { kind: 'choice', options: ['140円', '240円', '40円'], correct: 0 },
     explain: [
-      'まず パンだい。120×3 = 360えん',
-      'つぎに おつり。500 - 360 = 140えん！',
-      '2だんかいで とく もんだいだね',
+      'まず パン 3つぶんの おだいを けいさんしよう。おつりは そのあとだよ',
+      'パンだいは 120×3 = 360えん',
+      'おつりは 500 - 360 = 140えん！2だんかいで とく もんだいだね',
     ],
     pack: 'legacy',
   },
@@ -230,7 +233,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'hard',
     text: '35{分|ふん} + 40{分|ぷん} は {何時間何分|なんじかんなんぷん}？',
     answer: { kind: 'choice', options: ['1時間5分', '1時間15分', '75分'], correct: 1 },
-    explain: ['35 + 40 = 75ふん', '60ぷんで 1じかんだから…', '75ふんは 1じかん15ふん！'],
+    explain: ['まず ふたつを たして なんぷんか だそう。60ぷんを こえたら「なんじかん なんぷん」に なおすのを わすれずに！', '35 + 40 = 75ふん。60ぷんで 1じかんだから…', '75ふんは 1じかん15ふん！'],
     pack: 'legacy',
   },
   {
@@ -241,7 +244,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     difficulty: 'hard',
     text: '2000 - 125 = ?',
     answer: { kind: 'choice', options: ['1875', '1975', '1775'], correct: 0 },
-    explain: ['2000 - 100 = 1900', '1900 - 25 = 1875', 'くらいに きをつけて ひいてみよう'],
+    explain: ['125を 100と 25に わけて、じゅんばんに ひいて みよう', '2000 - 100 = 1900。1900 - 25 = 1875', 'くらいに きをつけて ひくのが コツだよ'],
     pack: 'legacy',
   },
   {
@@ -253,9 +256,9 @@ export const LEGACY_QUESTIONS: Question[] = [
     text: '50{円玉|えんだま}が 20{枚|まい}あります。{全部|ぜんぶ}でいくら？',
     answer: { kind: 'choice', options: ['200円', '1000円', '500円'], correct: 1 },
     explain: [
-      '50えんが 2まいで 100えん',
-      '20まいは 2まいの 10ばいだから、100えんの 10ばい',
-      '1000えんだ！',
+      'なんまいで 100えんに なるかな？100えんの まとまりを つくって かんがえよう',
+      '50えんが 2まいで 100えん。20まいは 2まいの 10ばい',
+      '100えんの 10ばいで 1000えんだ！',
     ],
     pack: 'legacy',
   },

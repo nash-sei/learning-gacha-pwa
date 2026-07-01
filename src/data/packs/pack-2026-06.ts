@@ -216,7 +216,7 @@ export const PACK_2026_06: Question[] = [
   },
   {
     id: 'm26-0012',
-    gen: genMul3x1({ aMin: 113, aMax: 329, bMin: 3, bMax: 4 }),
+    gen: genMul3x1({ aMin: 113, aMax: 329, bMin: 3, bMax: 4, maxProduct: 999 }),
     subject: 'math',
     type: 'calc',
     grade: 3,

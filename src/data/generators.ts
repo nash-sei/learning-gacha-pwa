@@ -209,18 +209,32 @@ export function genMul2x1(opts: { aMin: number; aMax: number; bMin: number; bMax
   }
 }
 
-/** 3けた × 1けた（筆算・くり上がりに注意） */
-export function genMul3x1(opts: { aMin: number; aMax: number; bMin: number; bMax: number }): QuestionGen {
+/**
+ * 3けた × 1けた（百・十・一のくらいに わけて かける）。
+ * maxProduct を指定すると、こたえがその値をこえない数だけ出す（答えの桁数＝難易度を一定に保つ）。
+ */
+export function genMul3x1(opts: {
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  /** こたえの上限（例 999 で 3けたの答えに固定） */
+  maxProduct?: number
+}): QuestionGen {
   return (rng) => {
-    const a = randInt(rng, opts.aMin, opts.aMax)
-    const b = randInt(rng, opts.bMin, opts.bMax)
+    const { a, b } = sampleUntil(
+      () => ({ a: randInt(rng, opts.aMin, opts.aMax), b: randInt(rng, opts.bMin, opts.bMax) }),
+      ({ a, b }) => (opts.maxProduct == null ? true : a * b <= opts.maxProduct)
+    )
+    const parts = [Math.floor(a / 100) * 100, (Math.floor(a / 10) % 10) * 10, a % 10].filter((x) => x > 0)
     return {
       text: `${a} × ${b} は いくつかな？`,
       answer: { kind: 'number', value: a * b },
       explain: [
-        '一のくらいから じゅんばんに かけていこう。くり上がりに ちゅうい！',
-        `一のくらいは ${a % 10} × ${b} = ${(a % 10) * b}`,
-        `こたえは ${a * b}！`,
+        '百のくらい・十のくらい・一のくらいに わけて かけると かんたんだよ',
+        `${a} = ${parts.join(' + ')} だね`,
+        `${parts.map((p) => `${p} × ${b} = ${p * b}`).join('、')}`,
+        `ぜんぶ たすと ${a * b}！`,
       ],
     }
   }

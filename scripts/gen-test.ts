@@ -110,9 +110,10 @@ verifyArithmetic('mul2x1-0010', genMul2x1({ aMin: 12, aMax: 39, bMin: 3, bMax: 5
   const p = parseBinary(v.text)!
   check(p.a >= 12 && p.a <= 39 && p.b >= 3 && p.b <= 5, `mul2x1: 範囲外 ${p.a}×${p.b}`)
 })
-verifyArithmetic('mul3x1-0012', genMul3x1({ aMin: 113, aMax: 329, bMin: 3, bMax: 4 }), (v) => {
+verifyArithmetic('mul3x1-0012', genMul3x1({ aMin: 113, aMax: 329, bMin: 3, bMax: 4, maxProduct: 999 }), (v) => {
   const p = parseBinary(v.text)!
   check(p.a >= 113 && p.a <= 329 && p.b >= 3 && p.b <= 4, `mul3x1: 範囲外 ${p.a}×${p.b}`)
+  if (v.answer.kind === 'number') check(v.answer.value >= 100 && v.answer.value <= 999, `mul3x1: 答えが3けたでない ${p.a}×${p.b}=${v.answer.value}`)
 })
 
 // ---- 3けた ----

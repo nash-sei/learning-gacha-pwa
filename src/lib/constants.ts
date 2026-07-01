@@ -9,6 +9,7 @@ import type {
   Rarity,
   SaveData,
   Settings,
+  Subject,
 } from '../types'
 
 // ========== localStorage キー（spec §9-1） ==========
@@ -194,6 +195,27 @@ export const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   easy: 'かんたん',
   normal: 'ふつう',
   hard: 'むずかしい',
+}
+
+/** 教科の表示ラベル（子供モードの教科えらび・2026-07 社会追加） */
+export const SUBJECT_LABEL: Record<Subject, string> = {
+  math: 'さんすう',
+  japanese: 'こくご',
+  shakai: 'しゃかい',
+}
+
+/** 教科のアイコン絵文字（教科えらび画面） */
+export const SUBJECT_EMOJI: Record<Subject, string> = {
+  math: '🔢',
+  japanese: '📖',
+  shakai: '🗾',
+}
+
+/** 教科の ひとこと（教科えらび画面のサブ表示） */
+export const SUBJECT_NOTE: Record<Subject, string> = {
+  math: 'けいさん・かたち・とけい',
+  japanese: 'かんじ・ことば・おはなし',
+  shakai: 'とどうふけん・れきし・くらし',
 }
 
 export const RARITY_COLOR: Record<Rarity, string> = {

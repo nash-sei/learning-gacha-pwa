@@ -11,7 +11,7 @@ export type Grade = 2 | 3 | 4
 
 export type Difficulty = 'easy' | 'normal' | 'hard'
 
-export type Subject = 'math' | 'japanese'
+export type Subject = 'math' | 'japanese' | 'shakai'
 
 export type QuestionType =
   | 'calc' // けいさん
@@ -22,6 +22,7 @@ export type QuestionType =
   | 'story' // みじかいおはなし（読解）
   | 'vocab' // ことばのいみ
   | 'order' // ぶんのならべかえ
+  | 'social' // しゃかい（とどうふけん・れきし・みぢかなくらし）
 
 export type Rarity = 'N' | 'R' | 'SR' | 'UR'
 
@@ -58,7 +59,7 @@ export type QuestionCheck =
 
 // ========== 解答 ==========
 
-export type AnswerKind = 'number' | 'choice' | 'order'
+export type AnswerKind = 'number' | 'choice' | 'order' | 'map'
 
 /**
  * 解答。spec §9-4。
@@ -77,6 +78,11 @@ export type Answer =
   | { kind: 'number'; value: number; unit?: string }
   | { kind: 'choice'; options: string[]; correct: number }
   | { kind: 'order'; tokens: string[]; correctTokenCount?: number }
+  /**
+   * map : 日本地図で「場所（地方／都道府県）」をタップして答える（社会・都道府県）。
+   * value は正解の地域ID（例 'hokkaido'）。JapanMap の region ID と一致させる。
+   */
+  | { kind: 'map'; value: string }
 
 // ========== 問題 ==========
 

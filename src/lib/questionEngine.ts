@@ -119,7 +119,7 @@ export function checkUnderstanding(
  */
 export function checkAnswer(
   answer: Answer,
-  given: { number?: number; index?: number; order?: number[] }
+  given: { number?: number; index?: number; order?: number[]; region?: string }
 ): boolean {
   switch (answer.kind) {
     case 'number':
@@ -134,6 +134,9 @@ export function checkAnswer(
       // 先頭 expectedLen 個（＝元 index 0..expectedLen-1）が、その順で選ばれているか。
       return order.slice(0, expectedLen).every((originalIndex, position) => originalIndex === position)
     }
+    case 'map':
+      // 地図タップ：選んだ地域ID（given.region）が正解の地域ID（answer.value）と一致
+      return given.region != null && given.region === answer.value
   }
 }
 

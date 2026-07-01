@@ -10,11 +10,14 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import type { Difficulty, Question } from '../../types'
+import type { Difficulty, Question, Subject } from '../../types'
 import {
   DIFFICULTY_LABEL,
   QUESTION_COUNT,
   SHARD_FOR_UNDERSTANDING,
+  SUBJECT_EMOJI,
+  SUBJECT_LABEL,
+  SUBJECT_NOTE,
 } from '../../lib/constants'
 import {
   buildAskedOptions,
@@ -34,6 +37,7 @@ import Dialog from '../../components/Dialog'
 import MonsterSprite from '../../components/MonsterSprite'
 import FigureView from '../../components/figures/FigureView'
 import HintDisclosure from '../../components/HintDisclosure'
+import JapanMap from '../../components/JapanMap'
 
 export interface QuizProps {
   onComplete: (r: { difficulty: Difficulty; retryUsed: boolean }) => void
@@ -93,6 +97,13 @@ const DIFF_BUTTON_BG: Record<Difficulty, string> = {
   easy: 'bg-[var(--color-success)]',
   normal: 'bg-[var(--color-primary)]',
   hard: 'bg-[var(--color-secondary)]',
+}
+
+/** 教科えらびボタンの色（教科ごと・2026-07 社会追加） */
+const SUBJECT_BUTTON_BG: Record<Subject, string> = {
+  math: 'bg-[var(--color-primary)]',
+  japanese: 'bg-[var(--color-secondary)]',
+  shakai: 'bg-[var(--color-success)]',
 }
 
 /** よむ→わかる→とく の現在地表示（check 付き問題のみ） */
@@ -216,7 +227,8 @@ function NumberPad(props: {
 export default function Quiz({ onComplete, onQuit }: QuizProps) {
   const { save, updateSave, currentProfile, customQuestions } = useGame()
 
-  const [phase, setPhase] = useState<'select' | 'play' | 'complete'>('select')
+  const [phase, setPhase] = useState<'subject' | 'select' | 'play' | 'complete'>('subject')
+  const [subject, setSubject] = useState<Subject>('math')
   const [difficulty, setDifficulty] = useState<Difficulty>('easy')
   const [questions, setQuestions] = useState<Question[]>([])
   const [qIndex, setQIndex] = useState(0)
@@ -274,10 +286,12 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
     audio.unlock()
     audio.playSe('tap')
     const count = QUESTION_COUNT[diff]
+    // 選んだ教科の問題だけに絞る（社長の「1チャレンジ＝1教科」）
+    const subjectPool = pool.filter((qq) => qq.subject === subject)
     const qs = selectQuestions({
       difficulty: diff,
       grade,
-      pool,
+      pool: subjectPool,
       clearCounts: save?.questionClearCounts ?? {},
       count,
     })
@@ -385,6 +399,12 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
     finishSolve(checkAnswer(q.answer, { order }))
   }
 
+  // 地図タップ（社会・都道府県）：選んだ地域IDで判定
+  const submitMap = (regionId: string) => {
+    if (!q || q.answer.kind !== 'map') return
+    finishSolve(checkAnswer(q.answer, { region: regionId }))
+  }
+
   // ---- 段階解説の読み進め（spec §5-1：読了後のみリトライ可） ----
   const advanceExplain = () => {
     if (step.kind !== 'explain' || !q) return
@@ -417,10 +437,53 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
 
   // ========== 描画 ==========
 
+  // ---- 教科えらび（2026-07 社会追加・難易度の前に1画面） ----
+  if (phase === 'subject') {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 p-6">
+        <h1 className="text-center text-3xl font-extrabold text-[var(--color-primary-dark)]">
+          きょうは なにを
+          <br />
+          べんきょうする？
+        </h1>
+        <div className="flex w-full max-w-sm flex-col gap-4">
+          {(['math', 'japanese', 'shakai'] as const).map((s) => (
+            <button
+              key={s}
+              className={`btn-kid w-full ${SUBJECT_BUTTON_BG[s]}`}
+              onClick={() => {
+                audio.unlock()
+                audio.playSe('tap')
+                setSubject(s)
+                setPhase('select')
+              }}
+            >
+              <span className="mr-1">{SUBJECT_EMOJI[s]}</span>
+              {SUBJECT_LABEL[s]}
+              <span className="block text-sm font-bold opacity-90">{SUBJECT_NOTE[s]}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          className="rounded-full bg-[var(--color-bg-2)] px-6 py-3 text-lg font-bold text-[var(--color-ink-soft)] active:scale-95"
+          onClick={() => {
+            audio.playSe('tap')
+            onQuit()
+          }}
+        >
+          もどる
+        </button>
+      </div>
+    )
+  }
+
   // ---- 難易度選択 ----
   if (phase === 'select') {
     return (
       <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 p-6">
+        <div className="rounded-full bg-[var(--color-bg-2)] px-5 py-1.5 text-xl font-extrabold text-[var(--color-ink)]">
+          {SUBJECT_EMOJI[subject]} {SUBJECT_LABEL[subject]}
+        </div>
         <h1 className="text-center text-3xl font-extrabold text-[var(--color-primary-dark)]">
           どの タマゴに
           <br />
@@ -445,7 +508,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
           className="rounded-full bg-[var(--color-bg-2)] px-6 py-3 text-lg font-bold text-[var(--color-ink-soft)] active:scale-95"
           onClick={() => {
             audio.playSe('tap')
-            onQuit()
+            setPhase('subject')
           }}
         >
           もどる
@@ -801,6 +864,15 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
                 >
                   できた！
                 </button>
+              </div>
+            )}
+
+            {q.answer.kind === 'map' && (
+              <div className="flex flex-col gap-3">
+                <p className="text-center text-base font-bold text-[var(--color-ink-soft)]">
+                  ちずを タップして こたえてね
+                </p>
+                <JapanMap onPick={submitMap} />
               </div>
             )}
           </div>

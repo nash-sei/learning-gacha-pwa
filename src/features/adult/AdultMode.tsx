@@ -216,7 +216,7 @@ function NumberPad(props: {
   const press = (d: string) => {
     if (disabled) return
     audio.playSe('tap')
-    if (value.length >= 4) return
+    if (value.length >= 8) return
     onInput(value + d)
   }
   const erase = () => {

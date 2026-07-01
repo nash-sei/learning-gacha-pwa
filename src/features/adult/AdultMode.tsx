@@ -10,7 +10,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { AdultData, Question, Rarity } from '../../types'
-import { shuffle, buildChoiceOptions, checkAnswer } from '../../lib/questionEngine'
+import { shuffle, buildChoiceOptions, buildOrderTokens, checkAnswer } from '../../lib/questionEngine'
+import type { ShuffledToken } from '../../lib/questionEngine'
 import { audio } from '../../lib/audio'
 import { storage } from '../../lib/storage'
 import { rollAdultMonster } from '../../lib/adultRoulette'
@@ -18,11 +19,25 @@ import AdultRoulette, { type RouletteSegment } from './AdultRoulette'
 import AdultZukan from './AdultZukan'
 import { PACK_ADULT } from '../../data/packs/pack-adult'
 import { PACK_ADULT2 } from '../../data/packs/pack-adult2'
+import { PACK_ADULT3 } from '../../data/packs/pack-adult3'
 
 /** 大人モードの出題プール（既存200問＋追加240問＝計440問） */
-const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2]
+const ADULT_POOL: Question[] = [...PACK_ADULT, ...PACK_ADULT2, ...PACK_ADULT3]
 /** 現在プールに存在する問題ID（既出メモの掃除に使う） */
 const POOL_IDS = new Set(ADULT_POOL.map((q) => q.id))
+
+/** 本番（公開）ドメイン。ここでは新問題テストスイッチを無効化する。 */
+const ADULT_PROD_HOST = 'learning-gacha-pwa.vercel.app'
+/**
+ * テスト用スイッチ：URLに ?newonly が付いていたら、追加パック(pack-adult3)の新問題だけを出す。
+ * 有効なのは localhost / Vercelプレビュー等だけ。本番ドメインでは常に無効。
+ */
+function adultTestPool(): Question[] {
+  if (typeof window === 'undefined') return ADULT_POOL
+  if (!new URLSearchParams(window.location.search).has('newonly')) return ADULT_POOL
+  if (window.location.hostname === ADULT_PROD_HOST) return ADULT_POOL
+  return PACK_ADULT3
+}
 
 export interface AdultModeProps {
   onDone: () => void
@@ -171,12 +186,12 @@ function spreadByGenre(items: Question[]): Question[] {
 function pickQuestions(): Question[] {
   let seen = loadSeen()
   // まだ出していない問題だけを対象にシャッフル
-  const available = shuffle(ADULT_POOL.filter((q) => !seen.has(q.id)))
+  const available = shuffle(adultTestPool().filter((q) => !seen.has(q.id)))
   let picked = available.slice(0, QUESTION_COUNT)
   if (picked.length < QUESTION_COUNT) {
     // 全問題を出し切った → 周回をリセット。直前に出した分は避けて補充する
     const usedIds = new Set(picked.map((q) => q.id))
-    const refill = shuffle(ADULT_POOL.filter((q) => !usedIds.has(q.id))).slice(
+    const refill = shuffle(adultTestPool().filter((q) => !usedIds.has(q.id))).slice(
       0,
       QUESTION_COUNT - picked.length
     )
@@ -189,11 +204,84 @@ function pickQuestions(): Question[] {
   return spreadByGenre(picked)
 }
 
+/** 数字キーパッド（number 解答用・子供モードの NumberPad を大人モードへ移植） */
+function NumberPad(props: {
+  value: string
+  unit?: string
+  disabled?: boolean
+  onInput: (v: string) => void
+  onSubmit: () => void
+}) {
+  const { value, unit, disabled, onInput, onSubmit } = props
+  const press = (d: string) => {
+    if (disabled) return
+    audio.playSe('tap')
+    if (value.length >= 8) return
+    onInput(value + d)
+  }
+  const erase = () => {
+    if (disabled) return
+    audio.playSe('tap')
+    onInput(value.slice(0, -1))
+  }
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+  return (
+    <div className="mx-auto w-full max-w-xs">
+      <div className="mb-3 flex items-end justify-center gap-1 rounded-2xl border-4 border-[var(--color-bg-2)] bg-white px-4 py-3">
+        <span className="min-h-12 text-4xl font-extrabold tracking-widest text-[var(--color-primary-dark)]">
+          {value === '' ? '？' : value}
+        </span>
+        {unit != null && unit !== '' && (
+          <span className="pb-1 text-xl font-bold text-[var(--color-ink-soft)]">{unit}</span>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {keys.map((k) => (
+          <button
+            key={k}
+            onClick={() => press(k)}
+            disabled={disabled}
+            className="rounded-2xl bg-[var(--color-surface)] py-3 text-3xl font-extrabold text-[var(--color-ink)] shadow-md active:translate-y-0.5 active:scale-95 disabled:opacity-40"
+          >
+            {k}
+          </button>
+        ))}
+        <button
+          onClick={erase}
+          disabled={disabled}
+          aria-label="けす"
+          className="rounded-2xl bg-[var(--color-bg-2)] py-3 text-2xl font-extrabold text-[var(--color-ink-soft)] shadow-md active:translate-y-0.5 active:scale-95 disabled:opacity-40"
+        >
+          ←
+        </button>
+        <button
+          onClick={() => press('0')}
+          disabled={disabled}
+          className="rounded-2xl bg-[var(--color-surface)] py-3 text-3xl font-extrabold text-[var(--color-ink)] shadow-md active:translate-y-0.5 active:scale-95 disabled:opacity-40"
+        >
+          0
+        </button>
+        <button
+          onClick={onSubmit}
+          disabled={disabled || value === ''}
+          className="rounded-2xl bg-[var(--color-accent)] py-3 text-2xl font-extrabold text-white shadow-md active:translate-y-0.5 active:scale-95 disabled:opacity-40"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function AdultMode({ onDone }: AdultModeProps) {
   const [questions, setQuestions] = useState<Question[]>(pickQuestions)
   const [qIndex, setQIndex] = useState(0)
-  const [answered, setAnswered] = useState<{ displayIndex: number; correct: boolean } | null>(null)
+  // 回答済み。displayIndex は choice の選択ハイライト用（number/order では未使用）
+  const [answered, setAnswered] = useState<{ correct: boolean; displayIndex?: number } | null>(null)
   const [score, setScore] = useState(0)
+  // number 解答の入力値（文字列）／ order 解答で並べた表示indexの配列
+  const [numberInput, setNumberInput] = useState('')
+  const [orderPicked, setOrderPicked] = useState<number[]>([])
   const [phase, setPhase] = useState<'quiz' | 'roulette' | 'result' | 'zukan'>('quiz')
   // ヒント：使った合計回数（ゲーム単位）と、今の問題で見せたヒントが「何回目」か
   const [hintsUsed, setHintsUsed] = useState(0)
@@ -208,6 +296,8 @@ export default function AdultMode({ onDone }: AdultModeProps) {
   const q = questions[qIndex] ?? null
   // 選択肢の並びはこの問題の間だけ固定（再レンダーで並び替わらないよう q をキーに）
   const choiceUi = useMemo(() => (q ? buildChoiceOptions(q.answer) : null), [q])
+  // 並べ替えトークンの並びもこの問題の間だけ固定（choice 以外は null）
+  const orderUi = useMemo<ShuffledToken[] | null>(() => (q ? buildOrderTokens(q.answer) : null), [q])
 
   const perfect = questions.length > 0 && score === questions.length
 
@@ -221,6 +311,8 @@ export default function AdultMode({ onDone }: AdultModeProps) {
     setQuestions(pickQuestions())
     setQIndex(0)
     setAnswered(null)
+    setNumberInput('')
+    setOrderPicked([])
     setHintsUsed(0)
     setRevealedOrdinal(null)
     setScore(0)
@@ -288,11 +380,31 @@ export default function AdultMode({ onDone }: AdultModeProps) {
     setAnswered({ displayIndex, correct })
   }
 
+  const submitNumber = () => {
+    if (answered || !q || q.answer.kind !== 'number' || numberInput === '') return
+    const correct = checkAnswer(q.answer, { number: Number(numberInput) })
+    audio.playSe(correct ? 'correct' : 'wrong')
+    if (correct) setScore((s) => s + 1)
+    setAnswered({ correct })
+  }
+
+  const submitOrder = () => {
+    if (answered || !q || q.answer.kind !== 'order' || !orderUi) return
+    // 並べた表示indexを元tokensのindexに変換して採点（先頭correctTokenCount個が正解札）
+    const order = orderPicked.map((i) => orderUi[i].originalIndex)
+    const correct = checkAnswer(q.answer, { order })
+    audio.playSe(correct ? 'correct' : 'wrong')
+    if (correct) setScore((s) => s + 1)
+    setAnswered({ correct })
+  }
+
   const next = () => {
     audio.playSe('tap')
     if (qIndex + 1 < questions.length) {
       setQIndex(qIndex + 1)
       setAnswered(null)
+      setNumberInput('') // 次の問題では数字入力をクリア
+      setOrderPicked([]) // 次の問題では並べ替えをクリア
       setRevealedOrdinal(null) // 次の問題ではヒント表示をリセット（使った合計は持ち越し）
       return
     }
@@ -486,8 +598,9 @@ export default function AdultMode({ onDone }: AdultModeProps) {
     )
   }
 
-  // 念のためのフォールバック（問題が取れない）
-  if (!q || !choiceUi) {
+  // 念のためのフォールバック（問題そのものが取れないときだけ。number/order では choiceUi=null なので
+  // ここで誤って「もどる」を出さないよう、!q のみで判定する）
+  if (!q) {
     return (
       <div className="flex min-h-dvh items-center justify-center" style={{ background: ADULT_BG }}>
         <button className="btn-kid bg-[var(--color-primary)]" onClick={onDone}>
@@ -568,38 +681,107 @@ export default function AdultMode({ onDone }: AdultModeProps) {
           </div>
         )}
 
-        {/* 選択肢 */}
-        <div className="flex flex-col gap-3">
-          {choiceUi.options.map((opt, i) => {
-            const revealed = answered != null
-            const isCorrect = i === choiceUi.correct
-            const isPicked = answered?.displayIndex === i
-            let cls =
-              'flex w-full items-center rounded-2xl border-2 px-4 py-3 text-left text-lg font-bold shadow-sm active:scale-[0.99] '
-            if (!revealed) {
-              cls += 'border-[var(--color-primary-light)] bg-white text-[var(--color-ink)]'
-            } else if (isCorrect) {
-              cls += 'border-[var(--color-success)] bg-[var(--color-success)] text-white'
-            } else if (isPicked) {
-              cls += 'border-[var(--color-danger)] bg-[var(--color-danger)] text-white'
-            } else {
-              cls += 'border-[var(--color-bg-2)] bg-white text-[var(--color-ink-faint)] opacity-60'
-            }
-            return (
-              <button
-                key={`${opt}-${i}`}
-                className={cls}
-                disabled={revealed}
-                onClick={() => choose(i)}
-              >
-                <span className="mr-2 shrink-0">
-                  {revealed && isCorrect ? '⭕' : revealed && isPicked ? '❌' : '・'}
-                </span>
-                <span>{opt}</span>
-              </button>
-            )
-          })}
-        </div>
+        {/* 選択肢（4択・◯✕） */}
+        {q.answer.kind === 'choice' && choiceUi && (
+          <div className="flex flex-col gap-3">
+            {choiceUi.options.map((opt, i) => {
+              const revealed = answered != null
+              const isCorrect = i === choiceUi.correct
+              const isPicked = answered?.displayIndex === i
+              let cls =
+                'flex w-full items-center rounded-2xl border-2 px-4 py-3 text-left text-lg font-bold shadow-sm active:scale-[0.99] '
+              if (!revealed) {
+                cls += 'border-[var(--color-primary-light)] bg-white text-[var(--color-ink)]'
+              } else if (isCorrect) {
+                cls += 'border-[var(--color-success)] bg-[var(--color-success)] text-white'
+              } else if (isPicked) {
+                cls += 'border-[var(--color-danger)] bg-[var(--color-danger)] text-white'
+              } else {
+                cls += 'border-[var(--color-bg-2)] bg-white text-[var(--color-ink-faint)] opacity-60'
+              }
+              return (
+                <button
+                  key={`${opt}-${i}`}
+                  className={cls}
+                  disabled={revealed}
+                  onClick={() => choose(i)}
+                >
+                  <span className="mr-2 shrink-0">
+                    {revealed && isCorrect ? '⭕' : revealed && isPicked ? '❌' : '・'}
+                  </span>
+                  <span>{opt}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* 数字入力（number） */}
+        {q.answer.kind === 'number' && (
+          <NumberPad
+            value={numberInput}
+            unit={q.answer.unit}
+            disabled={answered != null}
+            onInput={setNumberInput}
+            onSubmit={submitNumber}
+          />
+        )}
+
+        {/* 並べ替え（order・ダミー札対応） */}
+        {q.answer.kind === 'order' && orderUi && (
+          <div className="flex flex-col gap-3">
+            <p className="text-center text-base font-bold text-white/80">
+              ただしい じゅんばんに ならべよう（タップで もどせるよ）
+            </p>
+            {/* ならべた列 */}
+            <div className="flex min-h-16 flex-wrap items-center gap-2 rounded-2xl border-4 border-dashed border-[var(--color-primary-light)] bg-[var(--color-bg)] p-3">
+              {orderPicked.length === 0 && (
+                <span className="text-base text-[var(--color-ink-faint)]">ここに ならべてね</span>
+              )}
+              {orderPicked.map((tokenIdx, pos) => (
+                <button
+                  key={`picked-${tokenIdx}`}
+                  disabled={answered != null}
+                  onClick={() => {
+                    audio.playSe('tap')
+                    setOrderPicked((p) => p.filter((_, j) => j !== pos))
+                  }}
+                  className="rounded-xl bg-[var(--color-primary)] px-4 py-2 text-xl font-extrabold text-white shadow active:scale-95 disabled:opacity-60"
+                >
+                  {orderUi[tokenIdx].text}
+                </button>
+              ))}
+            </div>
+            {/* のこりのことば（正解札＋ダミー札がシャッフルされて並ぶ） */}
+            <div className="flex flex-wrap items-center gap-2">
+              {orderUi.map((t, i) =>
+                orderPicked.includes(i) ? null : (
+                  <button
+                    key={`pool-${i}`}
+                    disabled={answered != null}
+                    onClick={() => {
+                      audio.playSe('tap')
+                      setOrderPicked((p) => [...p, i])
+                    }}
+                    className="rounded-xl border-4 border-[var(--color-primary-light)] bg-white px-4 py-2 text-xl font-extrabold text-[var(--color-primary-dark)] shadow active:scale-95 disabled:opacity-60"
+                  >
+                    {t.text}
+                  </button>
+                )
+              )}
+            </div>
+            <button
+              className="btn-kid mx-auto bg-[var(--color-accent)]"
+              disabled={
+                answered != null ||
+                orderPicked.length !== (q.answer.correctTokenCount ?? orderUi.length)
+              }
+              onClick={submitOrder}
+            >
+              できた！
+            </button>
+          </div>
+        )}
 
         {/* 解説＋つぎへ */}
         {answered && (

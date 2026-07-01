@@ -65,11 +65,18 @@ export type AnswerKind = 'number' | 'choice' | 'order'
  * - number : 数値入力
  * - choice : 選択肢から正解を選ぶ（表示時シャッフル）
  * - order  : tokens を正しい順に並べる（表示時シャッフル）
+ *
+ * order の correctTokenCount（任意・ダミー札＝おとり対応）：
+ *   tokens の「先頭 correctTokenCount 個（＝元 index 0..correctTokenCount-1）」が正解札で、
+ *   その並び順が正解。残りの tokens はダミー（おとり）。
+ *   例：8 札中 4 札が正解なら correctTokenCount: 4 とし、tokens[0..3] に正解を正しい順で、
+ *       tokens[4..7] にダミーを置く（表示時はすべてシャッフルされる）。
+ *   未指定（既存問題）は「全 tokens を使い、全一致で正解」（従来どおり）。
  */
 export type Answer =
   | { kind: 'number'; value: number; unit?: string }
   | { kind: 'choice'; options: string[]; correct: number }
-  | { kind: 'order'; tokens: string[] }
+  | { kind: 'order'; tokens: string[]; correctTokenCount?: number }
 
 // ========== 問題 ==========
 

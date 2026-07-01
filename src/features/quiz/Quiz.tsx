@@ -796,7 +796,7 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
                 </div>
                 <button
                   className="btn-kid mx-auto bg-[var(--color-accent)]"
-                  disabled={orderPicked.length !== ui.order.length}
+                  disabled={orderPicked.length !== (q.answer.correctTokenCount ?? ui.order.length)}
                   onClick={submitOrder}
                 >
                   できた！

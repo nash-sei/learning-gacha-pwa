@@ -23,6 +23,15 @@ import {
   genMul3x1,
   genDivExact,
   genDivRemainderChoice,
+  genMoneyCoinSum,
+  genMoneyChange,
+  genClockReadHour,
+  genClockReadHalf,
+  genClockReadMinute,
+  genClockAfter,
+  genShapeName,
+  genShapePerimeterEqTriangle,
+  genShapePerimeterRect,
 } from '../generators'
 
 export const PACK_2026_06: Question[] = [
@@ -644,6 +653,7 @@ export const PACK_2026_06: Question[] = [
       '10えんが 3まいで 30えん。それに 5えんを たすよ',
       '30 + 5 = 35えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 1, max: 6 }, { yen: 5, min: 1, max: 3 }] }),
     pack: '2026-06',
   },
   {
@@ -668,6 +678,7 @@ export const PACK_2026_06: Question[] = [
       '10えんが 4まいで 40えん',
       '50 + 40 = 90。ぜんぶで 90えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 50, min: 1, max: 1 }, { yen: 10, min: 1, max: 9 }] }),
     pack: '2026-06',
   },
   {
@@ -717,6 +728,7 @@ export const PACK_2026_06: Question[] = [
       '100えんが 2まいで 200えん。10えんが 7まいで 70えん、1えんが 3まいで 3えん',
       '200 + 70 + 3 = 273えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 100, min: 1, max: 3 }, { yen: 10, min: 3, max: 8 }, { yen: 1, min: 1, max: 5 }] }),
     pack: '2026-06',
   },
   {
@@ -738,6 +750,7 @@ export const PACK_2026_06: Question[] = [
       '320 は 300 と 20 に わけられるね。500 - 300 = 200、200 - 20 = 180',
       'おつりは 180えん！',
     ],
+    gen: genMoneyChange({ payment: 500, priceMin: 120, priceMax: 480, step: 10, items: ['いろえんぴつ', 'クレヨン', 'ノート', 'けしゴム'] }),
     pack: '2026-06',
   },
 
@@ -758,6 +771,7 @@ export const PACK_2026_06: Question[] = [
       'みじかい はりは 3、ながい はりは 12。ながい はりが 12のときは「ちょうど」だよ',
       'だから 3じ！',
     ],
+    gen: genClockReadHour(),
     pack: '2026-06',
   },
   {
@@ -774,6 +788,7 @@ export const PACK_2026_06: Question[] = [
       'みじかい はりは 7と 8の あいだ。まだ 8に なっていないね',
       'だから 7じはん！',
     ],
+    gen: genClockReadHalf(),
     pack: '2026-06',
   },
   {
@@ -794,6 +809,7 @@ export const PACK_2026_06: Question[] = [
       'ながい はりは 9のところ。かぞえると 45ふん',
       'みじかい はりは 2と 3の あいだだから、まだ 2じ。だから 2じ45ふん！',
     ],
+    gen: genClockReadMinute(),
     pack: '2026-06',
   },
   {
@@ -814,6 +830,7 @@ export const PACK_2026_06: Question[] = [
       '10じ50ぷんから 10ぷんで 11じ。のこりは 20 - 10 = 10ぷん',
       '11じから 10ぷん すすんで、11じ10ぷん！',
     ],
+    gen: genClockAfter({ phrasing: 'after' }),
     pack: '2026-06',
   },
   {
@@ -834,6 +851,7 @@ export const PACK_2026_06: Question[] = [
       '9じ40ぷんから 20ぷんで 10じ。のこりは 35 - 20 = 15ふん',
       '10じから 15ふん すすんで、10じ15ふん！',
     ],
+    gen: genClockAfter({ phrasing: 'activity' }),
     pack: '2026-06',
   },
 
@@ -854,6 +872,7 @@ export const PACK_2026_06: Question[] = [
       correct: 0,
     },
     explain: ['へんの かずと かどの かずを かぞえて みよう', 'へんが 3ぼん、かどが 3つ。だから さんかくけい！'],
+    gen: genShapeName(),
     pack: '2026-06',
   },
   {
@@ -874,6 +893,7 @@ export const PACK_2026_06: Question[] = [
       'たてと よこの ながさが ちがうから、ちょうほうけい！',
       'ぜんぶ おなじ ながさなら せいほうけいだよ',
     ],
+    gen: genShapeName(),
     pack: '2026-06',
   },
   {
@@ -923,6 +943,7 @@ export const PACK_2026_06: Question[] = [
       'まわりの ながさは へん 3ぼんぶん',
       '5 + 5 + 5 = 15。こたえは 15cm！',
     ],
+    gen: genShapePerimeterEqTriangle({ sMin: 3, sMax: 9 }),
     pack: '2026-06',
   },
   {
@@ -943,6 +964,7 @@ export const PACK_2026_06: Question[] = [
       'たてが 2ほん、よこが 2ほん。4 + 6 + 4 + 6 を けいさんしよう',
       'こたえは 20cm！',
     ],
+    gen: genShapePerimeterRect({ wMin: 4, wMax: 12, hMin: 3, hMax: 9 }),
     pack: '2026-06',
   },
 

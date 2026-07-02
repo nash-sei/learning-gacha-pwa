@@ -785,6 +785,11 @@ export function honLabel(n: number): string {
   if (o === 3) return 'ぼん'
   return 'ほん'
 }
+/** unit は 固定文字列 または 答えの数に あわせて 変わる関数（匹/本のよみ分け用） */
+type UnitOpt = string | ((value: number) => string)
+function resolveUnit(unit: UnitOpt, value: number): string {
+  return typeof unit === 'function' ? unit(value) : unit
+}
 
 // ---------- A：のこり（total - sub・tape unknown=part） ----------
 export function genWordRemainder(opts: {
@@ -836,7 +841,7 @@ export function genWordSum(opts: {
   aMax: number
   bMin: number
   bMax: number
-  unit: string
+  unit: UnitOpt
   labelA: string
   labelB: string
   text: (a: number, b: number) => string
@@ -852,7 +857,7 @@ export function genWordSum(opts: {
     const total = a + b
     const variant: QuestionVariant = {
       text: opts.text(a, b),
-      answer: { kind: 'number', value: total, unit: opts.unit },
+      answer: { kind: 'number', value: total, unit: resolveUnit(opts.unit, total) },
       explain: opts.explain(a, b, total),
       figure: {
         type: 'tape',
@@ -878,7 +883,7 @@ export function genWordDifference(opts: {
   bMax: number
   /** 「〜より おおい」の おおい方（text と 合わせる） */
   bigger: 'a' | 'b'
-  unit: string
+  unit: UnitOpt
   labelA: string
   labelB: string
   text: (a: number, b: number) => string
@@ -892,7 +897,7 @@ export function genWordDifference(opts: {
     const diff = Math.abs(a - b)
     return {
       text: opts.text(a, b),
-      answer: { kind: 'number', value: diff, unit: opts.unit },
+      answer: { kind: 'number', value: diff, unit: resolveUnit(opts.unit, diff) },
       explain: opts.explain(a, b, diff),
       figure: {
         type: 'tape',
@@ -913,7 +918,7 @@ export function genWordEqualDivide(opts: {
   nChoices: number[]
   ansMin: number
   ansMax: number
-  unit: string
+  unit: UnitOpt
   partLabel: string
   text: (total: number, n: number) => string
   explain: (total: number, n: number, ans: number) => string[]
@@ -931,7 +936,7 @@ export function genWordEqualDivide(opts: {
     )
     const variant: QuestionVariant = {
       text: opts.text(total, n),
-      answer: { kind: 'number', value: ans, unit: opts.unit },
+      answer: { kind: 'number', value: ans, unit: resolveUnit(opts.unit, ans) },
       explain: opts.explain(total, n, ans),
       figure: {
         type: 'tape',

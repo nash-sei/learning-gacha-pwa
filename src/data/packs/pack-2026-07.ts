@@ -599,9 +599,9 @@ export const PACK_2026_07: Question[] = [
       'おつりは 300 - 270 = 30えん。2だんかいで とけたね！',
     ],
     gen: genWordMultiplyChange({
-      priceMin: 60,
+      priceMin: 40,
       priceMax: 90,
-      priceStep: 10,
+      priceStep: 5,
       k: 3,
       payment: 300,
       unit: 'えん',

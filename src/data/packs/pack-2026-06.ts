@@ -333,7 +333,7 @@ export const PACK_2026_06: Question[] = [
       aMax: 9,
       bMin: 2,
       bMax: 6,
-      unit: 'ひき',
+      unit: hikiLabel,
       labelA: 'いた きんぎょ',
       labelB: 'もらった',
       numberTap: { prompt: 'あとから ふえた かずは どれ？', which: 'b' },
@@ -427,7 +427,7 @@ export const PACK_2026_06: Question[] = [
       bMin: 4,
       bMax: 11,
       bigger: 'a',
-      unit: 'ほん',
+      unit: honLabel,
       labelA: 'あかい はな',
       labelB: 'しろい はな',
       text: (a, b) =>
@@ -660,9 +660,9 @@ export const PACK_2026_06: Question[] = [
       'おつりは 200 - 160 = 40えん。2だんかいで とけたね！',
     ],
     gen: genWordMultiplyChange({
-      priceMin: 60,
+      priceMin: 40,
       priceMax: 90,
-      priceStep: 10,
+      priceStep: 5,
       k: 2,
       payment: 200,
       unit: 'えん',
@@ -807,7 +807,7 @@ export const PACK_2026_06: Question[] = [
       nChoices: [3, 4, 6],
       ansMin: 4,
       ansMax: 8,
-      unit: 'ひき',
+      unit: hikiLabel,
       partLabel: '1つの おり',
       text: (total, n) =>
         `どうぶつえんに さるが ${total}${hikiLabel(total)} います。${n}つの おりに おなじ かずずつ わけると、1つの おりは なんびきに なる？`,

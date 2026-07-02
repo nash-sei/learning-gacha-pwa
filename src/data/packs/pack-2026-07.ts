@@ -22,6 +22,15 @@ import {
   genMul2x1,
   genDivExact,
   genDivRemainderChoice,
+  genMoneyCoinSum,
+  genMoneyTwoItemChange,
+  genClockReadHour,
+  genClockReadHalf,
+  genClockUntil,
+  genShapeName,
+  genShapePerimeterSquare,
+  genShapeTriangleClassify,
+  genShapeSideFromPerimeterSquare,
 } from '../generators'
 
 export const PACK_2026_07: Question[] = [
@@ -505,6 +514,7 @@ export const PACK_2026_07: Question[] = [
       '10えんが 2まいで 20えん。5えんが 2まいで 10えん',
       '20 + 10 = 30えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 1, max: 4 }, { yen: 5, min: 1, max: 2 }] }),
     pack: '2026-07',
   },
   {
@@ -529,6 +539,7 @@ export const PACK_2026_07: Question[] = [
       '10えんが 6まいで 60えん',
       '100 + 60 = 160。ぜんぶで 160えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 100, min: 1, max: 2 }, { yen: 10, min: 2, max: 7 }] }),
     pack: '2026-07',
   },
   {
@@ -554,6 +565,7 @@ export const PACK_2026_07: Question[] = [
       '100えんが 3まいで 300えん、10えんが 5まいで 50えん',
       '500 + 300 + 50 = 850えん！',
     ],
+    gen: genMoneyCoinSum({ coins: [{ yen: 500, min: 1, max: 1 }, { yen: 100, min: 1, max: 4 }, { yen: 10, min: 2, max: 7 }] }),
     pack: '2026-07',
   },
   {
@@ -575,6 +587,7 @@ export const PACK_2026_07: Question[] = [
       'ごうけいは 160 + 230 = 390えん',
       '500 - 390 = 110。のこりは 110えん！',
     ],
+    gen: genMoneyTwoItemChange({ payment: 500, aMin: 120, aMax: 250, bMin: 120, bMax: 250, step: 10, names: ['ジュース', 'パン'] }),
     pack: '2026-07',
   },
 
@@ -595,6 +608,7 @@ export const PACK_2026_07: Question[] = [
       'みじかい はりは 8、ながい はりは 12。ながい はりが 12のときは「ちょうど」だよ',
       'だから 8じ！',
     ],
+    gen: genClockReadHour(),
     pack: '2026-07',
   },
   {
@@ -615,6 +629,7 @@ export const PACK_2026_07: Question[] = [
       'みじかい はりは 11と 12の あいだ。まだ 12に なっていないね',
       'だから 11じはん！',
     ],
+    gen: genClockReadHalf(),
     pack: '2026-07',
   },
   {
@@ -635,6 +650,7 @@ export const PACK_2026_07: Question[] = [
       '1じ40ぷんから 2じまでは 20ぷん。2じから 2じ10ぷんまでは 10ぷん',
       '20 + 10 = 30。あと 30ぷんで はじまるよ！',
     ],
+    gen: genClockUntil(),
     pack: '2026-07',
   },
 
@@ -659,6 +675,7 @@ export const PACK_2026_07: Question[] = [
       'かどが ぜんぶ ちょっかくで、へんの ながさが みんな おなじだね。だから せいほうけい！',
       'たてと よこが ちがう ながさなら ちょうほうけいだよ',
     ],
+    gen: genShapeName(),
     pack: '2026-07',
   },
   {
@@ -694,6 +711,7 @@ export const PACK_2026_07: Question[] = [
       '7cmの へんが 4ほんぶん。7 + 7 + 7 + 7 だね',
       'こたえは 28cm！',
     ],
+    gen: genShapePerimeterSquare({ sMin: 4, sMax: 12 }),
     pack: '2026-07',
   },
   {
@@ -717,6 +735,7 @@ export const PACK_2026_07: Question[] = [
       '6cmの へんが 2ほん あるね。2つの へんが おなじ ながさの さんかくけいを にとうへんさんかくけいと いうよ',
       '3つ ぜんぶ おなじなら せいさんかくけいだね',
     ],
+    gen: genShapeTriangleClassify({ min: 3, max: 9 }),
     pack: '2026-07',
   },
   {
@@ -733,6 +752,7 @@ export const PACK_2026_07: Question[] = [
       'まわりの ながさ 24cmを 4つに わけよう。24 ÷ 4 だね',
       '1ぺんは 6cm！',
     ],
+    gen: genShapeSideFromPerimeterSquare({ sMin: 4, sMax: 12 }),
     pack: '2026-07',
   },
 

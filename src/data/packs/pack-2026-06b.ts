@@ -15,7 +15,7 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
-import { genAdd, genKuku, genDivExact } from '../generators'
+import { genAdd, genKuku, genDivExact, genMoneySum } from '../generators'
 
 export const PACK_2026_06B: Question[] = [
   // ============================================================
@@ -202,6 +202,7 @@ export const PACK_2026_06B: Question[] = [
       '120 + 80 = 200',
       'あわせて 200円！',
     ],
+    gen: genMoneySum({ aMin: 80, aMax: 250, bMin: 60, bMax: 200, step: 10, names: ['パン', 'ジュース'] }),
     pack: '2026-06b',
   },
 

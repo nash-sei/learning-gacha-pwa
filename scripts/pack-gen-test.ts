@@ -41,9 +41,10 @@ for (const [packName, questions] of packs) {
     if (!q.gen) continue
     genCount++
     converted[packName].push(q.id)
-    // スコープ確認：この段階では calc のみに gen が付くはず
-    if (q.type !== 'calc') {
-      check(false, `${q.id}: calc以外にgenが付いている(type=${q.type})`)
+    // スコープ確認：gen が付いてよいのは calc / money / clock / shape / word（さいころ化対象）
+    const genAllowedTypes = ['calc', 'money', 'clock', 'shape', 'word']
+    if (!genAllowedTypes.includes(q.type)) {
+      check(false, `${q.id}: 想定外のtypeにgenが付いている(type=${q.type})`)
     }
     for (let i = 0; i < N; i++) {
       const v = q.gen(Math.random)

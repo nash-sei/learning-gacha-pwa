@@ -8,6 +8,7 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／答えを問題文で先に言わない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
+import { genClockSumChoice } from '../generators'
 
 export const LEGACY_QUESTIONS: Question[] = [
   // ===== easy =====
@@ -234,6 +235,7 @@ export const LEGACY_QUESTIONS: Question[] = [
     text: '35{分|ふん} + 40{分|ぷん} は {何時間何分|なんじかんなんぷん}？',
     answer: { kind: 'choice', options: ['1時間5分', '1時間15分', '75分'], correct: 1 },
     explain: ['まず ふたつを たして なんぷんか だそう。60ぷんを こえたら「なんじかん なんぷん」に なおすのを わすれずに！', '35 + 40 = 75ふん。60ぷんで 1じかんだから…', '75ふんは 1じかん15ふん！'],
+    gen: genClockSumChoice(),
     pack: 'legacy',
   },
   {

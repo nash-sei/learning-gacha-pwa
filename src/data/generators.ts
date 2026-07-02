@@ -298,8 +298,455 @@ export function genDivRemainderChoice(opts?: {
   }
 }
 
-// ========== お金（フェーズ1b で使用予定・土台のみ） ==========
-// 図（figure）の再生成をともなうので、calc の安定稼働を確認してから追加する。
+// ==========================================================================
+// お金・時計・図形（さいころ化 第2弾）
+// - figure（お金/時計/図形）も毎回 数に あわせて 作り直す。
+// - choice の distractor は「原理のある まちがい」（はりの読みまちがい等）にして
+//   ・正解と別 ・おたがい重複しない ・もっともらしい を守る（gen-test で機械チェック）。
+// - explain[0] は 答えを言わない手がかり（子供向け作問9ルール）。
+// ==========================================================================
 
-// 型を使うだけの再エクスポート（将来 word/money/clock 用）
+/** こうかの よびかた（1000えん以上は おさつ） */
+function denomName(yen: number): string {
+  return yen >= 1000 ? `${yen}えんさつ` : `${yen}えんだま`
+}
+/** 1..12 に おさめる（13→1・0→12） */
+function wrap12(h: number): number {
+  return (((h - 1) % 12) + 12) % 12 + 1
+}
+/** 分の counter の よみ（「ふん」か「ぷん」か・一のくらいで決まる） */
+function punFun(n: number): string {
+  return [2, 5, 7, 9].includes((((n % 10) + 10) % 10)) ? 'ふん' : 'ぷん'
+}
+/** 分の 表示（例 45→"45ふん"、10→"10ぷん"） */
+function minLabel(n: number): string {
+  return `${n}${punFun(n)}`
+}
+
+// ---------- お金 ----------
+
+interface CoinSpec {
+  yen: number
+  min: number
+  max: number
+}
+
+/** こうか・おさつを かぞえて ごうけい（number＋お金の図・図は数に あわせて作り直す） */
+export function genMoneyCoinSum(opts: { coins: CoinSpec[]; maxCoins?: number }): QuestionGen {
+  const maxCoins = opts.maxCoins ?? 18
+  return (rng) => {
+    const counts = sampleUntil(
+      () => opts.coins.map((c) => randInt(rng, c.min, c.max)),
+      (cs) => cs.every((n) => n >= 1) && cs.reduce((s, n) => s + n, 0) <= maxCoins
+    )
+    const coins = opts.coins.map((c, i) => ({ yen: c.yen, count: counts[i] }))
+    const total = coins.reduce((s, c) => s + c.yen * c.count, 0)
+    return {
+      text: `${coins.map((c) => `${denomName(c.yen)}が ${c.count}まい`).join('、')} あります。ぜんぶで なんえん？`,
+      answer: { kind: 'number', value: total, unit: 'えん' },
+      explain: [
+        'おなじ こうかごとに まとめてから、さいごに ぜんぶ たそう',
+        coins.map((c) => `${c.yen}えんが ${c.count}まいで ${c.yen * c.count}えん`).join('、'),
+        `ぜんぶ たすと ${total}えん！`,
+      ],
+      figure: { type: 'money', params: { coins } },
+    }
+  }
+}
+
+/** おつり（number＋はらった こうかの図）。payment - price。 */
+export function genMoneyChange(opts: {
+  payment: number
+  priceMin: number
+  priceMax: number
+  step?: number
+  items?: string[]
+}): QuestionGen {
+  const step = opts.step ?? 10
+  const items = opts.items ?? ['ジュース', 'パン', 'けしゴム', 'おかし', 'いろえんぴつ', 'ノート']
+  return (rng) => {
+    const price = randInt(rng, Math.ceil(opts.priceMin / step), Math.floor(opts.priceMax / step)) * step
+    const item = pick(rng, items)
+    const change = opts.payment - price
+    const payPhrase = opts.payment >= 1000 ? `${opts.payment}えんさつを だして、` : `${opts.payment}えんだまで `
+    return {
+      text: `${payPhrase}${price}えんの ${item}を かいました。おつりは なんえん？`,
+      answer: { kind: 'number', value: change, unit: 'えん' },
+      explain: [
+        'おつりは「はらったお金 − ねだん」だよ',
+        `${opts.payment} - ${price} を けいさんしよう`,
+        `おつりは ${change}えん！`,
+      ],
+      figure: { type: 'money', params: { coins: [{ yen: opts.payment, count: 1 }] } },
+    }
+  }
+}
+
+/** 2品 かって のこり（number＋はらった こうかの図）。payment -(a+b)。 */
+export function genMoneyTwoItemChange(opts: {
+  payment: number
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  step?: number
+  names?: [string, string]
+}): QuestionGen {
+  const step = opts.step ?? 10
+  const [nameA, nameB] = opts.names ?? ['ジュース', 'パン']
+  return (rng) => {
+    const { a, b } = sampleUntil(
+      () => ({
+        a: randInt(rng, Math.ceil(opts.aMin / step), Math.floor(opts.aMax / step)) * step,
+        b: randInt(rng, Math.ceil(opts.bMin / step), Math.floor(opts.bMax / step)) * step,
+      }),
+      ({ a, b }) => a + b < opts.payment
+    )
+    const rest = opts.payment - (a + b)
+    return {
+      text: `${opts.payment}えんだまが 1まい あります。${a}えんの ${nameA}と ${b}えんの ${nameB}を かうと、のこりは なんえん？`,
+      answer: { kind: 'number', value: rest, unit: 'えん' },
+      explain: [
+        'まず ふたつの ごうけいを けいさんしよう。のこりは そのあとだよ',
+        `ごうけいは ${a} + ${b} = ${a + b}えん`,
+        `${opts.payment} - ${a + b} = ${rest}。のこりは ${rest}えん！`,
+      ],
+      figure: { type: 'money', params: { coins: [{ yen: opts.payment, count: 1 }] } },
+    }
+  }
+}
+
+/** 2品 かって あわせて いくら（number・図なし）。a + b。 */
+export function genMoneySum(opts: {
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  step?: number
+  names?: [string, string]
+}): QuestionGen {
+  const step = opts.step ?? 10
+  const [nameA, nameB] = opts.names ?? ['パン', 'ジュース']
+  return (rng) => {
+    const a = randInt(rng, Math.ceil(opts.aMin / step), Math.floor(opts.aMax / step)) * step
+    const b = randInt(rng, Math.ceil(opts.bMin / step), Math.floor(opts.bMax / step)) * step
+    return {
+      text: `${a}えんの ${nameA}と ${b}えんの ${nameB}を かいました。あわせて なんえん？`,
+      answer: { kind: 'number', value: a + b, unit: 'えん' },
+      explain: ['あわせるから たしざんだよ', `${a} + ${b} を けいさんしよう`, `あわせて ${a + b}えん！`],
+    }
+  }
+}
+
+// ---------- 時計（すべて choice・図の はりも 数に あわせて 動かす） ----------
+
+/** 「なんじ」（ちょうど）を よむ */
+export function genClockReadHour(): QuestionGen {
+  return (rng) => {
+    const h = randInt(rng, 1, 12)
+    const cands = [12, wrap12(h + 6), wrap12(h + 3), wrap12(h - 3), wrap12(h + 1)]
+    const distractors: number[] = []
+    for (const c of cands) {
+      if (c !== h && !distractors.includes(c) && distractors.length < 2) distractors.push(c)
+    }
+    return {
+      text: 'とけいは なんじを さしているかな？',
+      answer: { kind: 'choice', options: [`${h}じ`, `${distractors[0]}じ`, `${distractors[1]}じ`], correct: 0 },
+      explain: [
+        '「なんじ」は みじかい はりが おしえて くれるよ',
+        `みじかい はりは ${h}、ながい はりは 12。ながい はりが 12のときは「ちょうど」だよ`,
+        `だから ${h}じ！`,
+      ],
+      figure: { type: 'clock', params: { hour: h, minute: 0 } },
+    }
+  }
+}
+
+/** 「なんじはん」を よむ */
+export function genClockReadHalf(): QuestionGen {
+  return (rng) => {
+    const h = randInt(rng, 1, 12)
+    const prev = wrap12(h - 1)
+    const next = wrap12(h + 1)
+    return {
+      text: 'とけいは なんじはんを さしているかな？',
+      answer: { kind: 'choice', options: [`${h}じはん`, `${prev}じはん`, `${next}じはん`], correct: 0 },
+      explain: [
+        'ながい はりが 6を さすと「はん」（30ぷん）だよ',
+        `みじかい はりは ${h}と ${next}の あいだ。まだ ${next}に なっていないね`,
+        `だから ${h}じはん！`,
+      ],
+      figure: { type: 'clock', params: { hour: h, minute: 30 } },
+    }
+  }
+}
+
+/** 「なんじなんぷん」を よむ（分は 5とび） */
+export function genClockReadMinute(): QuestionGen {
+  const MINS = [5, 10, 15, 20, 25, 35, 40, 45, 50, 55]
+  return (rng) => {
+    const h = randInt(rng, 1, 12)
+    const m = pick(rng, MINS)
+    const next = wrap12(h + 1)
+    const numberOnDial = m / 5 // ながい針が さす 文字ばんの数字
+    return {
+      text: 'とけいは なんじなんぷんを さしているかな？',
+      answer: {
+        kind: 'choice',
+        options: [`${h}じ${minLabel(m)}`, `${next}じ${minLabel(m)}`, `${h}じ${minLabel(numberOnDial)}`],
+        correct: 0,
+      },
+      explain: [
+        '「なんぷん」は ながい はりを 5、10、15…と 5とびで かぞえるよ',
+        `ながい はりは ${numberOnDial}のところ。かぞえると ${minLabel(m)}`,
+        `みじかい はりは ${h}と ${next}の あいだだから、まだ ${h}じ。だから ${h}じ${minLabel(m)}！`,
+      ],
+      figure: { type: 'clock', params: { hour: h, minute: m } },
+    }
+  }
+}
+
+/** じこく＋すすむ分 → おわりの じこく（時を またぐ） */
+export function genClockAfter(opts: { phrasing: 'after' | 'activity'; activities?: string[] }): QuestionGen {
+  const activities = opts.activities ?? ['さんぽ', 'べんきょう', 'おてつだい', 'ピアノの れんしゅう']
+  return (rng) => {
+    const { h, m, d } = sampleUntil(
+      () => ({
+        h: randInt(rng, 1, 11),
+        m: pick(rng, [40, 45, 50, 55]),
+        d: pick(rng, [15, 20, 25, 30, 35, 40]),
+      }),
+      ({ m, d }) => m + d > 60 && (m + d) % 60 !== 0
+    )
+    const endH = wrap12(h + 1)
+    const endM = m + d - 60
+    const toNext = 60 - m
+    const dMinWrong = endM + 10 <= 55 ? endM + 10 : endM - 10
+    const text =
+      opts.phrasing === 'after'
+        ? `いま ${h}じ${minLabel(m)}です。${minLabel(d)}ごは なんじなんぷん？`
+        : `${h}じ${minLabel(m)}から ${d}${punFun(d)}かん ${pick(rng, activities)}を しました。おわったのは なんじなんぷん？`
+    return {
+      text,
+      answer: {
+        kind: 'choice',
+        options: [`${endH}じ${minLabel(endM)}`, `${endH}じ${minLabel(dMinWrong)}`, `${wrap12(endH + 1)}じ${minLabel(endM)}`],
+        correct: 0,
+      },
+      explain: [
+        `まず「つぎの ${endH}じ」まで なんぷんか かんがえよう。のこりの ぷんは そのあと たすよ`,
+        `${h}じ${minLabel(m)}から ${minLabel(toNext)}で ${endH}じ。のこりは ${d} - ${toNext} = ${minLabel(endM)}`,
+        `${endH}じから ${minLabel(endM)} すすんで、${endH}じ${minLabel(endM)}！`,
+      ],
+      figure: { type: 'clock', params: { hour: h, minute: m } },
+    }
+  }
+}
+
+/** いまから 予定まで あと なんぷん（時を またぐ） */
+export function genClockUntil(opts?: { events?: string[] }): QuestionGen {
+  const events = opts?.events ?? ['サッカーの れんしゅう', 'えいがの じょうえい', 'おけいこ', 'でんしゃ']
+  return (rng) => {
+    const h = randInt(rng, 1, 11)
+    const m = pick(rng, [35, 40, 45, 50, 55])
+    const m2 = pick(rng, [5, 10, 15, 20, 25])
+    const h2 = wrap12(h + 1)
+    const toNext = 60 - m
+    const duration = toNext + m2
+    return {
+      text: `いま ${h}じ${minLabel(m)}です。${pick(rng, events)}は ${h2}じ${minLabel(m2)}に はじまります。あと なんぷんで はじまる？`,
+      answer: {
+        kind: 'choice',
+        options: [`${duration}${punFun(duration)}`, `${toNext}${punFun(toNext)}`, `${m + duration}${punFun(m + duration)}`],
+        correct: 0,
+      },
+      explain: [
+        `「${h2}じに なるまで」と「${h2}じから あと」の ふたつに わけて かんがえよう`,
+        `${h}じ${minLabel(m)}から ${h2}じまでは ${minLabel(toNext)}。${h2}じから ${h2}じ${minLabel(m2)}までは ${minLabel(m2)}`,
+        `${toNext} + ${m2} = ${duration}。あと ${duration}${punFun(duration)}で はじまるよ！`,
+      ],
+      figure: { type: 'clock', params: { hour: h, minute: m } },
+    }
+  }
+}
+
+/** ふたつの 分を たして なんじかんなんぷん（60を こえる・図なし） */
+export function genClockSumChoice(): QuestionGen {
+  return (rng) => {
+    const { a, b } = sampleUntil(
+      () => ({ a: pick(rng, [30, 35, 40, 45, 50]), b: pick(rng, [30, 35, 40, 45, 50]) }),
+      ({ a, b }) => a + b > 60 && a + b < 120 && (a + b) % 60 !== 0
+    )
+    const sum = a + b
+    const rem = sum - 60
+    const wrongRem = rem + 10 <= 55 ? rem + 10 : rem - 10
+    return {
+      text: `${a}${punFun(a)} + ${b}${punFun(b)} は なんじかんなんぷん？`,
+      answer: {
+        kind: 'choice',
+        options: [`1じかん${minLabel(rem)}`, `1じかん${minLabel(wrongRem)}`, `${sum}${punFun(sum)}`],
+        correct: 0,
+      },
+      explain: [
+        'まず ふたつを たして なんぷんか だそう。60ぷんを こえたら「なんじかん なんぷん」に なおすのを わすれずに！',
+        `${a} + ${b} = ${sum}ふん。60ぷんで 1じかんだから…`,
+        `${sum}ふんは 1じかん${minLabel(rem)}！`,
+      ],
+    }
+  }
+}
+
+// ---------- 図形（number は図の再生成つき／name は かたちを 出しわけ） ----------
+
+const SHAPE_NAME: Record<'triangle' | 'square' | 'rectangle', string> = {
+  triangle: 'さんかくけい',
+  square: 'せいほうけい',
+  rectangle: 'ちょうほうけい',
+}
+const SHAPE_NAME_EXPLAIN: Record<'triangle' | 'square' | 'rectangle', string[]> = {
+  triangle: ['へんの かずと かどの かずを かぞえて みよう', 'へんが 3ぼん、かどが 3つ。だから さんかくけい！'],
+  square: [
+    'へんの ながさを くらべて みよう。たてと よこは おなじかな？ちがうかな？',
+    'かどが ぜんぶ ちょっかくで、へんの ながさが みんな おなじだね。だから せいほうけい！',
+    'たてと よこが ちがう ながさなら ちょうほうけいだよ',
+  ],
+  rectangle: [
+    'かどが ぜんぶ かくかく（ちょっかく）の しかくけいだね',
+    'たてと よこの ながさが ちがうから、ちょうほうけい！',
+    'ぜんぶ おなじ ながさなら せいほうけいだよ',
+  ],
+}
+
+/** かたちの なまえは どれ（三角形/正方形/長方形を 出しわけ・choice） */
+export function genShapeName(): QuestionGen {
+  const kinds: Array<'triangle' | 'square' | 'rectangle'> = ['triangle', 'square', 'rectangle']
+  return (rng) => {
+    const kind = pick(rng, kinds)
+    const correct = SHAPE_NAME[kind]
+    const priority = kind === 'square' ? 'ちょうほうけい' : kind === 'rectangle' ? 'せいほうけい' : 'えん'
+    const rest = ['さんかくけい', 'せいほうけい', 'ちょうほうけい', 'えん'].filter((n) => n !== correct && n !== priority)
+    return {
+      text: 'この かたちの なまえは どれ？',
+      answer: { kind: 'choice', options: [correct, priority, pick(rng, rest)], correct: 0 },
+      explain: SHAPE_NAME_EXPLAIN[kind],
+      figure: { type: 'shape', params: { kind } },
+    }
+  }
+}
+
+/** 正三角形の まわりの ながさ（number＋図） */
+export function genShapePerimeterEqTriangle(opts: { sMin: number; sMax: number }): QuestionGen {
+  return (rng) => {
+    const s = randInt(rng, opts.sMin, opts.sMax)
+    const p = s * 3
+    return {
+      text: `へんの ながさが どれも ${s}cmの さんかくけいが あります。まわりの ながさは なんcm？`,
+      answer: { kind: 'number', value: p, unit: 'cm' },
+      explain: [
+        'へんが みんな おなじ さんかくけいを {正三角形|せいさんかくけい}と いうよ',
+        'まわりの ながさは へん 3ぼんぶん',
+        `${s} + ${s} + ${s} = ${p}。こたえは ${p}cm！`,
+      ],
+      figure: { type: 'shape', params: { kind: 'triangle', sides: [s, s, s], labels: [`${s}cm`, `${s}cm`, `${s}cm`] } },
+    }
+  }
+}
+
+/** 長方形の まわりの ながさ（number＋図・たて≠よこ） */
+export function genShapePerimeterRect(opts: { wMin: number; wMax: number; hMin: number; hMax: number }): QuestionGen {
+  return (rng) => {
+    const { w, h } = sampleUntil(
+      () => ({ w: randInt(rng, opts.wMin, opts.wMax), h: randInt(rng, opts.hMin, opts.hMax) }),
+      ({ w, h }) => w !== h
+    )
+    const p = 2 * (w + h)
+    return {
+      text: `たて ${h}cm、よこ ${w}cmの ちょうほうけいが あります。まわりの ながさは なんcm？`,
+      answer: { kind: 'number', value: p, unit: 'cm' },
+      explain: [
+        'ちょうほうけいは むかいあう へんが おなじ ながさだよ',
+        `たてが 2ほん、よこが 2ほん。${h} + ${w} + ${h} + ${w} を けいさんしよう`,
+        `こたえは ${p}cm！`,
+      ],
+      figure: { type: 'shape', params: { kind: 'rectangle', sides: [w, h], labels: [`${w}cm`, `${h}cm`] } },
+    }
+  }
+}
+
+/** 正方形の まわりの ながさ（number＋図） */
+export function genShapePerimeterSquare(opts: { sMin: number; sMax: number }): QuestionGen {
+  return (rng) => {
+    const s = randInt(rng, opts.sMin, opts.sMax)
+    const p = s * 4
+    return {
+      text: `へんの ながさが ${s}cmの せいほうけいが あります。まわりの ながさは なんcm？`,
+      answer: { kind: 'number', value: p, unit: 'cm' },
+      explain: [
+        'せいほうけいは 4つの へんが みんな おなじ ながさだよ',
+        `${s}cmの へんが 4ほんぶん。${s} + ${s} + ${s} + ${s} だね`,
+        `こたえは ${p}cm！`,
+      ],
+      figure: { type: 'shape', params: { kind: 'square', sides: [s], labels: [`${s}cm`] } },
+    }
+  }
+}
+
+/** まわりの ながさ → 1ぺんの ながさ（正方形・number＋図） */
+export function genShapeSideFromPerimeterSquare(opts: { sMin: number; sMax: number }): QuestionGen {
+  return (rng) => {
+    const s = randInt(rng, opts.sMin, opts.sMax)
+    const p = s * 4
+    return {
+      text: `まわりの ながさが ${p}cmの せいほうけいが あります。1ぺんの ながさは なんcm？`,
+      answer: { kind: 'number', value: s, unit: 'cm' },
+      explain: [
+        'せいほうけいは へんが みんな おなじ ながさだよ',
+        `まわりの ながさ ${p}cmを 4つに わけよう。${p} ÷ 4 だね`,
+        `1ぺんは ${s}cm！`,
+      ],
+      figure: { type: 'shape', params: { kind: 'square' } },
+    }
+  }
+}
+
+/** 三角形の なまえ（にとうへん or せいさんかく・choice＋図） */
+export function genShapeTriangleClassify(opts: { min: number; max: number }): QuestionGen {
+  return (rng) => {
+    const equilateral = rng() < 0.35
+    let sides: number[]
+    if (equilateral) {
+      const s = randInt(rng, opts.min, opts.max)
+      sides = [s, s, s]
+    } else {
+      const { a, b } = sampleUntil(
+        () => ({ a: randInt(rng, opts.min, opts.max), b: randInt(rng, opts.min, opts.max) }),
+        ({ a, b }) => a !== b && a < 2 * b
+      )
+      sides = [a, b, b]
+    }
+    const explain = equilateral
+      ? [
+          '3つの へんの ながさを よーく くらべて みよう。きづく ことは あるかな？',
+          `3つの へんが ぜんぶ ${sides[0]}cmで おなじだね。3つとも おなじ ながさの さんかくけいを せいさんかくけいと いうよ`,
+          '2つだけ おなじ ながさなら にとうへんさんかくけいだね',
+        ]
+      : [
+          '3つの へんの ながさを よーく くらべて みよう。きづく ことは あるかな？',
+          `${sides[1]}cmの へんが 2ほん あるね。2つの へんが おなじ ながさの さんかくけいを にとうへんさんかくけいと いうよ`,
+          '3つ ぜんぶ おなじなら せいさんかくけいだね',
+        ]
+    return {
+      text: `へんの ながさが ${sides[0]}cm、${sides[1]}cm、${sides[2]}cmの さんかくけいが あります。この かたちの なまえは どれ？`,
+      answer: {
+        kind: 'choice',
+        options: ['にとうへんさんかくけい', 'せいさんかくけい', 'ちょっかくさんかくけい'],
+        correct: equilateral ? 1 : 0,
+      },
+      explain,
+      figure: { type: 'shape', params: { kind: 'triangle', sides, labels: sides.map((x) => `${x}cm`) } },
+    }
+  }
+}
+
+// 型を使うだけの再エクスポート
 export type { QuestionVariant, QuestionCheck }

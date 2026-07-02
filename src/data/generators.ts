@@ -365,7 +365,11 @@ export function genMoneyChange(opts: {
   const step = opts.step ?? 10
   const items = opts.items ?? ['ジュース', 'パン', 'けしゴム', 'おかし', 'いろえんぴつ', 'ノート']
   return (rng) => {
-    const price = randInt(rng, Math.ceil(opts.priceMin / step), Math.floor(opts.priceMax / step)) * step
+    // 安全柵：おつりが 0以下に ならないよう price < payment を保証（設定ミス対策）
+    const price = sampleUntil(
+      () => randInt(rng, Math.ceil(opts.priceMin / step), Math.floor(opts.priceMax / step)) * step,
+      (p) => p > 0 && p < opts.payment
+    )
     const item = pick(rng, items)
     const change = opts.payment - price
     const payPhrase = opts.payment >= 1000 ? `${opts.payment}えんさつを だして、` : `${opts.payment}えんだまで `
@@ -534,7 +538,7 @@ export function genClockAfter(opts: { phrasing: 'after' | 'activity'; activities
         correct: 0,
       },
       explain: [
-        `まず「つぎの ${endH}じ」まで なんぷんか かんがえよう。のこりの ぷんは そのあと たすよ`,
+        'まず 「つぎの ちょうどの じかん」まで あと なんぷんか かんがえよう。のこりの ぷんは そのあと たすよ',
         `${h}じ${minLabel(m)}から ${minLabel(toNext)}で ${endH}じ。のこりは ${d} - ${toNext} = ${minLabel(endM)}`,
         `${endH}じから ${minLabel(endM)} すすんで、${endH}じ${minLabel(endM)}！`,
       ],
@@ -545,7 +549,7 @@ export function genClockAfter(opts: { phrasing: 'after' | 'activity'; activities
 
 /** いまから 予定まで あと なんぷん（時を またぐ） */
 export function genClockUntil(opts?: { events?: string[] }): QuestionGen {
-  const events = opts?.events ?? ['サッカーの れんしゅう', 'えいがの じょうえい', 'おけいこ', 'でんしゃ']
+  const events = opts?.events ?? ['サッカーの れんしゅう', 'えいがの じょうえい', 'おけいこ', 'すきな アニメ']
   return (rng) => {
     const h = randInt(rng, 1, 11)
     const m = pick(rng, [35, 40, 45, 50, 55])
@@ -589,8 +593,8 @@ export function genClockSumChoice(): QuestionGen {
       },
       explain: [
         'まず ふたつを たして なんぷんか だそう。60ぷんを こえたら「なんじかん なんぷん」に なおすのを わすれずに！',
-        `${a} + ${b} = ${sum}ふん。60ぷんで 1じかんだから…`,
-        `${sum}ふんは 1じかん${minLabel(rem)}！`,
+        `${a} + ${b} = ${minLabel(sum)}。60ぷんで 1じかんだから…`,
+        `${minLabel(sum)}は 1じかん${minLabel(rem)}！`,
       ],
     }
   }

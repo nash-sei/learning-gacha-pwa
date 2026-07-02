@@ -235,10 +235,16 @@ export default function Quiz({ onComplete, onQuit }: QuizProps) {
   const grade = currentProfile?.grade ?? 2
   const partnerId = save?.partnerId ?? null
 
-  const pool = useMemo(
-    () => [...BUILTIN_QUESTIONS, ...customQuestions],
-    [customQuestions]
-  )
+  const pool = useMemo(() => {
+    const all = [...BUILTIN_QUESTIONS, ...customQuestions]
+    // テスト用スイッチ：?wordonly で「ぶんしょうだい(word)」だけ出す（本番ドメインでは無効）。
+    // 数字ランダム化(さいころ化)の確認を、他のタイプに埋もれず まとめて見るため。
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('wordonly')) {
+      const enabled = import.meta.env.DEV || window.location.hostname !== 'learning-gacha-pwa.vercel.app'
+      if (enabled) return all.filter((qq) => qq.type === 'word')
+    }
+    return all
+  }, [customQuestions])
 
   const q: Question | null = phase === 'play' ? (questions[qIndex] ?? null) : null
 

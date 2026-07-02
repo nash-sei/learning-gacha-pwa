@@ -31,6 +31,14 @@ import {
   genShapePerimeterSquare,
   genShapeTriangleClassify,
   genShapeSideFromPerimeterSquare,
+  genWordRemainder,
+  genWordSum,
+  genWordDifference,
+  genWordEqualDivide,
+  genWordTwoStepRemainder,
+  genWordMultiplyTotal,
+  genWordMultiplyChange,
+  genWordSubThenAdd,
 } from '../generators'
 
 export const PACK_2026_07: Question[] = [
@@ -207,6 +215,20 @@ export const PACK_2026_07: Question[] = [
       'ぜんぶで 14まい、つかったのは 6まい。テープずで みてみよう',
       '14 - 6 = 8。のこりは 8まい！',
     ],
+    gen: genWordRemainder({
+      totalMin: 11,
+      totalMax: 17,
+      subMin: 4,
+      subMax: 9,
+      unit: 'まい',
+      removedLabel: 'つかった',
+      text: (total, sub) => `おりがみが ${total}まい あります。つるを おるのに ${sub}まい つかいました。のこりは なんまい？`,
+      explain: (total, sub, ans) => [
+        '「のこりは？」← のこりを きいているよ',
+        `ぜんぶで ${total}まい、つかったのは ${sub}まい。テープずで みてみよう`,
+        `${total} - ${sub} = ${ans}。のこりは ${ans}まい！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -237,6 +259,22 @@ export const PACK_2026_07: Question[] = [
       'みかちゃんの 9こと いもうとの 7こを あわせるよ',
       '9 + 7 = 16。あわせて 16こ！',
     ],
+    gen: genWordSum({
+      aMin: 5,
+      aMax: 9,
+      bMin: 5,
+      bMax: 9,
+      unit: 'こ',
+      labelA: 'みかちゃん',
+      labelB: 'いもうと',
+      numberTap: { prompt: 'いもうとが ひろった かずは どれ？', which: 'b' },
+      text: (a, b) => `きょうは 10がつ 4にち。みかちゃんは どんぐりを ${a}こ ひろいました。いもうとは ${b}こ ひろいました。あわせて なんこ？`,
+      explain: (a, b, total) => [
+        '「10がつ 4にち」は ひづけ。けいさんには つかわないよ',
+        `みかちゃんの ${a}こと いもうとの ${b}こを あわせるよ`,
+        `${a} + ${b} = ${total}。あわせて ${total}こ！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -269,6 +307,20 @@ export const PACK_2026_07: Question[] = [
       '15 - 6 = 9',
       'のこりは 9だい！',
     ],
+    gen: genWordRemainder({
+      totalMin: 12,
+      totalMax: 18,
+      subMin: 5,
+      subMax: 9,
+      unit: 'だい',
+      removedLabel: 'かした',
+      text: (total, sub) => `おもちゃばこに ミニカーが ${total}だい あります。ともだちに ${sub}だい かしました。のこりは なんだい？`,
+      explain: (total, sub, ans) => [
+        'おもちゃの おはなし。「かした」から、へるんだね',
+        `${total} - ${sub} = ${ans}`,
+        `のこりは ${ans}だい！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -300,6 +352,23 @@ export const PACK_2026_07: Question[] = [
       'ちがいは ひきざんで もとめるよ',
       '35 - 28 = 7。けんたくんが 7かい おおい！',
     ],
+    gen: genWordDifference({
+      aMin: 30,
+      aMax: 40,
+      bMin: 22,
+      bMax: 37,
+      bigger: 'a',
+      unit: 'かい',
+      labelA: 'けんたくん',
+      labelB: 'あやちゃん',
+      text: (a, b) =>
+        `けんたくんは なわとびを ${a}かい とびました。あやちゃんは ${b}かい とびました。けんたくんは あやちゃんより なんかい おおく とんだ？`,
+      explain: (a, b, diff) => [
+        '「なんかい おおく とんだ？」← ふたつの かずの ちがいだね',
+        'ちがいは ひきざんで もとめるよ',
+        `${a} - ${b} = ${diff}。けんたくんが ${diff}かい おおい！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -330,6 +399,23 @@ export const PACK_2026_07: Question[] = [
       'はじめの 25さつに、ふえた 6さつを たすよ',
       '25 + 6 = 31。ぜんぶで 31さつ！',
     ],
+    gen: genWordSum({
+      aMin: 20,
+      aMax: 29,
+      bMin: 3,
+      bMax: 7,
+      unit: 'さつ',
+      labelA: 'はじめ',
+      labelB: 'ふえた',
+      numberTap: { prompt: 'ふえた ほんの かずは どれ？', which: 'b' },
+      text: (a, b) =>
+        `あさ 8じに がっこうに つきました。きょうしつの ほんだなには ほんが ${a}さつ あります。あたらしい ほんが ${b}さつ ふえました。ぜんぶで なんさつ？`,
+      explain: (a, b, total) => [
+        '「あさ 8じ」は じこく。けいさんには つかわないよ',
+        `はじめの ${a}さつに、ふえた ${b}さつを たすよ`,
+        `${a} + ${b} = ${total}。ぜんぶで ${total}さつ！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -363,6 +449,24 @@ export const PACK_2026_07: Question[] = [
       '8 + 6 = 14まい つかったね',
       '30 - 14 = 16。のこりは 16まい！',
     ],
+    gen: genWordTwoStepRemainder({
+      totalMin: 24,
+      totalMax: 34,
+      aMin: 5,
+      aMax: 9,
+      bMin: 5,
+      bMax: 9,
+      unit: 'まい',
+      labelA: 'きのう',
+      labelB: 'きょう',
+      text: (total, a, b) =>
+        `ずこうの じかんに つかう いろがみが ${total}まい あります。きのう ${a}まい、きょう ${b}まい つかいました。のこりは なんまい？`,
+      explain: (total, a, b, ans) => [
+        'きのうと きょう、りょうほう つかったね。まず あわせよう',
+        `${a} + ${b} = ${a + b}まい つかったね`,
+        `${total} - ${a + b} = ${ans}。のこりは ${ans}まい！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -398,6 +502,20 @@ export const PACK_2026_07: Question[] = [
       'おなじ かずが 6はこぶんだから かけざんだね',
       '8×6 = 48。ぜんぶで 48こ！',
     ],
+    gen: genWordMultiplyTotal({
+      perMin: 6,
+      perMax: 9,
+      kMin: 4,
+      kMax: 7,
+      unit: 'こ',
+      groupLabel: 'はこ',
+      text: (per, k) => `おかしの はこが ${k}はこ あります。1はこに チョコが ${per}こずつ はいっています。チョコは ぜんぶで なんこ？`,
+      explain: (per, k, total) => [
+        '「ぜんぶで なんこ？」← ぜんぶの かずを きいているよ',
+        `おなじ かずが ${k}はこぶんだから かけざんだね`,
+        `${per}×${k} = ${total}。ぜんぶで ${total}こ！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -431,6 +549,21 @@ export const PACK_2026_07: Question[] = [
       'おなじ かずずつ わけるから わりざん。36 ÷ 4 だね',
       '9×4 = 36 だから、ひとりぶんは 9こ！',
     ],
+    gen: genWordEqualDivide({
+      nChoices: [3, 4, 6],
+      ansMin: 6,
+      ansMax: 9,
+      unit: 'こ',
+      partLabel: 'ひとりぶん',
+      numberTap: { prompt: 'とれた おいもの かずは どれ？', which: 'total' },
+      text: (total, n) =>
+        `きょうは 11がつ 18にち。さつまいもほりで おいもが ${total}こ とれました。${n}にんで おなじ かずずつ わけると、ひとりぶんは なんこ？`,
+      explain: (total, n, ans) => [
+        '「11がつ 18にち」は ひづけ。けいさんには つかわないよ',
+        `おなじ かずずつ わけるから わりざん。${total} ÷ ${n} だね`,
+        `${ans}×${n} = ${total} だから、ひとりぶんは ${ans}こ！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -465,6 +598,21 @@ export const PACK_2026_07: Question[] = [
       'ドーナツだいは 90×3 = 270えん',
       'おつりは 300 - 270 = 30えん。2だんかいで とけたね！',
     ],
+    gen: genWordMultiplyChange({
+      priceMin: 40,
+      priceMax: 90,
+      priceStep: 5,
+      k: 3,
+      payment: 300,
+      unit: 'えん',
+      itemLabel: 'ドーナツ',
+      text: (price, k, payment) => `パンやさんで 1こ ${price}えんの ドーナツを ${k}こ かいました。${payment}えん はらうと、おつりは なんえん？`,
+      explain: (price, k, payment, change) => [
+        'まず ドーナツ 3こぶんの おだいを けいさんしよう。おつりは そのあとだよ',
+        `ドーナツだいは ${price}×${k} = ${price * k}えん`,
+        `おつりは ${payment} - ${price * k} = ${change}えん。2だんかいで とけたね！`,
+      ],
+    }),
     pack: '2026-07',
   },
   {
@@ -486,6 +634,22 @@ export const PACK_2026_07: Question[] = [
       '23 - 7 = 16にん',
       '16 + 4 = 20。いま のっているのは 20にん！',
     ],
+    gen: genWordSubThenAdd({
+      startMin: 18,
+      startMax: 29,
+      downMin: 5,
+      downMax: 9,
+      upMin: 2,
+      upMax: 6,
+      unit: 'にん',
+      numberTap: { prompt: 'はじめに のっていた かずは どれ？', which: 'start' },
+      text: (start, down, up) => `バスに ${start}にん のっています。バスていで ${down}にん おりて、${up}にん のってきました。いま なんにん のっている？`,
+      explain: (start, down, up, ans) => [
+        'おりると へる、のると ふえるよ。じゅんばんに けいさんしよう',
+        `${start} - ${down} = ${start - down}にん`,
+        `${start - down} + ${up} = ${ans}。いま のっているのは ${ans}にん！`,
+      ],
+    }),
     pack: '2026-07',
   },
 

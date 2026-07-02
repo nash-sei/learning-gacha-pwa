@@ -15,7 +15,16 @@
  *   explain[0]=答えを言わない手がかり（途中計算の結果もNG）／storyは単語探しにしない／ハズレは惜しい間違いに。
  */
 import type { Question } from '../../types'
-import { genAdd, genKuku, genDivExact, genMoneySum } from '../generators'
+import {
+  genAdd,
+  genKuku,
+  genDivExact,
+  genMoneySum,
+  genWordSubThenAdd,
+  genWordInverseAdd,
+  genWordInverseSub,
+  genWordInverseDivide,
+} from '../generators'
 
 export const PACK_2026_06B: Question[] = [
   // ============================================================
@@ -57,6 +66,22 @@ export const PACK_2026_06B: Question[] = [
       'まず 7人 おりたよ。18 - 7 = 11人',
       'つぎに 5人 のってきた。11 + 5 = 16。いま バスには 16人！',
     ],
+    gen: genWordSubThenAdd({
+      startMin: 15,
+      startMax: 25,
+      downMin: 5,
+      downMax: 9,
+      upMin: 3,
+      upMax: 7,
+      unit: '人',
+      text: (start, down, up) =>
+        `バスに ${start}人 のっていました。バスていで ${down}人 おりて、つぎに ${up}人 のってきました。いま バスには なん人 いるかな？`,
+      explain: (start, down, up, ans) => [
+        'おりると へる、のると ふえる。おこった じゅんばんに けいさんしよう',
+        `まず ${down}人 おりたよ。${start} - ${down} = ${start - down}人`,
+        `つぎに ${up}人 のってきた。${start - down} + ${up} = ${ans}。いま バスには ${ans}人！`,
+      ],
+    }),
     pack: '2026-06b',
   },
   {
@@ -376,6 +401,20 @@ export const PACK_2026_06B: Question[] = [
       'ぜんぶの 10から もらった 3を ひくよ。10 - 3 = 7',
       'はじめは 7こ もっていた！',
     ],
+    gen: genWordInverseAdd({
+      gotMin: 2,
+      gotMax: 5,
+      totalMin: 8,
+      totalMax: 14,
+      unit: 'こ',
+      text: (got, total) =>
+        `あめを なんこか もっていました。${got}こ もらったら、ぜんぶで ${total}こに なりました。はじめに もっていたのは なんこ？`,
+      explain: (got, total, start) => [
+        `もらって ふえて ${total}こ。ぎゃくに かんがえよう`,
+        `ぜんぶの ${total}から もらった ${got}を ひくよ。${total} - ${got} = ${start}`,
+        `はじめは ${start}こ もっていた！`,
+      ],
+    }),
     pack: '2026-06b',
   },
   {
@@ -397,6 +436,20 @@ export const PACK_2026_06B: Question[] = [
       'へった あとが 8まい だから、ぎゃくに たしざん。8 + 5 = 13',
       'はじめは 13まい あった！',
     ],
+    gen: genWordInverseSub({
+      usedMin: 3,
+      usedMax: 7,
+      remainMin: 5,
+      remainMax: 10,
+      unit: 'まい',
+      text: (used, remain) =>
+        `おりがみが なんまいか ありました。${used}まい つかったら、のこりが ${remain}まいに なりました。はじめに あったのは なんまい？`,
+      explain: (used, remain, start) => [
+        'つかう まえの かずを きかれているよ。もとに もどして かんがえよう',
+        `へった あとが ${remain}まい だから、ぎゃくに たしざん。${remain} + ${used} = ${start}`,
+        `はじめは ${start}まい あった！`,
+      ],
+    }),
     pack: '2026-06b',
   },
   {
@@ -418,6 +471,19 @@ export const PACK_2026_06B: Question[] = [
       'わりざんだよ。18 ÷ 3 = 6',
       '1ふくろには 6こ 入っている！',
     ],
+    gen: genWordInverseDivide({
+      bagsChoices: [2, 3, 4],
+      perMin: 4,
+      perMax: 8,
+      unit: 'こ',
+      text: (bags, total) =>
+        `1ふくろに あめが おなじ かずずつ 入っています。${bags}ふくろで ぜんぶで ${total}こ ありました。1ふくろには なんこ 入っている？`,
+      explain: (bags, total, per) => [
+        `おなじ かずずつ ${bags}ふくろで ${total}こ。「ひとつぶん」は どうやって もとめる かな？`,
+        `わりざんだよ。${total} ÷ ${bags} = ${per}`,
+        `1ふくろには ${per}こ 入っている！`,
+      ],
+    }),
     pack: '2026-06b',
   },
 

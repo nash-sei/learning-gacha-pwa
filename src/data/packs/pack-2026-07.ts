@@ -514,7 +514,7 @@ export const PACK_2026_07: Question[] = [
       '10えんが 2まいで 20えん。5えんが 2まいで 10えん',
       '20 + 10 = 30えん！',
     ],
-    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 1, max: 4 }, { yen: 5, min: 1, max: 2 }] }),
+    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 1, max: 6 }, { yen: 5, min: 1, max: 3 }] }),
     pack: '2026-07',
   },
   {
@@ -711,7 +711,7 @@ export const PACK_2026_07: Question[] = [
       '7cmの へんが 4ほんぶん。7 + 7 + 7 + 7 だね',
       'こたえは 28cm！',
     ],
-    gen: genShapePerimeterSquare({ sMin: 4, sMax: 12 }),
+    gen: genShapePerimeterSquare({ sMin: 3, sMax: 14 }),
     pack: '2026-07',
   },
   {
@@ -752,7 +752,7 @@ export const PACK_2026_07: Question[] = [
       'まわりの ながさ 24cmを 4つに わけよう。24 ÷ 4 だね',
       '1ぺんは 6cm！',
     ],
-    gen: genShapeSideFromPerimeterSquare({ sMin: 4, sMax: 12 }),
+    gen: genShapeSideFromPerimeterSquare({ sMin: 3, sMax: 14 }),
     pack: '2026-07',
   },
 

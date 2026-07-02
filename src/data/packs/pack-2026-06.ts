@@ -653,7 +653,7 @@ export const PACK_2026_06: Question[] = [
       '10えんが 3まいで 30えん。それに 5えんを たすよ',
       '30 + 5 = 35えん！',
     ],
-    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 2, max: 5 }, { yen: 5, min: 1, max: 1 }] }),
+    gen: genMoneyCoinSum({ coins: [{ yen: 10, min: 1, max: 6 }, { yen: 5, min: 1, max: 3 }] }),
     pack: '2026-06',
   },
   {
@@ -678,7 +678,7 @@ export const PACK_2026_06: Question[] = [
       '10えんが 4まいで 40えん',
       '50 + 40 = 90。ぜんぶで 90えん！',
     ],
-    gen: genMoneyCoinSum({ coins: [{ yen: 50, min: 1, max: 1 }, { yen: 10, min: 2, max: 6 }] }),
+    gen: genMoneyCoinSum({ coins: [{ yen: 50, min: 1, max: 1 }, { yen: 10, min: 1, max: 9 }] }),
     pack: '2026-06',
   },
   {

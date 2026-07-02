@@ -752,5 +752,431 @@ export function genShapeTriangleClassify(opts: { min: number; max: number }): Qu
   }
 }
 
+// ==========================================================================
+// 文章題（ぶんしょうだい・さいころ化 第3弾）
+// - お話・単位・場面絵は固定。数字だけ 毎回 変える（scene-pick を くずさない）。
+// - テープ図の数字も、number-tap の こたえ(answerNumber)も 数に あわせて 作り直す。
+// - explain の式は 生成した数から くみたてる → 算数は かならず 正しい。
+//   explain[0] は 答えを言わない手がかり（子供向け作問9ルール）。
+// - id は変えない＝苦手記録(questionClearCounts)は そのまま ひきつぐ。
+// ==========================================================================
+
+/** ルビ {漢字|かな} を のぞいて、文中の 数字を すべて とり出す（number-tap の一意チェック用） */
+function textNumbers(text: string): number[] {
+  const bare = text.replace(/\{[^|}]*\|[^}]*\}/g, '')
+  return (bare.match(/\d+/g) ?? []).map(Number)
+}
+/** number-tap の こたえ(value)が 問題文に ちょうど1回だけ 出るか（タップ先が 一意か） */
+function tapUnique(text: string, value: number): boolean {
+  return textNumbers(text).filter((v) => v === value).length === 1
+}
+
+/** 匹（ひき/びき/ぴき）の よみ分け（一のくらい 1・6・8・0=ぴき、3=びき、ほかは ひき） */
+export function hikiLabel(n: number): string {
+  const o = n % 10
+  if (o === 1 || o === 6 || o === 8 || o === 0) return 'ぴき'
+  if (o === 3) return 'びき'
+  return 'ひき'
+}
+/** 本（ほん/ぼん/ぽん）の よみ分け（一のくらい 1・6・8・0=ぽん、3=ぼん、ほかは ほん） */
+export function honLabel(n: number): string {
+  const o = n % 10
+  if (o === 1 || o === 6 || o === 8 || o === 0) return 'ぽん'
+  if (o === 3) return 'ぼん'
+  return 'ほん'
+}
+
+// ---------- A：のこり（total - sub・tape unknown=part） ----------
+export function genWordRemainder(opts: {
+  totalMin: number
+  totalMax: number
+  subMin: number
+  subMax: number
+  unit: string
+  removedLabel: string
+  text: (total: number, sub: number) => string
+  explain: (total: number, sub: number, ans: number) => string[]
+  numberTap?: { prompt: string; which: 'total' | 'sub' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const { total, sub } = sampleUntil(
+      () => ({ total: randInt(rng, opts.totalMin, opts.totalMax), sub: randInt(rng, opts.subMin, opts.subMax) }),
+      ({ total, sub }) => {
+        if (sub >= total) return false
+        if (nt && !tapUnique(opts.text(total, sub), nt.which === 'total' ? total : sub)) return false
+        return true
+      }
+    )
+    const ans = total - sub
+    const variant: QuestionVariant = {
+      text: opts.text(total, sub),
+      answer: { kind: 'number', value: ans, unit: opts.unit },
+      explain: opts.explain(total, sub, ans),
+      figure: {
+        type: 'tape',
+        params: {
+          total,
+          parts: [
+            { label: opts.removedLabel, value: sub },
+            { label: 'のこり', value: 0 },
+          ],
+          unknown: 'part',
+        },
+      },
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: nt.which === 'total' ? total : sub }
+    return variant
+  }
+}
+
+// ---------- B：あわせる／ふえる（a + b・tape unknown=total） ----------
+export function genWordSum(opts: {
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  unit: string
+  labelA: string
+  labelB: string
+  text: (a: number, b: number) => string
+  explain: (a: number, b: number, total: number) => string[]
+  numberTap?: { prompt: string; which: 'a' | 'b' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const { a, b } = sampleUntil(
+      () => ({ a: randInt(rng, opts.aMin, opts.aMax), b: randInt(rng, opts.bMin, opts.bMax) }),
+      ({ a, b }) => (nt ? tapUnique(opts.text(a, b), nt.which === 'a' ? a : b) : true)
+    )
+    const total = a + b
+    const variant: QuestionVariant = {
+      text: opts.text(a, b),
+      answer: { kind: 'number', value: total, unit: opts.unit },
+      explain: opts.explain(a, b, total),
+      figure: {
+        type: 'tape',
+        params: {
+          parts: [
+            { label: opts.labelA, value: a },
+            { label: opts.labelB, value: b },
+          ],
+          unknown: 'total',
+        },
+      },
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: nt.which === 'a' ? a : b }
+    return variant
+  }
+}
+
+// ---------- C：ちがい（|a - b|・tape compare） ----------
+export function genWordDifference(opts: {
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  /** 「〜より おおい」の おおい方（text と 合わせる） */
+  bigger: 'a' | 'b'
+  unit: string
+  labelA: string
+  labelB: string
+  text: (a: number, b: number) => string
+  explain: (a: number, b: number, diff: number) => string[]
+}): QuestionGen {
+  return (rng) => {
+    const { a, b } = sampleUntil(
+      () => ({ a: randInt(rng, opts.aMin, opts.aMax), b: randInt(rng, opts.bMin, opts.bMax) }),
+      ({ a, b }) => (opts.bigger === 'a' ? a > b : b > a)
+    )
+    const diff = Math.abs(a - b)
+    return {
+      text: opts.text(a, b),
+      answer: { kind: 'number', value: diff, unit: opts.unit },
+      explain: opts.explain(a, b, diff),
+      figure: {
+        type: 'tape',
+        params: {
+          mode: 'compare',
+          parts: [
+            { label: opts.labelA, value: a },
+            { label: opts.labelB, value: b },
+          ],
+        },
+      },
+    }
+  }
+}
+
+// ---------- D：等分のわり算（total / n・tape 全パート0） ----------
+export function genWordEqualDivide(opts: {
+  nChoices: number[]
+  ansMin: number
+  ansMax: number
+  unit: string
+  partLabel: string
+  text: (total: number, n: number) => string
+  explain: (total: number, n: number, ans: number) => string[]
+  numberTap?: { prompt: string; which: 'total' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const { total, n, ans } = sampleUntil(
+      () => {
+        const n = pick(rng, opts.nChoices)
+        const ans = randInt(rng, opts.ansMin, opts.ansMax)
+        return { n, ans, total: n * ans }
+      },
+      (v) => (nt ? tapUnique(opts.text(v.total, v.n), v.total) : true)
+    )
+    const variant: QuestionVariant = {
+      text: opts.text(total, n),
+      answer: { kind: 'number', value: ans, unit: opts.unit },
+      explain: opts.explain(total, n, ans),
+      figure: {
+        type: 'tape',
+        params: {
+          total,
+          parts: Array.from({ length: n }, () => ({ label: opts.partLabel, value: 0 })),
+          unknown: 'part',
+        },
+      },
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: total }
+    return variant
+  }
+}
+
+// ---------- E：2かい へって のこり（total -(a + b)・tape 3パート） ----------
+export function genWordTwoStepRemainder(opts: {
+  totalMin: number
+  totalMax: number
+  aMin: number
+  aMax: number
+  bMin: number
+  bMax: number
+  unit: string
+  labelA: string
+  labelB: string
+  text: (total: number, a: number, b: number) => string
+  explain: (total: number, a: number, b: number, ans: number) => string[]
+  numberTap?: { prompt: string; which: 'total' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const v = sampleUntil(
+      () => ({
+        total: randInt(rng, opts.totalMin, opts.totalMax),
+        a: randInt(rng, opts.aMin, opts.aMax),
+        b: randInt(rng, opts.bMin, opts.bMax),
+      }),
+      (x) => {
+        if (x.a + x.b >= x.total) return false
+        if (nt && !tapUnique(opts.text(x.total, x.a, x.b), x.total)) return false
+        return true
+      }
+    )
+    const ans = v.total - (v.a + v.b)
+    const variant: QuestionVariant = {
+      text: opts.text(v.total, v.a, v.b),
+      answer: { kind: 'number', value: ans, unit: opts.unit },
+      explain: opts.explain(v.total, v.a, v.b, ans),
+      figure: {
+        type: 'tape',
+        params: {
+          total: v.total,
+          parts: [
+            { label: opts.labelA, value: v.a },
+            { label: opts.labelB, value: v.b },
+            { label: 'のこり', value: 0 },
+          ],
+          unknown: 'part',
+        },
+      },
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: v.total }
+    return variant
+  }
+}
+
+// ---------- F：おなじ数が いくつぶん（per × k・tape unknown=total） ----------
+export function genWordMultiplyTotal(opts: {
+  perMin: number
+  perMax: number
+  kMin: number
+  kMax: number
+  unit: string
+  groupLabel: string
+  text: (per: number, k: number) => string
+  explain: (per: number, k: number, total: number) => string[]
+  numberTap?: { prompt: string; which: 'per' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const v = sampleUntil(
+      () => ({ per: randInt(rng, opts.perMin, opts.perMax), k: randInt(rng, opts.kMin, opts.kMax) }),
+      (x) => (nt ? tapUnique(opts.text(x.per, x.k), x.per) : true)
+    )
+    const total = v.per * v.k
+    const variant: QuestionVariant = {
+      text: opts.text(v.per, v.k),
+      answer: { kind: 'number', value: total, unit: opts.unit },
+      explain: opts.explain(v.per, v.k, total),
+      figure: {
+        type: 'tape',
+        params: {
+          parts: Array.from({ length: v.k }, () => ({ label: opts.groupLabel, value: v.per })),
+          unknown: 'total',
+        },
+      },
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: v.per }
+    return variant
+  }
+}
+
+// ---------- G：かけ算 → おつり（payment - price × k・tape unknown=part） ----------
+export function genWordMultiplyChange(opts: {
+  priceMin: number
+  priceMax: number
+  priceStep?: number
+  k: number
+  payment: number
+  unit: string
+  itemLabel: string
+  text: (price: number, k: number, payment: number) => string
+  explain: (price: number, k: number, payment: number, change: number) => string[]
+}): QuestionGen {
+  const step = opts.priceStep ?? 10
+  return (rng) => {
+    const price = sampleUntil(
+      () => randInt(rng, Math.ceil(opts.priceMin / step), Math.floor(opts.priceMax / step)) * step,
+      (p) => p > 0 && p * opts.k < opts.payment
+    )
+    const change = opts.payment - price * opts.k
+    return {
+      text: opts.text(price, opts.k, opts.payment),
+      answer: { kind: 'number', value: change, unit: opts.unit },
+      explain: opts.explain(price, opts.k, opts.payment, change),
+      figure: {
+        type: 'tape',
+        params: {
+          total: opts.payment,
+          parts: [
+            ...Array.from({ length: opts.k }, () => ({ label: opts.itemLabel, value: price })),
+            { label: 'おつり', value: 0 },
+          ],
+          unknown: 'part',
+        },
+      },
+    }
+  }
+}
+
+// ---------- H：へって ふえる（start - down + up・図は 元のまま） ----------
+export function genWordSubThenAdd(opts: {
+  startMin: number
+  startMax: number
+  downMin: number
+  downMax: number
+  upMin: number
+  upMax: number
+  unit: string
+  text: (start: number, down: number, up: number) => string
+  explain: (start: number, down: number, up: number, ans: number) => string[]
+  numberTap?: { prompt: string; which: 'start' }
+}): QuestionGen {
+  return (rng) => {
+    const nt = opts.numberTap
+    const v = sampleUntil(
+      () => ({
+        start: randInt(rng, opts.startMin, opts.startMax),
+        down: randInt(rng, opts.downMin, opts.downMax),
+        up: randInt(rng, opts.upMin, opts.upMax),
+      }),
+      (x) => {
+        if (x.down >= x.start) return false // 途中で 0未満に ならない
+        if (nt && !tapUnique(opts.text(x.start, x.down, x.up), x.start)) return false
+        return true
+      }
+    )
+    const ans = v.start - v.down + v.up
+    const variant: QuestionVariant = {
+      text: opts.text(v.start, v.down, v.up),
+      answer: { kind: 'number', value: ans, unit: opts.unit },
+      explain: opts.explain(v.start, v.down, v.up, ans),
+    }
+    if (nt) variant.check = { kind: 'number-tap', prompt: nt.prompt, answerNumber: v.start }
+    return variant
+  }
+}
+
+// ---------- I：ぎゃく（もらって ふえた → はじめ・total - got） ----------
+export function genWordInverseAdd(opts: {
+  gotMin: number
+  gotMax: number
+  totalMin: number
+  totalMax: number
+  unit: string
+  text: (got: number, total: number) => string
+  explain: (got: number, total: number, start: number) => string[]
+}): QuestionGen {
+  return (rng) => {
+    const v = sampleUntil(
+      () => ({ got: randInt(rng, opts.gotMin, opts.gotMax), total: randInt(rng, opts.totalMin, opts.totalMax) }),
+      (x) => x.got < x.total
+    )
+    const start = v.total - v.got
+    return {
+      text: opts.text(v.got, v.total),
+      answer: { kind: 'number', value: start, unit: opts.unit },
+      explain: opts.explain(v.got, v.total, start),
+    }
+  }
+}
+
+// ---------- J：ぎゃく（つかって へった → はじめ・remain + used） ----------
+export function genWordInverseSub(opts: {
+  usedMin: number
+  usedMax: number
+  remainMin: number
+  remainMax: number
+  unit: string
+  text: (used: number, remain: number) => string
+  explain: (used: number, remain: number, start: number) => string[]
+}): QuestionGen {
+  return (rng) => {
+    const used = randInt(rng, opts.usedMin, opts.usedMax)
+    const remain = randInt(rng, opts.remainMin, opts.remainMax)
+    const start = remain + used
+    return {
+      text: opts.text(used, remain),
+      answer: { kind: 'number', value: start, unit: opts.unit },
+      explain: opts.explain(used, remain, start),
+    }
+  }
+}
+
+// ---------- K：ぎゃく（ぜんぶで → 1ふくろぶん・total / bags） ----------
+export function genWordInverseDivide(opts: {
+  bagsChoices: number[]
+  perMin: number
+  perMax: number
+  unit: string
+  text: (bags: number, total: number) => string
+  explain: (bags: number, total: number, per: number) => string[]
+}): QuestionGen {
+  return (rng) => {
+    const bags = pick(rng, opts.bagsChoices)
+    const per = randInt(rng, opts.perMin, opts.perMax)
+    const total = bags * per
+    return {
+      text: opts.text(bags, total),
+      answer: { kind: 'number', value: per, unit: opts.unit },
+      explain: opts.explain(bags, total, per),
+    }
+  }
+}
+
 // 型を使うだけの再エクスポート
 export type { QuestionVariant, QuestionCheck }
